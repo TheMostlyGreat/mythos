@@ -1,0 +1,3 @@
+Title: "Insomniac Odyssey"
+
+A witty woman in San Francisco battles insomnia and a mischievous God disrupting her nightly routine in a 10-page comedic short story. Penelope, determined to conquer her sleep deprivation, faces whimsical challenges from Hermes, an impish deity. Set against iconic city landmarks, themes of perseverance, absurdity, and fate are explored with humor and heart. Inspired by Sophie Kinsella's style, "Insomniac Odyssey" offers a modern twist on the eternal quest for peaceful slumber.

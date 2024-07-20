@@ -1,0 +1,221 @@
+{
+  "main": {
+    "id": "6fb6faa5b5ca7449",
+    "type": "split",
+    "children": [
+      {
+        "id": "de3df3e5a4a7f8f9",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "e8520d3415809b58",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Chapter Prompt.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          },
+          {
+            "id": "81386c53ba3a4013",
+            "type": "leaf",
+            "state": {
+              "type": "empty",
+              "state": {}
+            }
+          },
+          {
+            "id": "360a0c55c3b89855",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Story Prompt.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          },
+          {
+            "id": "4e22db0ffccbf157",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "About the Story/Critical Analysis/Psychoanalytic Analysis Framework.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          }
+        ],
+        "currentTab": 3
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "aa741008feff410f",
+    "type": "split",
+    "children": [
+      {
+        "id": "64f9dc521defe92a",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "33fbe4356a9ed082",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "45cc05aec388333b",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "c4fa31ab747deae3",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {}
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "c31be9d1c11467b6",
+    "type": "split",
+    "children": [
+      {
+        "id": "b07dcfe21cd0fb0c",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "d97425f4ad4e900a",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "About the Story/Critical Analysis/Psychoanalytic Analysis Framework.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "f20ed7515b406c09",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "About the Story/Critical Analysis/Psychoanalytic Analysis Framework.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "22f8a83b7b1ca0e2",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true
+              }
+            }
+          },
+          {
+            "id": "62ba8e6dc1e74ff3",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "About the Story/Critical Analysis/Psychoanalytic Analysis Framework.md"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false
+    }
+  },
+  "active": "4e22db0ffccbf157",
+  "lastOpenFiles": [
+    "code/mythos/planner-v2.py",
+    "code/mythos/story-v2.py",
+    "code/mythos/plannerv2.py",
+    "About the Story/Critical Analysis/Structural Analysis Framework.md",
+    "About the Story/Critical Analysis/Reader-Response Analysis Framework.md",
+    "About the Story/Critical Analysis/Psychoanalytic Analysis Framework.md",
+    "About the Story/Critical Analysis/Marxist Analysis Framework.md",
+    "About the Story/Critical Analysis/Linguistic Analysis Framework.md",
+    "About the Story/Critical Analysis/Historical Analysis Framework.md",
+    "About the Story/Critical Analysis/Cultural Analysis Framework.md",
+    "About the Story/Critical Analysis/Intertextuality.md",
+    "About the Story/Critical Analysis/Formalism Analysis Framework.md",
+    "About the Story/Critical Analysis/Feminist Analysis Framework.md",
+    "About the Story/Critical Analysis/Notes.md",
+    "Story Prompt.md",
+    "Notes.md",
+    "code/New Story/narrative_outline.md",
+    "code/New Story/writing_style.md",
+    "code/New Story/characters.md",
+    "code/New Story/setting.md",
+    "code/New Story/themes.md",
+    "code/New Story/concept.md",
+    "code/New Story/concept-2.md",
+    "code/New Story/concept-1.md",
+    "code/New Story",
+    "code/mythos/__pycache__/story.cpython-311.pyc",
+    "code/mythos/story.py",
+    "code/New Stories/concept.md",
+    "code/New Stories",
+    "code/authorai/__pycache__/section.cpython-311.pyc",
+    "code/section_test.py",
+    "code/authorai/section.py",
+    "code/prompts/section1.md",
+    "code/prompts/section.md",
+    "code/authorai/__pycache__/writer.cpython-311.pyc",
+    "The Great Gatsby/Characters.md"
+  ]
+}
