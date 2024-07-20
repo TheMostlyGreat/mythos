@@ -11,8 +11,7 @@ class Story():
     length = "Length not yet set"
     narrative_outline = "Narrative outline not yet set"
 
-    
-    
+
     # Set concept
     def set_concept(self, concept):
         self.concept = concept

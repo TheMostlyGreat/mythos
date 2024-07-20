@@ -45,7 +45,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "About the Story/Critical Analysis/Psychoanalytic Analysis Framework.md",
+                "file": "code/prompts/frameworks/concept_framework.md",
                 "mode": "source",
                 "source": false
               }
@@ -118,7 +118,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "About the Story/Critical Analysis/Psychoanalytic Analysis Framework.md",
+                "file": "code/prompts/frameworks/concept_framework.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -135,7 +135,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "About the Story/Critical Analysis/Psychoanalytic Analysis Framework.md",
+                "file": "code/prompts/frameworks/concept_framework.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -158,7 +158,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "About the Story/Critical Analysis/Psychoanalytic Analysis Framework.md"
+                "file": "code/prompts/frameworks/concept_framework.md"
               }
             }
           }
@@ -181,41 +181,41 @@
   },
   "active": "4e22db0ffccbf157",
   "lastOpenFiles": [
-    "code/mythos/planner-v2.py",
-    "code/mythos/story-v2.py",
-    "code/mythos/plannerv2.py",
-    "About the Story/Critical Analysis/Structural Analysis Framework.md",
-    "About the Story/Critical Analysis/Reader-Response Analysis Framework.md",
-    "About the Story/Critical Analysis/Psychoanalytic Analysis Framework.md",
-    "About the Story/Critical Analysis/Marxist Analysis Framework.md",
-    "About the Story/Critical Analysis/Linguistic Analysis Framework.md",
-    "About the Story/Critical Analysis/Historical Analysis Framework.md",
-    "About the Story/Critical Analysis/Cultural Analysis Framework.md",
-    "About the Story/Critical Analysis/Intertextuality.md",
-    "About the Story/Critical Analysis/Formalism Analysis Framework.md",
-    "About the Story/Critical Analysis/Feminist Analysis Framework.md",
-    "About the Story/Critical Analysis/Notes.md",
-    "Story Prompt.md",
-    "Notes.md",
-    "code/New Story/narrative_outline.md",
-    "code/New Story/writing_style.md",
-    "code/New Story/characters.md",
-    "code/New Story/setting.md",
-    "code/New Story/themes.md",
-    "code/New Story/concept.md",
-    "code/New Story/concept-2.md",
-    "code/New Story/concept-1.md",
-    "code/New Story",
-    "code/mythos/__pycache__/story.cpython-311.pyc",
-    "code/mythos/story.py",
-    "code/New Stories/concept.md",
-    "code/New Stories",
-    "code/authorai/__pycache__/section.cpython-311.pyc",
-    "code/section_test.py",
-    "code/authorai/section.py",
-    "code/prompts/section1.md",
-    "code/prompts/section.md",
-    "code/authorai/__pycache__/writer.cpython-311.pyc",
-    "The Great Gatsby/Characters.md"
+    "Stories/Moms_Odyssey_to_Dreamland/concept.md",
+    "Stories/Moms_Odyssey_to_Dreamland",
+    "Stories/Slumber_Quest/concept.md",
+    "Stories/Slumber_Quest",
+    "code/mythos/planner.py",
+    "Stories/The_Slumber_Odyssey/concept.md",
+    "Stories/The_Slumber_Odyssey",
+    "Stories/Momyssey/concept.md",
+    "Stories/Momyssey",
+    "code/prompts/frameworks/setting_framework.md",
+    "Stories/Mommys_Odyssey/inspiration.md",
+    "Stories/Mommys_Odyssey/research_notes.md",
+    "Stories/Mommys_Odyssey/concept-1.md",
+    "Stories/Mommy_Odyssey/concept-3.md",
+    "Stories/Mommys_Odyssey/concept.md",
+    "Stories/Mommys_Odyssey",
+    "Stories/Mommy_Odyssey/concept-2.md",
+    "code/mythos/planner.py-old",
+    "Stories/Mom_vs_the_Sleep_God/concept.md",
+    "Stories/Mom_vs_the_Sleep_God",
+    "code/prompts/frameworks/main_characters_framework.md",
+    "Stories/Dream_Quest/inspiration.md",
+    "Stories/Dream_Quest/research_notes.md",
+    "Stories/Dream_Quest/concept.md",
+    "Stories/Dream_Quest",
+    "Stories/Mommy_Odyssey/inspiration.md",
+    "Stories/Mommy_Odyssey/research_notes.md",
+    "Stories/Mommy_Odyssey/concept-1.md",
+    "code/prompts/frameworks/inspirations_framework.md",
+    "Stories/Moms_Odyssey/research_notes.md",
+    "Stories/Moms_Odyssey/concept.md",
+    "Stories/Moms_Odyssey",
+    "Stories/Sleepless_Odyssey/concept-1.md",
+    "Stories/Mommy_Odyssey/concept.md",
+    "code/prompts/frameworks/research_framework.md",
+    "Stories/Sleepless_Odyssey/concept.md"
   ]
 }

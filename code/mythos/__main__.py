@@ -116,17 +116,49 @@ def story_menu():
         else:
             print("Invalid choice. Please restart and select a valid option.\n")
 
+
+def alt_main():
+    DEBUG = True
+    concept = ""
+    user_info = ""
+    target_audience = ""
+
+    concept = input(
+        "Tell me about your story idea. Include any details you've thought of so \n"
+        "far - characters, setting, plot, or themes. Any other stories or writers \n"
+        "you're inspired by. Also consider sharing informaation about you and your \n"
+        "your target audience. Share as much or as little as you like: \n"
+        )
+    #user_info = input("Tell me about yourself. The more the better. :)")
+    #target_audience = input("Who is the target audience for this story? ")
+    if DEBUG:
+        concept = (
+            "sleepy mom is battle some god in order to get to sleep. it's a comedic "
+            "adaptation to the odessy by sophie kinsella. I'm a 38 yeard old mother of 3.  "
+            "Just wound down my startup and taking a sabbatical. Target audience is other "
+            "middle aged women with kids."
+        )
+
+    details = {
+        "concept": concept,
+        "user_info": user_info,
+        "target_audience": target_audience
+    }
+
+    planner.develop_concept(details)
+
+    planner.conduct_research()
+
+    planner.collect_inspiration()
+
+    planner.define_main_characters()
+
 def main():
-    main_menu()
+    #main_menu()
+    alt_main()
 
 if __name__ == "__main__":
     main()
 
-def alt_maint():
-    concept = input(
-        "Tell me about your story idea. Include any details you've thought of so "
-        "far - characters, setting, plot, themes, or inspirations. Share as much "
-        "or as little as you like."
-        )
-    planner.draft_concept(concept)
+
         

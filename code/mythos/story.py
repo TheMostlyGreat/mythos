@@ -1,22 +1,46 @@
 import os
 
+import re
+
 class Story():
-    title = "Title not yet set"
-    path = "Path not yet set"
-    concept = "Concept not yet set"
-    themes = "Themes not yet set"
-    setting = "Setting not yet set"
-    characters = "Characters not yet set"
-    writing_style = "Writing style not yet set"
-    length = "Length not yet set"
-    narrative_outline = "Narrative outline not yet set"
 
+    def __init__(self):
+        #high-level_planning
+        self.title = False
+        self.path = "New Story"
+        self.concept = False
+        self.themes = False
+        self.genre = False
+        self.audience = False
+        self.plot_outline = False
+        self.research_notes = False
+        self.character_profiles = False
+        self.setting_descriptions = False
+        self.themes_symbols = False
+        self.chapter_breakdown = False
+        self.scene_list = False
+        self.dialogue_snippets = False
+        self.narrative_voice = False
+        self.timeline = False
+        self.inspiration = False
+        self.tone_mood = False
+        self.syntax_rhythm = False
+        self.feedback = False
+        self.older_versions = []
+        self.current_version = 0
 
+    
+    
     # Set concept
     def set_concept(self, concept):
-        self.concept = concept
 
-        self.save_file("concept", self.concept)
+        self.concept = self.save_file("concept", concept)
+
+    def set_research_notes(self, research):
+        self.research_notes = self.save_file("research_notes", research)
+
+    def set_inspiration(self, inspiration):
+        self.inspiration = self.save_file("inspiration", inspiration)
 
     def set_themes(self, themes):
         self.themes = themes
@@ -52,15 +76,20 @@ class Story():
         self.save_file("plot", self.plot)
 
     def set_title(self, title):
+        base_path = "../Stories"
         self.title = title
+        main_title = title.split(':')[0]  # Use only the main title
+        main_title = re.sub(r'[^a-zA-Z0-9\s]', '', main_title.strip())  # Remove special characters, keep alphanumeric and spaces
+        self.path = os.path.join(base_path, main_title.replace(' ', '_'))
 
     # Save file to New Story directory
     def save_file(self, filename, content):
+
         # Create directory if it doesn't exist
-        os.makedirs("New Story", exist_ok=True)
+        os.makedirs(self.path, exist_ok=True)
             
         # Determine file name
-        base_filename = f"New Story/{filename}"
+        base_filename = f"{self.path}/{filename}"
         extension = ".md"
         filename = base_filename + extension
         counter = 1
@@ -72,5 +101,8 @@ class Story():
         # Write to file
         with open(filename, "w") as file:
             file.write(content)
+
+        # Return the relative file path
+        return filename
 
     
