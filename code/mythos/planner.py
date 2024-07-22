@@ -6,8 +6,8 @@ import json
 import os
 
 class Planner():
-
-    def __init__(self, new_story):
+    # Initialize all elements
+    def __init__(self, new_story: Story):
         print("Waking up the planner\n")
         self.story = new_story
         #self.llm = Claude() 
@@ -119,9 +119,6 @@ class Planner():
         Character Profiles:
         - Detailed Profiles: Including background, goals, conflicts, and arcs for main and supporting characters.
         - Cultural and Historical Context: Integration of cultural and historical influences into character backgrounds.
-        Setting Descriptions:
-        - Detailed Descriptions: Detailed descriptions of each significant setting.
-        - Cultural and Historical Accuracy: Ensuring settings reflect accurate cultural and historical contexts.
         """
 
         characters_json = ""
@@ -143,7 +140,7 @@ class Planner():
             "\n\n" +
             plot_content +
             "\n" +
-            "Use this JSON template:\n" + 
+            "Ensure the JSON is well-formed and does not include any extraneous characters or formatting.Use this JSON template:\n" + 
             open('prompts/frameworks/characters_json.txt').read()
         )
 
@@ -157,7 +154,7 @@ class Planner():
             if not characters_json.strip():
                 print("The generated characters JSON is empty or invalid. Retrying...\n")
                 continue
-
+            
             # Validate JSON format
             try:
                 characters_dict = json.loads(characters_json)
@@ -168,6 +165,13 @@ class Planner():
                 print(f"JSON decoding error: {e}")
                 print("Invalid JSON:\n", characters_json)
                 print("Retrying...\n")
+                prompt = (
+                    "Please correct the following JSON to be valid JSON and do not include any extraneous characters or formatting.:\n" +
+                    characters_json +
+                    "\n" +
+                    "Use this framework and template:\n" +
+                    open('prompts/frameworks/characters_json.txt').read()
+                )
         else:
             raise ValueError("Failed to generate valid characters JSON after multiple attempts.")
 
@@ -203,7 +207,39 @@ class Planner():
 
         self.story.characters = character_list
 
+    def develop_setting(self):
+        """
+        **Setting Descriptions:**
+        - Detailed descriptions of locations, reflecting historical and cultural accuracy.
+        - Include social, economic, and political context relevant to Marxist analysis.
+        - Ensure settings accurately reflect cultural and historical contexts, including customs, traditions, and social structures.
+        """
+        setting = ""
 
+        # Developing character profiles
+        print("Developing character profiles\n")
+
+        with open(self.story.concept, 'r') as concept_file:
+            concept_content = concept_file.read()
+
+        with open(self.story.plot_outline, 'r') as plot_file:
+            plot_content = plot_file.read()
+
+        prompt = (
+            "Develop setting for the following concept and plot:\n" +
+            concept_content +
+            "\n" +
+            plot_content +
+            "\n" +
+            "Use this framework and template:\n" +
+            open('prompts/frameworks/setting_template.md').read()
+        )
+        setting = self.write(prompt)
+        print(f"Here's the setting:\n {setting}\n")
+
+        self.story.set_setting(setting)
+        
+        print("Setting saved to " + self.story.setting + "\n")
     # Create the concept for the Story   
     def develop_concept(self, details):
         print("Drafting the concept\n")
@@ -323,109 +359,6 @@ class Planner():
             file.write("\n\n")
             file.write(setting)
         print("Main characters appended to " + self.story.path + "/concept.md")
-
-    def draft_themes(self):
-        print(f"Drafting themes and motifs\n")
-
-        prompt = (
-            "Draft themes and motif for the following concept:\n" +
-            self.story.concept
-        )
-        themes = self.write(prompt)
-
-        print(f"Here's the themes and motifs:\n {themes}\n")
-
-        self.story.set_themes(themes)
-    
-    def draft_setting(self):
-        print(f"Drafting the setting\n")
-
-        prompt = (
-            "Draft the setting for the following concept:\n" +
-            self.story.concept
-        )
-
-        print(f"Prompt: {prompt}\n")
-        setting = self.write(prompt)
-
-        print(f"Here's the setting:\n {self.story.themes}\n")
-
-        self.story.set_setting(setting)
-
-    def draft_characters(self):
-        print(f"Drafting the characters\n")
-
-        prompt = (
-            "Draft the characters for the following concept:\n" +
-            self.story.concept
-        )
-
-        characters = self.write(prompt)
-
-        print(f"Here are the characters:\n {characters}\n")
-
-        self.story.set_characters(characters)
-
-    def draft_writing_style(self):
-        print(f"Drafting the writing style\n")
-
-        prompt = (
-            "Draft the writing style for the following concept:\n" +
-            self.story.concept
-        )
-
-        writing_style = self.write(prompt)
-
-        print(f"Here's the writing style:\n {writing_style}\n")
-
-        self.story.set_writing_style(writing_style)
-
-    def draft_plot(self):
-        print(f"Drafting the plot\n")
-
-        prompt = (
-            "Draft the plot for the following concept:\n" +
-            self.story.concept
-        )
-
-        plot = self.write(prompt)
-
-        print(f"Here's the plot:\n {plot}\n")
-
-        self.story.set_plot(plot)
-
-    def draft_narrative_outline(self):
-        print(f"Drafting the narrative\n")
-
-        prompt = (
-            "Draft the narrative for the following concept:\n" +
-            self.story.concept
-        )
-        narrative = self.write(prompt)
-
-        print(f"Here's the narrative:\n {narrative}\n")
-
-        self.story.set_narrative_outline(narrative)
-
-
-# Initialize all elements
-    def __init__(self, new_story):
-        print("Waking up the planner\n")
-        self.story = new_story
-        #self.llm = Claude() 
-        self.llm = OpenAI()
-        self.llm.system_prompt =(
-            "You are a renowned Harvard literature professor, NYT bestselling book editor, "
-            "and world-class storyteller. Your expertise lies in crafting brief, clear, and "
-            "specific narratives that captivate readers. Help me outline an entertaining and "
-            "engaging story."
-        )
-        self.llm.max_tokens = 4000
-        self.llm.temperature = 1
-
-        print("Planner is ready\n")
-
-
 
 
 """ # Main iterative process

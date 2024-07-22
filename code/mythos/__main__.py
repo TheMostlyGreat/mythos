@@ -157,6 +157,12 @@ def alt_main():
     planner.develop_characters()
     print("Character development completed. \n")
 
+    print("Starting setting development. \n")
+    planner.develop_setting()
+    print("Setting development completed. \n")
+
+    
+
 def main():
     #main_menu()
     alt_main()
