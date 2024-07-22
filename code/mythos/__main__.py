@@ -145,13 +145,17 @@ def alt_main():
         "target_audience": target_audience
     }
 
-    planner.develop_concept(details)
+    print("Starting story high-level planning. \n")
+    planner.create_high_level_plan(details)
+    print("Story high-level planning completed. \n")
 
-    planner.conduct_research()
+    print("Starting story structure planning. \n")
+    planner.plan_structure()
+    print("Story structure planning completed. \n")
 
-    planner.collect_inspiration()
-
-    planner.define_main_characters()
+    print("Starting character development. \n")
+    planner.develop_characters()
+    print("Character development completed. \n")
 
 def main():
     #main_menu()

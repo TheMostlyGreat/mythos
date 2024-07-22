@@ -3,6 +3,7 @@ import os
 import re
 
 class Story():
+    base_path = "../stories"
 
     def __init__(self):
         #high-level_planning
@@ -43,24 +44,22 @@ class Story():
         self.inspiration = self.save_file("inspiration", inspiration)
 
     def set_themes(self, themes):
-        self.themes = themes
-
-        self.save_file("themes", self.themes)
+        self.themes = self.save_file("themes", themes)
 
     def set_setting(self, setting):
-        self.setting = setting
-
-        self.save_file("setting", self.setting)
+        self.setting = self.save_file("setting", setting)
 
     def set_characters(self, characters):
-        self.characters = characters
+        self.characters = self.save_file("characters", characters)
 
-        self.save_file("characters", self.characters)
+    def set_plot_outline(self, plot_outline):
+        self.plot_outline = self.save_file("plot_outline", plot_outline)
+    
+    def set_timeline(self, timeline):
+        self.timeline = self.save_file("timeline", timeline)
 
     def set_writing_style(self, writing_style):
-        self.writing_style = writing_style
-
-        self.save_file("writing_style", self.writing_style)
+        self.writing_style = self.save_file("writing_style", writing_style)
 
     def set_length(self, length):
         self.length = length
@@ -76,11 +75,10 @@ class Story():
         self.save_file("plot", self.plot)
 
     def set_title(self, title):
-        base_path = "../Stories"
         self.title = title
         main_title = title.split(':')[0]  # Use only the main title
         main_title = re.sub(r'[^a-zA-Z0-9\s]', '', main_title.strip())  # Remove special characters, keep alphanumeric and spaces
-        self.path = os.path.join(base_path, main_title.replace(' ', '_'))
+        self.path = os.path.join(self.base_path, main_title.replace(' ', '_'))
 
     # Save file to New Story directory
     def save_file(self, filename, content):
@@ -95,6 +93,7 @@ class Story():
         counter = 1
         
         while os.path.exists(filename):
+            # Use the base filename and append '-counter' before the extension
             filename = f"{base_filename}-{counter}{extension}"
             counter += 1
         

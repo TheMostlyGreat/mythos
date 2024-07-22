@@ -1,0 +1,31 @@
+{
+    "characters": [
+      {
+        "name": "string",
+        "description": "string"
+      },
+      {
+        "name": "string",
+        "description": "string"
+      },
+      {
+        "name": "string",
+        "description": "string"
+      }
+    ]
+  }
+
+  example:
+
+  {
+    "characters": [
+      {
+        "name": "Alex Salazar",
+        "description": "Protagonist. A man who is a detective in the world of the dead."
+      }, 
+      {
+        "name": "John Doe",
+        "description": "Supporting character. A amnesiac man who is a friend of Alex Salazar."
+      }
+    ]
+  }
