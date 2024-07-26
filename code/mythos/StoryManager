@@ -1,0 +1,35 @@
+from mythos.story import Story
+from mythos.StoryAsset import StoryAsset
+from mythos.character import Character
+
+class StoryManager:
+    """
+    A class to manage the interactions between Story and StoryAsset.
+    """
+    def __init__(self, story_path: str) -> None:
+        self.story = Story(story_path)
+
+    def add_asset_to_story(self, name: str, content: str, full_version_file: str = None, summary_file: str = None) -> None:
+        asset = StoryAsset(name, content, full_version_file, summary_file)
+        self.story.add_asset(asset)
+
+class StoryManager:
+    def __init__(self):
+        self.assets = {}
+
+    def add_asset(self, asset_name, asset_type):
+        self.assets[asset_name] = AssetFactory.create_asset(asset_type)
+
+    def create_asset_pass(self, asset_name, pass_number, content):
+        if asset_name in self.assets:
+            self.assets[asset_name].create_pass(pass_number, content)
+        else:
+            print(f"Asset {asset_name} not found.")
+
+    def display_asset(self, asset_name):
+        if asset_name in self.assets:
+            asset = self.assets[asset_name]
+            for pass_number, content in asset.passes.items():
+                print(f"Pass {pass_number}: {content}")
+        else:
+            print(f"Asset {asset_name} not found.")

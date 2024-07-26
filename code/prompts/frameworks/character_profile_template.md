@@ -1,180 +1,194 @@
 # Character Profile: [Character Name]
 
 ## Basic Information
-- **Name:**
-- **Age:**
-- **Gender:**
-- **Occupation:**
-- **Role in the Story:** (e.g., protagonist, antagonist, supporting character)
+- **Name:** The character's full name, including any nicknames or aliases.
+- **Age:** The character's age at the start of the story.
+- **Gender:** The character's gender identity.
+- **Occupation:** What the character does for a living or their main role in life.
+- **Role in the Story:** Specify whether the character is a protagonist, antagonist, supporting character, etc.
 
 ## Background
-- **Birthplace and Hometown:**
-- **Family Background:**
-- **Education:**
-- **Significant Life Events:**
-- **Cultural and Historical Context:** (e.g., ethnicity, nationality, cultural heritage, historical background)
-- **Feminist Perspective:** (e.g., experiences with gender roles, feminist influences)
-- **Marxist Perspective:** (e.g., social class, economic background, labor experiences)
-- **Other Cultural Perspectives:** (e.g., religious influences, traditions, societal norms)
+- **Birthplace and Hometown:** Where the character was born and where they grew up. Include any significant moves.
+- **Family Background:** Briefly describe the character's family, including parents, siblings, and any other influential family members.
+- **Education:** The character's educational background, including any formal schooling, training, or self-taught skills.
+- **Significant Life Events:** Key events that have shaped the character’s life and personality.
+- **Cultural and Historical Context:** Describe the character’s ethnicity, nationality, cultural heritage, and any historical context relevant to their background.
+- **Feminist Perspective:** How the character's experiences with gender roles and feminist influences have shaped their worldview.
+- **Marxist Perspective:** The character’s social class, economic background, and labor experiences. How these factors influence their actions and attitudes.
+- **Other Cultural Perspectives:** Any additional cultural influences, such as religion, traditions, or societal norms that affect the character.
 
 ## Physical Description
-- **Appearance:** (e.g., height, build, eye color, hair color)
-- **Distinctive Features:** (e.g., scars, tattoos, birthmarks)
-- **Style of Dress:**
-- **Health and Physical Condition:**
+- **Appearance:** Detailed description of the character’s physical traits, including height, build, eye color, hair color, and any other notable features.
+- **Distinctive Features:** Any unique physical characteristics like scars, tattoos, or birthmarks.
+- **Style of Dress:** The character’s typical clothing style and how it reflects their personality.
+- **Health and Physical Condition:** The character’s overall health, any chronic conditions, and their level of fitness.
 
 ## Personality
-- **Traits:** (e.g., introverted, ambitious, compassionate)
-- **Strengths:**
-- **Weaknesses:**
-- **Fears:**
-- **Motivations:** (e.g., what drives them, their core values)
+- **Traits:** Key personality traits that define the character, such as being introverted, ambitious, or compassionate.
+- **Strengths:** The character’s positive attributes and skills.
+- **Weaknesses:** The character’s flaws or areas where they struggle.
+- **Fears:** The character’s deepest fears and anxieties.
+- **Motivations and Goals:** 
+  - **Motivations:** What drives the character, their core values, and what they seek to achieve.
+  - **Short-Term Goals:** Immediate objectives the character wants to accomplish.
+  - **Long-Term Goals:** Long-term ambitions and dreams.
+  - **Dreams and Aspirations:** The character’s ultimate aspirations and what they hope to achieve in life.
 - **Cognitive Processes and Behavioral Responses:**
-  - **Thought Patterns:** How does the character think? What are their cognitive distortions?
-  - **Behavioral Responses:** How do they react to stress and conflict?
-
-## Goals and Objectives
-- **Short-Term Goals:**
-- **Long-Term Goals:**
-- **Dreams and Aspirations:**
+  - **Thought Patterns:** How the character thinks, their mindset, and any cognitive distortions.
+  - **Behavioral Responses:** How the character reacts to stress, conflict, and challenges.
 
 ## Conflicts
-- **Internal Conflicts:** (e.g., personal dilemmas, emotional struggles)
-- **External Conflicts:** (e.g., conflicts with other characters, societal pressures)
-- **Cultural Conflicts:** (e.g., clashes with cultural norms, identity struggles)
-- **Psychological Conflicts:** (e.g., cognitive dissonance, unresolved trauma)
+- **Internal Conflicts:** Personal dilemmas and emotional struggles the character faces within themselves.
+- **External Conflicts:** Conflicts with other characters, societal pressures, or external circumstances.
+- **Cultural Conflicts:** Struggles with cultural norms, identity issues, and clashes with cultural expectations.
+- **Psychological Conflicts:** Cognitive dissonance, unresolved trauma, or mental health challenges.
 
 ## Relationships
-(for each, comment on their attachment style)
+(For each relationship, comment on their attachment style)
 - **Family:**
-  - Parents:
-  - Siblings:
-  - Extended Family:
-- **Friends:**
-- **Enemies:**
-- **Romantic Interests:**
-- **Mentors/Influences:**
-- **Other Significant Relationships:**
-- **Attachment and Relationships:** 
-  - How do early relationships influence their behavior and emotional responses?
+  - **Parents:** Describe the character's relationship with their parents.
+  - **Siblings:** Describe relationships with any siblings.
+  - **Extended Family:** Any significant relationships with extended family members.
+- **Friends:** Key friendships and the dynamics of these relationships.
+- **Enemies:** Any adversaries or characters the character is in conflict with.
+- **Romantic Interests:** Current or past romantic relationships and their impact on the character.
+- **Mentors/Influences:** Individuals who have significantly influenced or guided the character.
+- **Other Significant Relationships:** Any other important relationships that impact the character.
+- **Attachment and Relationships:** How early relationships influence their behavior and emotional responses.
 
 ## Linguistic Traits
-- **Word Choice (Lexicon):** What kind of vocabulary does the character use? What are their preferred words or phrases?
-- **Repetition and Patterns:** Are there any words or phrases the character frequently uses?
-- **Sentence Structure (Syntax):** How complex or simple are the character's sentences? What is their typical sentence length and structure?
-- **Language and Social Identity:** How does the character's language reflect their social identity?
-- **Speech Communities and Language Variation:** Does the character use different dialects, sociolects, or language variations?
-- **Code-Switching and Multilingualism:** Does the character switch between languages or use multiple languages?
+- **Word Choice (Lexicon):** The type of vocabulary the character uses and any preferred words or phrases.
+- **Repetition and Patterns:** Frequently used words or phrases and habitual language patterns.
+- **Sentence Structure (Syntax):** Typical complexity and length of the character’s sentences.
+- **Language and Social Identity:** How the character’s language reflects their social identity and background.
+- **Speech Communities and Language Variation:** Any dialects, sociolects, or language variations the character uses.
+- **Code-Switching and Multilingualism:** Whether the character switches between languages or uses multiple languages.
+- **Formality:** Define formality and complexity of each character’s language.
+- **Distinct Voices and Dialogue Snippets:** Ensure each character’s voice is distinct by describing their unique speaking style and providing sample dialogues that reflect linguistic traits and critical themes.
+- **Speech Patterns:** Analyze the character’s dialogue to understand their typical sentence structure, use of slang, or repetitive phrases, and explain how these reflect their background and personality.
+- **Voice Evolution:** Show how the character’s speech changes from the beginning to the end of the story, highlighting key events that influence these changes and providing examples of their evolving dialogue.
+- **Pragmatic Analysis:** Reflect how the character’s background and context influence their interactions, providing examples of implied meanings behind their words and how their social context shapes their dialogue.
+- **Subtext in Dialogue:** Plan key dialogues with underlying meanings, explaining what the character truly feels or thinks and how this contrasts with their spoken words, with annotated examples.
+- **Non-Verbal Communication:** Consider the character’s body language, facial expressions, and gestures, describing their typical non-verbal cues, how these change in different emotional states, and providing examples of scenes where non-verbal communication is crucial.
 
 ## Character Arc
-- **Initial State:** (e.g., who they are at the beginning of the story)
-- **Key Turning Points:** (e.g., significant events that change them)
-- **Development:** (e.g., how they grow or change over the course of the story)
-- **End State:** (e.g., who they are at the end of the story)
-- **Growth Influenced by Critical Perspectives:** (e.g., how feminist, Marxist, or cultural perspectives shape their development)
-- **Resolutions of Cultural Conflicts:**
-- **Biological and Psychological Factors:** 
-  - What are the biological, psychological, and social factors affecting their development?
-- **Trauma and Brain Function:** 
-  - How does trauma impact their behavior and mental state?
+- **Initial State:** Who the character is at the beginning of the story.
+- **Key Turning Points:** Significant events that change the character’s direction or perspective.
+- **Development:** How the character grows or changes over the course of the story.
+- **End State:** Who the character is at the end of the story.
+- **Growth Influenced by Critical Perspectives:** How feminist, Marxist, or other cultural perspectives shape the character’s development.
+- **Resolutions of Cultural Conflicts:** How the character resolves any cultural conflicts they face.
+- **Biological and Psychological Factors:** The biological, psychological, and social factors affecting their development.
+- **Trauma and Brain Function:** How trauma impacts their behavior and mental state.
+- **Development Arcs:** Define character arcs and how their voice and language evolve.
+- **Character-Specific Semantics:** Delve into the meanings of words and conceptual metaphors specific to each character.
 
 ## Additional Notes
-- **Symbolic Meaning:** (e.g., what the character represents in the story)
-- **Inspirations and Influences:** (e.g., real-life inspirations, literary archetypes)
-- **Quirks and Habits:** (e.g., nervous tics, hobbies)
-- **Relevant Backstory:** (e.g., additional details not covered above)
+- **Symbolic Meaning:** What the character represents in the story, their symbolic role.
+- **Inspirations and Influences:** Real-life inspirations, literary archetypes, or other influences on the character.
+- **Quirks and Habits:** Any nervous tics, hobbies, or other unique behaviors.
+- **Relevant Backstory:** Additional details not covered above that are important to the character's background and development.
 
-EXAMPLE
-Certainly! Here's the character profile for Jay Gatsby using the same Markdown format:
+--- 
+# EXAMPLE: Character Profile for Scout in "To Kill a Mockingbird" by Harper Lee
 
-# Character Profile: Jay Gatsby
+# Character Profile: Scout Finch
 
 ## Basic Information
-- **Name:** Jay Gatsby (born James Gatz)
-- **Age:** 32
-- **Gender:** Male
-- **Occupation:** Wealthy socialite, entrepreneur
-- **Role in the Story:** Protagonist
+- **Name:** Jean Louise "Scout" Finch
+- **Age:** 6 years old at the start of the story
+- **Gender:** Female
+- **Occupation:** Child, student
+- **Role in the Story:** Protagonist and narrator
 
 ## Background
-- **Birthplace and Hometown:** North Dakota, USA
-- **Family Background:** Born to poor farmers
-- **Education:** Briefly attended St. Olaf's College in Minnesota but dropped out; educated by Dan Cody in the ways of the world
-- **Significant Life Events:** Met and fell in love with Daisy Buchanan during World War I; amassed wealth through dubious means to win her back
-- **Cultural and Historical Context:** Represents the American Dream during the Roaring Twenties; his rise and fall reflect the era's moral decay and the corruption of the American Dream
-- **Feminist Perspective:** His idealization and pursuit of Daisy highlight gender dynamics and the objectification of women as symbols of success
-- **Marxist Perspective:** His wealth and social status are achieved through illicit means, reflecting the class struggles and corruption inherent in the pursuit of the American Dream
-- **Other Cultural Perspectives:** The story reflects the excesses and moral decay of the Jazz Age, a period of economic prosperity and cultural change
+- **Birthplace and Hometown:** Maycomb, Alabama
+- **Family Background:** Lives with her father, Atticus Finch, and her older brother, Jem Finch. Their mother died when Scout was very young.
+- **Education:** Attends primary school in Maycomb.
+- **Significant Life Events:** 
+  - Befriends Dill Harris, who visits Maycomb each summer.
+  - Observes her father's defense of Tom Robinson, a black man accused of raping a white woman.
+  - Faces prejudice and learns about racial and social injustices in her community.
+- **Cultural and Historical Context:** White, Southern, American, growing up during the Great Depression in the racially segregated South.
+- **Feminist Perspective:** Scout resists traditional gender roles and expectations, often preferring to wear overalls and engage in activities considered appropriate for boys.
+- **Marxist Perspective:** Comes from a middle-class background, experiences and observes class distinctions and economic hardships in Maycomb.
+- **Other Cultural Perspectives:** Influenced by the deeply ingrained racial prejudices and societal norms of the Southern United States during the 1930s.
 
 ## Physical Description
-- **Appearance:** Handsome, with a radiant smile; always impeccably dressed in expensive, stylish clothing
-- **Distinctive Features:** His smile, described as reassuring and understanding
-- **Style of Dress:** Fashionable and extravagant, often seen in custom suits and driving luxurious cars
-- **Health and Physical Condition:** Appears healthy and fit, a result of his disciplined lifestyle and desire to maintain a refined image
+- **Appearance:** 
+  - Height: Average for her age
+  - Build: Slim and agile
+  - Eye Color: Brown
+  - Hair Color: Dark brown, usually worn short
+- **Distinctive Features:** Often appears dirty and unkempt due to her tomboyish activities.
+- **Style of Dress:** Prefers overalls and comfortable clothing over dresses.
+- **Health and Physical Condition:** Generally healthy and active.
 
 ## Personality
-- **Traits:** Ambitious, mysterious, charismatic, idealistic, determined
-- **Strengths:** Charismatic, resourceful, optimistic, generous
-- **Weaknesses:** Naive, obsessive, secretive, disillusioned
-- **Fears:** Failure, losing Daisy, being exposed as a fraud
-- **Motivations:** Seeking validation and success through the love of Daisy Buchanan, achieving the American Dream
+- **Traits:** Curious, intelligent, outspoken, brave, compassionate
+- **Strengths:** Strong sense of justice, empathy, loyalty, and courage
+- **Weaknesses:** Can be impulsive, sometimes lacks understanding of complex adult issues
+- **Fears:** Initially fears Boo Radley, later fears injustice and harm to her loved ones
+- **Motivations and Goals:** 
+  - **Motivations:** Desire to understand the world around her, influenced by her father’s values
+  - **Short-Term Goals:** To understand why people act the way they do, particularly in terms of prejudice and morality
+  - **Long-Term Goals:** To grow up with a strong sense of justice and fairness
+  - **Dreams and Aspirations:** Hopes to emulate her father's strong moral code
 - **Cognitive Processes and Behavioral Responses:**
-  - **Thought Patterns:** Obsessed with recreating the past and idealizing Daisy
-  - **Behavioral Responses:** Throws lavish parties to attract Daisy's attention, maintains an air of mystery to protect his past
-
-## Goals and Objectives
-- **Short-Term Goals:** Reconnect with Daisy Buchanan and rekindle their romance
-- **Long-Term Goals:** Marry Daisy and secure his social status and happiness
-- **Dreams and Aspirations:** To be seen as successful and worthy of Daisy’s love; to achieve the quintessential American Dream
+  - **Thought Patterns:** Thinks critically and questions societal norms
+  - **Behavioral Responses:** Acts bravely in challenging situations, often reacts impulsively to injustice
 
 ## Conflicts
-- **Internal Conflicts:** Struggles with his identity and self-worth; haunted by his past and the fear of it being discovered
-- **External Conflicts:** Competes with Tom Buchanan for Daisy's love; faces societal judgment and the rigid class structure of the East Egg elite
-- **Cultural Conflicts:** Embodies the tension between the old money of East Egg and the new money of West Egg; the moral ambiguity of his wealth reflects the cultural conflicts of the Jazz Age
-- **Psychological Conflicts:** Experiences cognitive dissonance between his constructed persona and his true self
+- **Internal Conflicts:** Struggles to reconcile the innocence of childhood with the harsh realities of prejudice and injustice
+- **External Conflicts:** Faces societal pressures to conform to traditional gender roles, encounters racism and prejudice in her community
+- **Cultural Conflicts:** Struggles with the cultural norms of the racially segregated South
+- **Psychological Conflicts:** Experiences cognitive dissonance between her father's teachings and the prejudices of Maycomb society
 
 ## Relationships
-(for each, comment on their attachment style)
+(For each relationship, comment on their attachment style)
 - **Family:**
-  - Parents: Poor farmers from North Dakota; distanced himself from them to reinvent his identity (insecure attachment)
-  - Siblings: None mentioned
-  - Extended Family: None mentioned
-- **Friends:**
-  - Nick Carraway: Confidant and one of the few people Gatsby trusts (secure attachment)
-  - Meyer Wolfsheim: Business associate involved in illegal activities (transactional relationship)
-- **Enemies:**
-  - Tom Buchanan: Rival for Daisy's affection (antagonistic relationship)
-- **Romantic Interests:**
-  - Daisy Buchanan: The love of his life, whom he idealizes and obsesses over (insecure attachment)
-- **Mentors/Influences:**
-  - Dan Cody: Wealthy copper magnate who taught Gatsby about the world and influenced his pursuit of wealth (mentor relationship)
-- **Other Significant Relationships:**
-  - None prominently mentioned
-- **Attachment and Relationships:**
-  - Gatsby's insecure attachment to Daisy drives much of his behavior, leading him to create an idealized version of her and their past relationship.
+  - **Parents:** Close and respectful relationship with her father, Atticus. Atticus is a secure and nurturing figure.
+  - **Siblings:** Close, occasionally contentious relationship with her brother, Jem. Typical sibling rivalry but deep mutual care and support.
+  - **Extended Family:** Distant relationship with Aunt Alexandra, who represents traditional Southern womanhood.
+- **Friends:** Strong friendship with Dill Harris, characterized by loyalty and shared adventures.
+- **Enemies:** Faces antagonism from Bob Ewell and other prejudiced townsfolk.
+- **Romantic Interests:** None (as a child)
+- **Mentors/Influences:** Atticus Finch (father), Calpurnia (housekeeper and caretaker)
+- **Other Significant Relationships:** Sees Calpurnia as a mother figure; learns about morality and justice from her father and Calpurnia.
+- **Attachment and Relationships:** Secure attachment with her father; this foundation helps her navigate and question the world around her.
 
 ## Linguistic Traits
-- **Word Choice (Lexicon):** Uses sophisticated, polished language to reflect his constructed persona of wealth and refinement
-- **Repetition and Patterns:** Frequently uses the term "old sport" to create a sense of familiarity and charm
-- **Sentence Structure (Syntax):** His speech is often formal and measured, reflecting his careful construction of his identity
-- **Language and Social Identity:** His refined language and mannerisms are part of his attempt to fit into the upper class
-- **Speech Communities and Language Variation:** Adopts the language and style of the wealthy East Egg residents to blend in
-- **Code-Switching and Multilingualism:** Primarily uses polished, formal English; no significant code-switching or multilingualism noted
+- **Word Choice (Lexicon):** Uses simple, direct language typical of a child. Vocabulary reflects her Southern upbringing.
+- **Repetition and Patterns:** Repeats questions and phrases when seeking understanding.
+- **Sentence Structure (Syntax):** Uses short, straightforward sentences; reflective of her young age.
+- **Language and Social Identity:** Reflects her Southern, middle-class background.
+- **Speech Communities and Language Variation:** Speaks in Southern dialect, switches to more formal language when mimicking her father.
+- **Code-Switching and Multilingualism:** Occasionally adopts formal speech patterns from her father, Atticus.
+- **Formality:** Generally informal, but mimics formal language in serious situations.
+- **Distinct Voices and Dialogue Snippets:** "I was born good but had grown progressively worse every year." "Atticus, he was real nice." "Most people are, Scout, when you finally see them."
+- **Speech Patterns:** Reflects her inquisitive nature and straightforward thinking.
+- **Voice Evolution:** Grows more reflective and understanding of complex social issues as the story progresses.
+- **Pragmatic Analysis:** Contextual meaning often influenced by her age and innocence, gradually becomes more nuanced as she matures.
+- **Subtext in Dialogue:** Often asks questions to understand adult conversations; deeper realizations about justice and morality are implied.
+- **Non-Verbal Communication:** Often physical in expressing emotions, such as hugging Atticus for comfort, showing determination through body language.
 
 ## Character Arc
-- **Initial State:** Wealthy and mysterious socialite, focused on winning back Daisy
-- **Key Turning Points:** Reunion with Daisy, confrontation with Tom Buchanan, realization of the futility of his dream
-- **Development:** Becomes increasingly disillusioned as he realizes the impossibility of recreating the past and winning Daisy's love
-- **End State:** Tragic figure who dies still clinging to his dream, ultimately unfulfilled and misunderstood
-- **Growth Influenced by Critical Perspectives:** His downfall highlights the illusions and corruption of the American Dream, as seen through Marxist and cultural lenses
-- **Resolutions of Cultural Conflicts:** His failure reflects the rigid class structures and moral decay of the Jazz Age, underscoring the futility of his efforts to transcend his origins
-- **Biological and Psychological Factors:** 
-  - Gatsby's relentless drive and ambition are partly fueled by his humble beginnings and desire to escape poverty.
-- **Trauma and Brain Function:** 
-  - The trauma of his early poverty and his experiences in the war shape his obsessive pursuit of wealth and Daisy.
+- **Initial State:** Innocent and naive, with a limited understanding of the world’s complexities.
+- **Key Turning Points:** 
+  - Witnessing her father defend Tom Robinson
+  - Understanding the prejudice in her town
+  - Learning the true nature of Boo Radley
+- **Development:** Becomes more aware of social injustices, grows in empathy and understanding.
+- **End State:** More mature and reflective, retains her sense of justice and compassion.
+- **Growth Influenced by Critical Perspectives:** Experiences with gender roles, racial injustices, and social class shape her growth.
+- **Resolutions of Cultural Conflicts:** Gains a deeper understanding of racial and social dynamics, learning to see people as individuals.
+- **Biological and Psychological Factors:** Natural development from childhood to a more mature perspective.
+- **Trauma and Brain Function:** Exposure to racial injustice and personal threats (e.g., Bob Ewell) shapes her outlook.
+- **Development Arcs:** Moves from innocence to a deeper moral and social understanding.
+- **Character-Specific Semantics:** Learns the significance of terms like "justice," "prejudice," and "empathy" through her experiences.
 
 ## Additional Notes
-- **Symbolic Meaning:** Represents the American Dream and its ultimate failure; his mansion and parties symbolize the excesses of the Roaring Twenties
-- **Inspirations and Influences:** Inspired by Fitzgerald's observations of the Jazz Age and its contradictions
-- **Quirks and Habits:** Frequently uses the term "old sport"; throws extravagant parties every weekend
-- **Relevant Backstory:** Changed his name from James Gatz to Jay Gatsby; amassed wealth through illegal activities to reinvent himself and win back Daisy
+- **Symbolic Meaning:** Represents innocence and the journey from ignorance to understanding.
+- **Inspirations and Influences:** Inspired by Harper Lee’s own childhood; serves as a literary archetype of the child narrator learning about societal flaws.
+- **Quirks and Habits:** Tomboyish behavior, curiosity, habit of questioning adults.
+- **Relevant Backstory:** Loss of her mother at a young age, raised by a single father with strong moral values.

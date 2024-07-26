@@ -1,0 +1,35 @@
+{
+  "Chapter 1: [Chapter Title]": {
+    "Summary": {
+      "Overview": "[Brief overview of the chapter]"
+    },
+    "Key Points": {
+      "Event 1": "[Description of the first key event in the chapter]",
+      "Event 2": "[Description of the second key event in the chapter]",
+      "Event 3": "[Description of the third key event in the chapter]"
+    },
+    "Hook": "[Description of the chapter's hook]"
+  },
+  "Chapter 2: [Chapter Title]": {
+    "Summary": {
+      "Overview": "[Brief overview of the chapter]"
+    },
+    "Key Points": {
+      "Event 1": "[Description of the first key event in the chapter]",
+      "Event 2": "[Description of the second key event in the chapter]",
+      "Event 3": "[Description of the third key event in the chapter]"
+    },
+    "Hook": "[Description of the chapter's hook]"
+  },
+  "Chapter 3: [Chapter Title]": {
+    "Summary": {
+      "Overview": "[Brief overview of the chapter]"
+    },
+    "Key Points": {
+      "Event 1": "[Description of the first key event in the chapter]",
+      "Event 2": "[Description of the second key event in the chapter]",
+      "Event 3": "[Description of the third key event in the chapter]"
+    },
+    "Hook": "[Description of the chapter's hook]"
+  }
+}

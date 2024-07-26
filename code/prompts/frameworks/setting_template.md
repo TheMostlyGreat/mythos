@@ -84,7 +84,7 @@ Sure, here's the setting template cleaned up with the essential elements priorit
   - Specific scenes or plot points that highlight the setting
 
 ---
-# Setting Description for "The Great Gatsby"
+# EXAMPLE: Setting Description for "The Great Gatsby" by F. Scott Fitzgerald
 
 ## General Information
 - **Name of the Setting:** Long Island and New York City
