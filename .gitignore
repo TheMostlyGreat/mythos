@@ -1,2 +1,8 @@
-Stories/*
-!Stories/.gitkeep
+stories/*
+!stories/.gitkeep
+
+archive
+
+# Ignore Python bytecode files
+__pycache__/
+*.py[cod]
