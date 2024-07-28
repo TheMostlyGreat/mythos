@@ -1,153 +1,122 @@
 import os
-from mythos.constants import ASSETS_DIR, ASSET_SUMMARY_LENGTH
+import pickle
 from mythos.story_llm import generate_planning_text
-from mythos.file_utils import ensure_unique_directory, create_unique_file
+from mythos.file_utils import ensure_unique_directory, create_unique_file, save_file
+
 
 class StoryAsset:
-    """
-    A class to represent a story asset with full and brief versions.
+    @property
+    def ASSET_TYPE(self):
+        pass
 
-    Attributes:
-    ----------
-    name : str
-        The name of the story asset.
-    full_version_file : str
-        The file path for the full version of the story asset.
-    summary_file : str
-        The file path for the summary version of the story asset.
-    """
+    ASSET_DIR = "asset"
+    ASSET_BIN_DIR = os.path.join(ASSET_DIR, "bin")
 
-    def __init__(self, path: str, name: str, content: str, full_version_file: str = None, summary_file: str = None) -> None:
+    def __init__(self, story_path: str, name: str=ASSET_TYPE, details_filepath: str = None, summary_filepath: str = None, summary_length: int = 300) -> None:
         """
-        Constructs all the necessary attributes for the StoryAsset object.
+        Initializes a StoryAsset instance with the given parameters.
 
-        Parameters:
+        This constructor sets up the StoryAsset with the provided story path, name, 
+        details file path, summary file path, and summary length. It also initializes 
+        the asset and binary file paths. If a summary file path is provided, it loads 
+        the asset from the file.
+
+        Parameters
         ----------
-        name : str
-            The name of the story asset.
-        content : str
-            The content of the story asset.
-        full_version_file : str
-            The file path for the full version of the story asset.
-        summary_file : str
-            The file path for the summary version of the story asset.
+        story_path : str
+            The path to the story directory.
+        name : str, optional
+            The name of the asset. Defaults to ASSET_TYPE.
+        details_filepath : str, optional
+            The file path to the asset's details. Defaults to None.
+        summary_filepath : str, optional
+            The file path to the asset's summary. Defaults to None.
+        summary_length : int, optional
+            The maximum length of the summary in words. Defaults to 300.
+
+        Returns
+        -------
+        None
+
+        Raises
+        ------
+        None
+
+        Examples
+        --------
+        Creating a StoryAsset instance:
+
+        >>> asset = StoryAsset(story_path="/path/to/story", name="MyAsset")
+        >>> print(asset.name)
+        MyAsset
         """
         self.name = name
-        self.details = content
-        self.details_filepath = None
+        self.details = None
+        self.details_filepath = details_filepath
         self.summary = None
-        self.summary_filepath = None
+        self.summary_filepath = summary_filepath
+        self.summary_length = summary_length
+        self.asset_path = os.path.join(story_path, self.ASSET_DIR)
+        self.bin_filepath = os.path.join(story_path, self.ASSET_BIN_DIR, self.name.replace(' ', '_')+".pkl")
 
-        self.base_path = path
-        self.full_version_file = full_version_file
-        self.summary_file = summary_file
-        self.full_content = content
-
-        # If a full version file is provided, use it to initialize the Asset
-        if full_version_file:
-            self.name = os.path.basename(full_version_file).replace('.md', '').rsplit('_', 1)[0]
-            self.full_content = self.load_full_version()
-
-            # If a summary file is provided, use it to initialize the summary
-            if summary_file:
-                self.summary = self.load_summary()
-
-            # If no summary file is provided, create a new one
-            else:
-                summary_content = self.generate_summary_content(self.content)
-                self.save_summary(summary_content)
-        
-        else:
-            # If no full version file is provided, create a new one
-            self.full_version_file = os.path.join(self.base_path, self.name.replace(' ', '_'), ".md") #set the filename
-        
-            # Save the full version content
-            self.save_full_version(content)
+        # If a details filepath is provided, use it to initialize the Asset
+        if summary_filepath:
+            self = self.load(summary_filepath) 
 
     def generate_details(self, context):
-        raise NotImplementedError("This method should be overridden by subclasses.")
-    
+
+        print(f"Generating details for {self.name}.'\n")
+
+        with open(context, 'r') as context:
+            context_content = context.read()
+
+        prompt = (
+            f"Develop a details for {self.name} for my story using the following context:\n" +
+            context_content +
+            "\n\n" +
+            "Use this template:\n" +
+            open(f'prompts/templates/{self.ASSET_TYPE}_template.md').read()
+        )
+        self.details = generate_planning_text(prompt)
+        print(f"Here are the details for {self.name}:\n {self.details}\n")
+
+        save_file(content=self.details, filepath=self.details_filepath)
+        self.save()
+
+        print(f"{self.name} details saved to {self.details_filepath}\n"
+              f"{self.name} pickle saved to {self.bin_filepath}\n")
+
     def generate_summary(self, context):
-        raise NotImplementedError("This method should be overridden by subclasses.")
-    
-    def load_from_file(self, filepath):
-        raise NotImplementedError("This method should be overridden by subclasses.")
+
+        print(f"Generating summary of {self.name}.\n")
+
+        with open(context, 'r') as context:
+            context_content = context.read()
+
+        prompt = (
+            f"Develop a summary for {self.name} for my story using the following context\n" +
+            f"Please keep it under {self.summary_length} words.\n" +
+            context_content +
+            "\n\n" +
+            "Use this template:\n" +
+            open(f'prompts/templates/{self.ASSET_TYPE}_summary_template.md').read()
+        )
+        self.summary = generate_planning_text(prompt)
+        print(f"Here is the summary for {self.name}:\n {self.summary}\n")
+
+        save_file(content=self.summary, filepath=self.summary_filepath)
+        self.save()
+
+
+        print(f"{self.name} summary saved to {self.summary_filepath}\n"
+              f"{self.name} pickle saved to {self.bin_filepath}\n")
 
     
-    def load_full_version(self):
-        """
-        Loads the full version of the story asset from the file.
+    def save(self):
+        with open(self.bin_filepath, 'wb') as file:
+            pickle.dump(self, file)
 
-        Returns:
-        -------
-        str
-            The content of the full version file.
-        """
-        with open(self.full_version_file, 'r') as file:
-            return file.read()
-
-    def load_summary(self):
-        """
-        Loads the summary version of the story asset from the file.
-
-        Returns:
-        -------
-        str
-            The content of the summary version file.
-        """
-        with open(self.summary_file, 'r') as file:
-            return file.read()
-
-    def generate_summary_content(self, content):
-        """
-        Generates a summary version of the given content.
-
-        Parameters:
-        ----------
-        content : str
-            The content to be summarized.
-
-        Returns:
-        -------
-        str
-            The summary version of the content.
-        """
-        return generate_planning_text(f"Create a {ASSET_SUMMARY_LENGTH} word summary of the following content."
-                             "Focus on brevity, clarity, and specificity. Focus on the details most important "
-                             "to the writer who will use this to draft the story:\n"
-                             "\n{content}"
-                             )
-
-    def save_full_version(self, content):
-        """
-        Saves the content to the full version file and generates the summary version.
-
-        Parameters:
-        ----------
-        content : str
-            The content to be written to the full version file.
-        """
-        self.full_content = content
-
-        # Ensure the assets directory exists
-        ensure_unique_directory(self.base_path)  
-        
-        # Save the full version content
-        create_unique_file(content, self.base_path, self.name.replace(' ', '_'), ".md")
-        
-        # Generate the summary version content
-        summary_content = self.generate_summary_content(content)
-        
-        # Save the summary version content
-        self.save_summary(summary_content)
-
-    def save_summary(self, content):
-        """
-        Saves the content to the summary version file.
-
-        Parameters:
-        ----------
-        content : str
-            The content to be written to the summary version file.
-        """
-        self.summary_file = create_unique_file(content, self.base_path, self.name.replace(' ', '_')+"_summary", ".md")
+    @staticmethod
+    def load(filepath):
+        with open(filepath, 'rb') as file:
+            return pickle.load(file)

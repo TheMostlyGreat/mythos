@@ -8,6 +8,24 @@ def trace(func):
         return result
     return wrapper
 
+def save_file(content: str, filepath: str, extension: str = ".md") -> str:
+    """Save a file with the specified content.
+
+    Args:
+        content (str): The content to write to the file.
+        filepath (str): The full path of the file to create.
+        extension (str): The file extension (default is '.md').
+
+    Returns:
+        str: The path of the created unique file.
+    """
+    ensure_unique_directory(filepath)
+
+    with open(filepath, 'w') as file:
+        file.write(content)
+
+    return filepath
+
 def ensure_unique_directory(path: str) -> str:
     """Ensure that a unique directory exists at the specified path.
 

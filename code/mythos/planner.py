@@ -4,7 +4,7 @@ from mythos.StoryAsset import StoryAsset
 import json
 import os
 from mythos.constants import *
-from mythos.story_llm import generate_planning_text, generate_json
+from mythos.story_llm import generate_planning_text, generate_json, generate_narrative_text
 
 class Planner():
 
@@ -477,8 +477,7 @@ class Planner():
 
 
         #self.story.set_chapters(chapters)   
-        self.narrative_outline = StoryAsset(path=os.path.join(self.story.path, ASSETS_DIR), name=NARRATIVE_OUTLINE, content=narrative_outline_content)       
-        
+        self.story.narrative_outline = StoryAsset(path=os.path.join(self.story.path, ASSETS_DIR), name=NARRATIVE_OUTLINE, content=narrative_outline_content)       
         print("Narrative outline saved\n")
 
     def developer_chapter_summary(self):
@@ -486,12 +485,13 @@ class Planner():
         Drafts a summary for each chapter of the story.
         """
         #Get the narrative outline
-        narrative_outline = self.narrative_outline.content
+        with open(self.story.narrative_outline.full_version_file, 'r') as file:
+            narrative_outline_content = file.read()
 
         #turn it into JSON by calling generate_json_from_text(narrative_outline)
         prompt = (
             "Turn the following narrative outline into a JSON object:\n" +
-            narrative_outline +
+            narrative_outline_content +
             "\n" +
             "Use this template:\n" +
             open('prompts/frameworks/narrative_outline_template.json').read()
@@ -516,10 +516,10 @@ class Planner():
             chapter_summary_content = generate_planning_text(prompt)
             print(f"Here's the narrative summary:\n {chapter_summary_content}\n")
 
-            self.chapter_summary = StoryAsset(path=self.assets_path, name=CHAPTER_SUMMARY, content=chapter_summary_content)
+            self.chapter_summary = StoryAsset(path=self.story.path, name=CHAPTER_SUMMARY, content=chapter_summary_content)
             print(f"Here's the narrative summary:\n {chapter_summary_content}\n")
 
-            pass
+            return self.chapter_summary.full_content
 
 
 
@@ -529,23 +529,33 @@ class Planner():
         """
 
         chapter_summary = self.developer_chapter_summary()
+        print(f"\n\nCHECK: Here's the chapter summary:\n {chapter_summary}\n")
 
         prompt = (
-            "Draft a compelling opening scene for the following chapter summary. " 
-            "Ensure that is grips the reade so that they want to read more of the story.\n" +
+            "Draft a compelling 500 word opening scene for the following chapter summary. " 
+            "Ensure that it grips the reader so that they want to read more of the story.\n" +
             "Here is the broader context for the story:\n" +
             self.story.concept +
-            "\n" +
-            "Here is the chapter summary:\n" +
-            chapter_summary +
-            "\n" 
+            "\n"
         )
-        opening_scene = generate_narrative_text(prompt)
+        if chapter_summary:
+            prompt += (
+                "Here is the chapter summary:\n" +
+                chapter_summary +
+                "\n"
+            )
+        if self.story.writing_style:
+            prompt += (
+                "Here is the writing style:\n" +
+                self.story.writing_style +
+                "\n"
+            )
+        opening_scene = generate_narrative_text(prompt)[0].text
         print(f"Here's the opening scene:\n {opening_scene}\n")
 
         with open(os.path.join(self.story.path, 'opening_scene.md'), 'w') as file:
             file.write(opening_scene)
-        print("Opening scene saved to " + join(self.story.path, 'opening_scene.md') + "\n")
+        print("Opening scene saved to " + os.path.join(self.story.path, 'opening_scene.md') + "\n")
 
 
     def develop_timeline(self):

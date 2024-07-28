@@ -56,7 +56,8 @@ class Story():
         self.research_notes = False
         self.themes_and_motifs = False
         self.tone_mood = False
-        
+        self.writing_style = False
+        self.narrative_outline = False
         self.current_version = 0
         self.older_versions = []
         

@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "todos.md",
+                "file": "stories/Shadows_in_Buckhead/chapter_summary.md",
                 "mode": "source",
                 "source": false
               }
@@ -69,8 +69,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 300
   },
   "right": {
     "id": "c31be9d1c11467b6",
@@ -86,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "todos.md",
+                "file": "stories/Shadows_in_Buckhead/chapter_summary.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -103,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "todos.md",
+                "file": "stories/Shadows_in_Buckhead/chapter_summary.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -126,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "todos.md"
+                "file": "stories/Shadows_in_Buckhead/chapter_summary.md"
               }
             }
           }
@@ -149,41 +148,41 @@
   },
   "active": "e8520d3415809b58",
   "lastOpenFiles": [
-    "stories/Shadows_of_the_Forgotten/assets/writing_style_summary.md",
-    "stories/Shadows_of_the_Forgotten/assets/writing_style.md",
-    "stories/Shadows_of_the_Forgotten/writing_style.md",
-    "stories/Shadows_of_the_Forgotten/assets/narrative_outline_summary-1.md",
-    "stories/Shadows_of_the_Forgotten/assets/narrative_outline-1.md",
-    "stories/Shadows_of_the_Forgotten/assets/themes_and_motifs_summary-1.md",
-    "stories/Shadows_of_the_Forgotten/assets/themes_and_motifs-1.md",
-    "stories/Shadows_of_the_Forgotten/themes_and_motifs-1.md",
-    "stories/Shadows_of_the_Forgotten/setting-1.md",
-    "code/mythos/story_assets/base.py",
-    "stories/Shadows_of_the_Forgotten/characters/Clara's Mother_summary.md.md",
-    "stories/Shadows_of_the_Forgotten/characters/Clara's Mother.md",
-    "code/mythos/story_assets",
-    "stories/Shadows_of_the_Forgotten/characters/The Cursed Spirit_summary.md.md",
-    "stories/Shadows_of_the_Forgotten/characters/The Cursed Spirit.md",
-    "stories/Shadows_of_the_Forgotten/characters/Mr. Jensen_summary.md.md",
-    "stories/Shadows_of_the_Forgotten/characters/Mr. Jensen.md",
-    "stories/Shadows_of_the_Forgotten/characters/Lila_summary.md.md",
-    "stories/Shadows_of_the_Forgotten/characters/Lila.md",
-    "archive/xUnveiling_Desire/characters/summary.md",
-    "archive/xUnveiling_Desire/characters/summary-9.md",
-    "archive/xUnveiling_Desire/characters/summary-8.md",
-    "archive/xUnveiling_Desire/characters/summary-7.md",
-    "archive/xUnveiling_Desire/characters/summary-6.md",
-    "archive/xUnveiling_Desire/characters/summary-5.md",
-    "archive/xUnveiling_Desire/characters/summary-4.md",
-    "archive/xUnveiling_Desire/characters/summary-3.md",
-    "archive/xUnveiling_Desire/characters/summary-2.md",
-    "archive/xUnveiling_Desire/characters",
-    "archive/xThe_Politeness_Paradox/characters",
-    "archive/xPleasures_Edge/characters",
-    "archive/xHeatwave_Desires/characters",
-    "archive/xDream_Odyssey/characters",
-    "archive/The Great Gatsby/Themes",
-    "archive/The Great Gatsby/Style",
-    "archive/The Great Gatsby/Setting"
+    "stories/Shadows_in_Buckhead/assets/narrative_outline.md",
+    "stories/Shadows_in_Buckhead/chapter_summary.md",
+    "stories/Shadows_in_Buckhead/opening_scene.md",
+    "stories/Bound_by_Desire/opening_scene.md",
+    "stories/Bound_by_Desire/chapter_summary_summary.md",
+    "stories/Bound_by_Desire/chapter_summary.md",
+    "stories/Bound_by_Desire/assets/writing_style_summary.md",
+    "stories/Bound_by_Desire/assets/writing_style.md",
+    "stories/Bound_by_Desire/writing_style.md",
+    "stories/Bound_by_Desire/assets/narrative_outline_summary.md",
+    "stories/Bound_by_Desire/assets/narrative_outline.md",
+    "stories/Bound_by_Desire/assets",
+    "stories/Bound_by_Desire/plot_outline.md",
+    "stories/Bound_by_Desire/concept.md",
+    "stories/Bound_by_Desire",
+    "stories/Canine_Crusoe/opening_scene.md",
+    "stories/Shadows_in_Buckhead/chapter_summary_summary.md",
+    "stories/Shadows_in_Buckhead/assets/writing_style_summary.md",
+    "stories/Shadows_in_Buckhead/assets/writing_style.md",
+    "stories/Shadows_in_Buckhead/writing_style.md",
+    "stories/Shadows_in_Buckhead/assets/narrative_outline_summary.md",
+    "stories/Shadows_in_Buckhead/assets",
+    "stories/Shadows_in_Buckhead/plot_outline.md",
+    "stories/Shadows_in_Buckhead/concept.md",
+    "stories/Shadows_in_Buckhead",
+    "todos.md",
+    "stories/Canine_Crusoe/chapter_summary_summary.md",
+    "stories/Canine_Crusoe/chapter_summary.md",
+    "stories/Canine_Crusoe/assets/writing_style_summary.md",
+    "stories/Canine_Crusoe/assets/writing_style.md",
+    "stories/Canine_Crusoe/assets",
+    "stories/Canine_Crusoe",
+    "stories/Threads_of_Time/assets",
+    "stories/Threads_of_Time",
+    "stories/The_Echo_of_Shadows/assets",
+    "stories/The_Echo_of_Shadows"
   ]
 }

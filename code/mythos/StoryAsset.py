@@ -131,7 +131,7 @@ class StoryAsset:
         ensure_unique_directory(self.base_path)  
         
         # Save the full version content
-        create_unique_file(content, self.base_path, self.name.replace(' ', '_'), ".md")
+        self.full_version_file = create_unique_file(content, self.base_path, self.name.replace(' ', '_'), ".md")
         
         # Generate the summary version content
         summary_content = self.generate_summary_content(content)

@@ -45,6 +45,7 @@ def create_story():
     planner.plan_structure()
     print("Story structure planning completed. \n")
     
+    """   
     #Develop characters
     print("Starting character development. \n")
     planner.develop_characters()
@@ -59,7 +60,7 @@ def create_story():
     print("Starting theme development. \n")
     planner.develop_themes_and_motifs()
     print("Theme development completed. \n")
-
+    """
     # print("Starting timeline development. \n")
     # planner.develop_timeline()
     # print("Timeline development completed. \n")
