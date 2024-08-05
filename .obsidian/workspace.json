@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "stories/Shadows_in_Buckhead/chapter_summary.md",
+                "file": "stories/Whispers_of_the_Winged_Ones/opening_scene.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "stories/Shadows_in_Buckhead/chapter_summary.md",
+                "file": "stories/Whispers_of_the_Winged_Ones/opening_scene.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "stories/Shadows_in_Buckhead/chapter_summary.md",
+                "file": "stories/Whispers_of_the_Winged_Ones/opening_scene.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "stories/Shadows_in_Buckhead/chapter_summary.md"
+                "file": "stories/Whispers_of_the_Winged_Ones/opening_scene.md"
               }
             }
           }
@@ -148,41 +148,41 @@
   },
   "active": "e8520d3415809b58",
   "lastOpenFiles": [
-    "stories/Shadows_in_Buckhead/assets/narrative_outline.md",
-    "stories/Shadows_in_Buckhead/chapter_summary.md",
-    "stories/Shadows_in_Buckhead/opening_scene.md",
-    "stories/Bound_by_Desire/opening_scene.md",
-    "stories/Bound_by_Desire/chapter_summary_summary.md",
-    "stories/Bound_by_Desire/chapter_summary.md",
-    "stories/Bound_by_Desire/assets/writing_style_summary.md",
-    "stories/Bound_by_Desire/assets/writing_style.md",
-    "stories/Bound_by_Desire/writing_style.md",
-    "stories/Bound_by_Desire/assets/narrative_outline_summary.md",
-    "stories/Bound_by_Desire/assets/narrative_outline.md",
-    "stories/Bound_by_Desire/assets",
-    "stories/Bound_by_Desire/plot_outline.md",
-    "stories/Bound_by_Desire/concept.md",
-    "stories/Bound_by_Desire",
-    "stories/Canine_Crusoe/opening_scene.md",
-    "stories/Shadows_in_Buckhead/chapter_summary_summary.md",
-    "stories/Shadows_in_Buckhead/assets/writing_style_summary.md",
-    "stories/Shadows_in_Buckhead/assets/writing_style.md",
-    "stories/Shadows_in_Buckhead/writing_style.md",
-    "stories/Shadows_in_Buckhead/assets/narrative_outline_summary.md",
-    "stories/Shadows_in_Buckhead/assets",
-    "stories/Shadows_in_Buckhead/plot_outline.md",
-    "stories/Shadows_in_Buckhead/concept.md",
-    "stories/Shadows_in_Buckhead",
-    "todos.md",
-    "stories/Canine_Crusoe/chapter_summary_summary.md",
-    "stories/Canine_Crusoe/chapter_summary.md",
-    "stories/Canine_Crusoe/assets/writing_style_summary.md",
-    "stories/Canine_Crusoe/assets/writing_style.md",
-    "stories/Canine_Crusoe/assets",
-    "stories/Canine_Crusoe",
-    "stories/Threads_of_Time/assets",
-    "stories/Threads_of_Time",
-    "stories/The_Echo_of_Shadows/assets",
-    "stories/The_Echo_of_Shadows"
+    "stories/Echoes_of_Destiny/key_scenes_summary.md",
+    "stories/Whispers_of_the_Winged_Ones/opening_scene.md",
+    "stories/Whispers_of_the_Winged_Ones/bin/key_scenes.pkl",
+    "stories/Whispers_of_the_Winged_Ones/key_scenes_summary.md",
+    "stories/Whispers_of_the_Winged_Ones/bin/chapters_breakdown.pkl",
+    "stories/Whispers_of_the_Winged_Ones/chapters_breakdown_summary.md",
+    "stories/Whispers_of_the_Winged_Ones/bin/writing_style.pkl",
+    "stories/Whispers_of_the_Winged_Ones/writing_style_summary.md",
+    "stories/Whispers_of_the_Winged_Ones/bin/setting.pkl",
+    "stories/Whispers_of_the_Winged_Ones/setting_summary.md",
+    "stories/Whispers_of_the_Winged_Ones/bin/characters.pkl",
+    "stories/Whispers_of_the_Winged_Ones/characters_summary.md",
+    "stories/Whispers_of_the_Winged_Ones/bin/plot.pkl",
+    "stories/Whispers_of_the_Winged_Ones/plot_summary.md",
+    "stories/Whispers_of_the_Winged_Ones/bin/inspiration.pkl",
+    "stories/Whispers_of_the_Winged_Ones/inspiration_summary.md",
+    "stories/Whispers_of_the_Winged_Ones/synopsis.md",
+    "stories/Whispers_of_the_Winged_Ones/bin/research.pkl",
+    "stories/Whispers_of_the_Winged_Ones/research_summary.md",
+    "stories/Whispers_of_the_Winged_Ones/concept_summary.md",
+    "stories/Whispers_of_the_Winged_Ones/bin/concept.pkl",
+    "stories/Whispers_of_the_Winged_Ones/concept.md",
+    "stories/Whispers_of_the_Winged_Ones/bin",
+    "stories/A_Pawsitively_Urgent_Adventure/key_scenes.md",
+    "stories/A_Pawsitively_Urgent_Adventure/chapters_breakdown.md",
+    "stories/A_Pawsitively_Urgent_Adventure/writing_style.md",
+    "stories/A_Pawsitively_Urgent_Adventure/setting.md",
+    "stories/A_Pawsitively_Urgent_Adventure/characters.md",
+    "stories/A_Pawsitively_Urgent_Adventure/plot.md",
+    "stories/A_Pawsitively_Urgent_Adventure/inspiration.md",
+    "stories/A_Pawsitively_Urgent_Adventure/research.md",
+    "stories/A_Pawsitively_Urgent_Adventure/opening_scene.md",
+    "stories/A_Pawsitively_Urgent_Adventure/key_scenes_summary.md",
+    "stories/A_Pawsitively_Urgent_Adventure/chapters_breakdown_summary.md",
+    "stories/A_Pawsitively_Urgent_Adventure/writing_style_summary.md",
+    "stories/A_Pawsitively_Urgent_Adventure/setting_summary.md"
   ]
 }

@@ -2,51 +2,17 @@ import os
 import re
 from mythos.character import Character 
 from mythos.constants import STORY_DIR, CORE_PERSPECTIVES, THEMES_AND_MOTIFS
-from mythos.StoryAsset import StoryAsset
+#from mythos.StoryAsset import StoryAsset
+from mythos.story_assets import StoryAsset
 from mythos.file_utils import ensure_unique_directory, create_unique_file
 
 class Story():
-    """
-    A class to represent a story.
-
-    This class encapsulates the attributes and methods related to a story,
-    including its title, concept, plot outline, characters, setting, and
-    other relevant components. It provides functionality to load, save,
-    and manage the story's elements.
-
-    Attributes
-    ----------
-    title : str
-        The title of the story.
-    concept : str
-        The concept of the story.
-    path : str
-        The path to the story files.
-    brief : str
-        The story brief.
-    characters : list
-        A list of characters in the story.
-    inspiration : str
-        The inspiration behind the story.
-    perspectives : list
-        The perspectives from which the story can be told.
-    plot_outline : str
-        The outline of the story's plot.
-    research_notes : str
-        Notes related to research for the story.
-    themes_motifs : str
-        The themes and motifs present in the story.
-    tone_mood : str
-        The tone and mood of the story.
-    current_version : int
-        The current version of the story.
-    older_versions : list
-        A list of older versions of the story.
-    """
-    
+        
     def __init__(self):
+        self.user_prompt = False
         self.title = False
         self.concept = False
+        self.synopsis = False
         self.path = f"{STORY_DIR}/new_story"
         self.brief = False
         self.characters = False
@@ -58,8 +24,9 @@ class Story():
         self.tone_mood = False
         self.writing_style = False
         self.narrative_outline = False
-        self.current_version = 0
+        self.current_version_num = 0
         self.older_versions = []
+        self.assets = {}
         
 
     def load(self, path):
@@ -132,6 +99,31 @@ class Story():
                 for filename in os.listdir(char_dir) if filename.endswith(".md")
             ]
         return characters
+    
+    def build_synopsis(self):
+        self.synopsis = f"{self.user_prompt}\n{self.concept.details}\n"
+        for key, value in self.assets.items():
+            self.synopsis += f"# {key}\n{value.summary}\n"
+
+        filepath = os.path.join(self.path, "synopsis.md")
+        with open(filepath, 'w') as file:
+            file.write(self.synopsis)
+
+        print(f"\nSynopsis updated and written to {filepath}\n")
+        
+        return self.synopsis
+
+    def add_asset(self, asset):
+        self.assets[asset.asset_type] = asset
+        print(
+            f"\nStory asset added. There are now currently {len(self.assets)} assets.\n"
+            f"Current asset keys: {list(self.assets.keys())}\n"
+              )
+        self.build_synopsis()
+        print(
+            f"Synopsis: {self.synopsis}\n"
+            f"Word Count: {len(self.synopsis.split())}\n"
+        )
 
     def set_concept(self, concept):
         """

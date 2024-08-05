@@ -26,19 +26,18 @@ def save_file(content: str, filepath: str, extension: str = ".md") -> str:
 
     return filepath
 
-def ensure_unique_directory(path: str) -> str:
-    """Ensure that a unique directory exists at the specified path.
+def ensure_unique_directory(filepath: str) -> None:
+    """
+    Ensure that the directory for the given filepath exists.
 
     Args:
-        path (str): The path where the directory should be created.
+        filepath (str): The full path of the file.
 
     Returns:
-        str: The path of the created unique directory.
+        None
     """
-    if not os.path.exists(path):
-        path = create_unique_directory(path)  # Call the existing function to create the directory
-
-    return path
+    directory = os.path.dirname(filepath)
+    os.makedirs(directory, exist_ok=True)
 
 def create_unique_directory(path: str) -> str:
     """Create a unique directory at the specified path by appending a counter if necessary.
@@ -102,5 +101,3 @@ def create_unique_file(content: str, path: str, filename: str, extension: str = 
         file.write(content)  # Create an empty file
 
     return unique_filename
-
-

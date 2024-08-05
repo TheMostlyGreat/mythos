@@ -1,36 +1,25 @@
 import os
 import pickle
 from mythos.story_llm import generate_planning_text
-from mythos.file_utils import ensure_unique_directory, create_unique_file, save_file
-
+from mythos.file_utils import save_file
 
 class StoryAsset:
-    @property
-    def ASSET_TYPE(self):
-        pass
-
     ASSET_DIR = "asset"
-    ASSET_BIN_DIR = os.path.join(ASSET_DIR, "bin")
+    ASSET_BIN_DIR = "bin"
 
-    def __init__(self, story_path: str, name: str=ASSET_TYPE, details_filepath: str = None, summary_filepath: str = None, summary_length: int = 300) -> None:
+    def __init__(self, path: str, asset_type: str, name: str=None, 
+                 summary_length: int = 300) -> None:
         """
         Initializes a StoryAsset instance with the given parameters.
 
-        This constructor sets up the StoryAsset with the provided story path, name, 
-        details file path, summary file path, and summary length. It also initializes 
-        the asset and binary file paths. If a summary file path is provided, it loads 
-        the asset from the file.
-
         Parameters
         ----------
-        story_path : str
+        path : str
             The path to the story directory.
+        asset_type : str
+            The type of the asset.
         name : str, optional
-            The name of the asset. Defaults to ASSET_TYPE.
-        details_filepath : str, optional
-            The file path to the asset's details. Defaults to None.
-        summary_filepath : str, optional
-            The file path to the asset's summary. Defaults to None.
+            The name of the asset. Defaults to the asset type.
         summary_length : int, optional
             The maximum length of the summary in words. Defaults to 300.
 
@@ -38,85 +27,116 @@ class StoryAsset:
         -------
         None
 
-        Raises
-        ------
-        None
-
         Examples
         --------
         Creating a StoryAsset instance:
 
-        >>> asset = StoryAsset(story_path="/path/to/story", name="MyAsset")
+        >>> asset = StoryAsset(path="/path/to/story", asset_type="MyAsset")
         >>> print(asset.name)
         MyAsset
         """
-        self.name = name
-        self.details = None
-        self.details_filepath = details_filepath
-        self.summary = None
-        self.summary_filepath = summary_filepath
-        self.summary_length = summary_length
-        self.asset_path = os.path.join(story_path, self.ASSET_DIR)
-        self.bin_filepath = os.path.join(story_path, self.ASSET_BIN_DIR, self.name.replace(' ', '_')+".pkl")
+        self.name = name if name else asset_type  # Set the name of the asset
+        self.asset_type = asset_type  # Set the type of the asset
+        self.asset_path = path  # Set the path to the asset
+        self.bin_filepath = os.path.join(path, self.ASSET_BIN_DIR, self.name.replace(' ', '_')+".pkl")  # Path to save binary file
 
-        # If a details filepath is provided, use it to initialize the Asset
-        if summary_filepath:
-            self = self.load(summary_filepath) 
+        self.details = None  # Initialize details to None
+        self.details_filepath = os.path.join(path, self.name.replace(' ', '_')+".md")  # Path to save details
 
-    def generate_details(self, context):
+        self.summary = None  # Initialize summary to None
+        self.summary_filepath = os.path.join(path, self.name.replace(' ', '_')+"_summary.md")  # Path to save summary
+        self.summary_length = summary_length  # Set the maximum length of the summary
+        
+    def set_details(self, content):
+        """
+        Sets the details of the asset and saves it to the details file.
 
-        print(f"Generating details for {self.name}.'\n")
+        Parameters
+        ----------
+        content : str
+            The content to be set as the details of the asset.
 
-        with open(context, 'r') as context:
-            context_content = context.read()
+        Returns
+        -------
+        None
+        """
+        print(f"Setting details for {self.name}.'\n")
 
-        prompt = (
-            f"Develop a details for {self.name} for my story using the following context:\n" +
-            context_content +
-            "\n\n" +
-            "Use this template:\n" +
-            open(f'prompts/templates/{self.ASSET_TYPE}_template.md').read()
-        )
-        self.details = generate_planning_text(prompt)
-        print(f"Here are the details for {self.name}:\n {self.details}\n")
-
-        save_file(content=self.details, filepath=self.details_filepath)
-        self.save()
+        self.details = content  # Set the details of the asset
+        
+        save_file(content=self.details, filepath=self.details_filepath)  # Save details to file
+        self.save()  # Save the current state of the asset
 
         print(f"{self.name} details saved to {self.details_filepath}\n"
               f"{self.name} pickle saved to {self.bin_filepath}\n")
+        
+        self.set_summary()  # Generate and save the summary
 
-    def generate_summary(self, context):
+    def set_summary(self, content=None):
+        """
+        Sets the summary of the asset and saves it to the summary file.
 
-        print(f"Generating summary of {self.name}.\n")
+        Parameters
+        ----------
+        content : str, optional
+            The content to be set as the summary of the asset. If not provided, 
+            a summary will be generated based on the details.
 
-        with open(context, 'r') as context:
-            context_content = context.read()
+        Returns
+        -------
+        None
+        """
+        print(f"Setting the summary of {self.name}.\n")
 
-        prompt = (
-            f"Develop a summary for {self.name} for my story using the following context\n" +
-            f"Please keep it under {self.summary_length} words.\n" +
-            context_content +
-            "\n\n" +
-            "Use this template:\n" +
-            open(f'prompts/templates/{self.ASSET_TYPE}_summary_template.md').read()
-        )
-        self.summary = generate_planning_text(prompt)
-        print(f"Here is the summary for {self.name}:\n {self.summary}\n")
+        if content:
+            self.summary = content  # Set the summary if content is provided
+        else:
+            prompt = (
+                f"Write a summary for {self.name} for the story."
+                 "Focus on clarity, brevity, and specificity."
+                 "Please keep it under {self.summary_length} words."
+                 "Ensure the most important details are captured."
+                 f"Here is the details for {self.name}:\n"
+                 f"{self.details}\n\n"
+            )
 
-        save_file(content=self.summary, filepath=self.summary_filepath)
-        self.save()
+            self.summary = generate_planning_text(prompt)  # Generate summary using the prompt
 
+            print(f"Here is the summary for {self.name}:\n {self.summary}\n")
+
+        save_file(content=self.summary, filepath=self.summary_filepath)  # Save summary to file
+        self.save()  # Save the current state of the asset
 
         print(f"{self.name} summary saved to {self.summary_filepath}\n"
               f"{self.name} pickle saved to {self.bin_filepath}\n")
 
-    
     def save(self):
+        """
+        Saves the current state of the asset to a binary file.
+
+        Returns
+        -------
+        None
+        """
+        os.makedirs(os.path.dirname(self.bin_filepath), exist_ok=True)
+        
         with open(self.bin_filepath, 'wb') as file:
-            pickle.dump(self, file)
+            pickle.dump(self, file)  # Save the asset instance to a binary file
 
     @staticmethod
     def load(filepath):
+        """
+        Loads a StoryAsset instance from a binary file.
+
+        Parameters
+        ----------
+        filepath : str
+            The path to the binary file.
+
+        Returns
+        -------
+        StoryAsset
+            The loaded StoryAsset instance.
+        """
         with open(filepath, 'rb') as file:
-            return pickle.load(file)
+            return pickle.load(file)  # Load the asset instance from a binary file

@@ -1,6 +1,6 @@
 from mythos.story import Story
 from mythos.character import Character
-from mythos.StoryAsset import StoryAsset
+#from mythos.StoryAsset import StoryAsset
 import json
 import os
 from mythos.constants import *

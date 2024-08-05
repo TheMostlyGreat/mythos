@@ -1,5 +1,6 @@
 {
-  "Chapter 1: [Chapter Title]": {
+  "Chapter [Chapter Number]": {
+    "Title": "[Chapter Title]",
     "Summary": {
       "Overview": "[Brief overview of the chapter]"
     },
@@ -10,7 +11,8 @@
     },
     "Hook": "[Description of the chapter's hook]"
   },
-  "Chapter 2: [Chapter Title]": {
+  "Chapter [Chapter Number]": {
+    "Title": "[Chapter Title]",
     "Summary": {
       "Overview": "[Brief overview of the chapter]"
     },
@@ -21,7 +23,8 @@
     },
     "Hook": "[Description of the chapter's hook]"
   },
-  "Chapter 3: [Chapter Title]": {
+  "Chapter [Chapter Number]": {
+    "Title": "[Chapter Title]",
     "Summary": {
       "Overview": "[Brief overview of the chapter]"
     },

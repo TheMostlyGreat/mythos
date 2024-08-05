@@ -1,4 +1,4 @@
-# High-level Concept
+# Story Concept
 
 ## Title: An engaging and memorable title for the novel.
 
@@ -14,3 +14,15 @@
 - Secondary Themes: Additional themes that will be touched upon in the novel.
 
 - Length: The length of the story in pages.
+
+- Characters: 
+    - Main Characters: 
+    - Supporting Characters:
+
+- Setting
+
+- Writing Style
+
+- Inspiration
+
+- Research

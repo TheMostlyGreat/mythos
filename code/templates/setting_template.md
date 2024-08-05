@@ -75,6 +75,20 @@ Sure, here's the setting template cleaned up with the essential elements priorit
   - Events or practices borrowed from history
   - How historical accuracy is maintained or altered for the narrative
 
+## Technology and Magic (if applicable)
+- **Technological Advancements:**
+  - Level of Technological Development
+  - Key Inventions and Innovations
+  - Impact of Technology on Society and Daily Life
+- **Magical Systems:** (for fantasy settings)
+  - Types of Magic and Their Sources
+  - Rules and Limitations of Magic
+  - Magic Users and Their Role in Society
+- **Future Tech:** (for science fiction settings)
+  - Advanced Technologies and Their Functions
+  - Availability and Distribution of Technology
+  - Ethical and Social Implications of Technology
+
 ## Integration with Plot
 - **Role in the Story:**
   - How the setting influences the plot
