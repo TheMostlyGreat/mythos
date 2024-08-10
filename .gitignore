@@ -1,5 +1,8 @@
 stories/*
 !stories/.gitkeep
+.obsidian
+.todos.md
+.DS_Store
 
 archive
 
