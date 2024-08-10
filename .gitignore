@@ -1,11 +1,22 @@
+# Ignore all files in the stories directory except .gitkeep
 stories/*
 !stories/.gitkeep
-.obsidian/*
-*.todos.md
-*.DS_Store
 
-archive
+# Ignore .obsidian directory
+.obsidian/
+
+# Ignore todos.md files
+*.todos.md
+
+# Ignore macOS system files
+.DS_Store
+
+# Ignore archive directory
+archive/
 
 # Ignore Python bytecode files
 __pycache__/
 *.py[cod]
+
+# Ignore .todos.md in the root directory
+/.todos.md
