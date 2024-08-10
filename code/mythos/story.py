@@ -1,8 +1,6 @@
 import os
 import re
-from mythos.character import Character 
 from mythos.constants import STORY_DIR, CORE_PERSPECTIVES, THEMES_AND_MOTIFS
-#from mythos.StoryAsset import StoryAsset
 from mythos.story_assets import StoryAsset
 from mythos.file_utils import ensure_unique_directory, create_unique_file
 
@@ -66,9 +64,6 @@ class Story():
         if self.plot_outline:
             print(f"Plot outline loaded: {self.plot_outline}")
         
-        # Load characters
-        print("Loading characters")
-        self.characters = self.load_characters(os.path.join(self.path, Character.BASE_PATH))
         
         # Load setting
         self.setting = self.load_file("setting.md")
@@ -93,11 +88,7 @@ class Story():
             A list of Character instances loaded from the specified directory.
         """
         characters = []
-        if os.path.exists(char_dir):
-            characters = [
-                Character.from_file(self, os.path.join(char_dir, filename))
-                for filename in os.listdir(char_dir) if filename.endswith(".md")
-            ]
+
         return characters
     
     def build_synopsis(self):

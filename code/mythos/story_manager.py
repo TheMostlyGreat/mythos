@@ -15,8 +15,7 @@ class StoryManager:
             4. Characters
             5. Setting
             6. Writing Style
-            7. Chapters Breakdown
-            8. Key scenes
+            7. Chapter List
         3. Iterate
     """
     def __init__(self, story: Story):
@@ -25,13 +24,11 @@ class StoryManager:
         # List of asset types in the order they should be processed
         self.asset_types = [
             "research",
-            "inspiration",
             "plot",
             "characters",
             "setting",
             "writing_style",
-            "chapters_breakdown",
-            "key_scenes"
+            "chapter_list"
         ]
         
         self.assets = {}
@@ -157,19 +154,19 @@ class StoryManager:
 
     def draft_chapters(self):
         print("Drafting Chapters\n")
-        # Get the story chapter breakdown
-        chapter_breakdown = self.story.assets['chapters_breakdown']
-        if not chapter_breakdown:
-            print("No chapter breakdown found.")
+        # Get the story chapter list
+        chapter_list = self.story.assets['chapter_list']
+        if not chapter_list:
+            print("No chapter list found.")
             return
 
         # Turn it into JSON
-        with open('code/templates/chapter_breakdown_template.json', 'r') as file:
-            chapter_breakdown_template = file.read()
+        with open('templates/chapter_list_json.txt', 'r') as file:
+            chapter_list_json = file.read()
 
         json_prompt = (
-            f"Please generate JSON in this format:\n{chapter_breakdown_template}\n"
-            f"Based on the following chapter breakdown details:\n{chapter_breakdown.details}"
+            f"Please generate JSON in this format:\n{chapter_list_json}\n"
+            f"Based on the following chapter list details:\n{chapter_list.details}"
         )
         chapter_json = generate_json(json_prompt)
 
@@ -182,8 +179,12 @@ class StoryManager:
             print(f"Invalid JSON format: {e}")
             return
 
-        # Ensure we have the chapters list
-        chapters = chapter_data.get('chapters', [])
+        # Extract chapters from the JSON structure
+        chapters = []
+        for key, value in chapter_data.items():
+            if key.startswith("Chapter"):
+                chapters.append(value)
+
         if not chapters:
             print("No chapters found in the JSON data.")
             return
@@ -191,10 +192,10 @@ class StoryManager:
         story_so_far = ""
         chapter_counter = 1
 
-        # Iterate through the JSON and for each chapter
+        # Iterate through the chapters
         for chapter in chapters:
             print(f"Drafting chapter {chapter_counter}\n")
-            # 1. Create a prompt with the chapter json + the synopsis + story_so_far
+            # Create a prompt with the chapter json + the synopsis + story_so_far
             prompt = (
                 f"Create a detailed narrative for the following chapter:\n{json.dumps(chapter, indent=2)}\n"
                 f"Here is the synopsis of the story:\n{self.story.synopsis}\n"
@@ -227,6 +228,9 @@ class StoryManager:
 
             # Update the chapter counter by one
             chapter_counter += 1
+
+        print("Chapters drafted successfully.")
+        chapter_counter += 1
 
         print("Chapters drafted successfully.")
 

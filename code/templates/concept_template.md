@@ -5,7 +5,9 @@
 ## Concept and Themes:
 - Core Idea: A one-sentence summary of the novel’s main idea or concept.
 
-- Genre: The genre of the novel (e.g., fantasy, science fiction, romance, thriller).
+- Inspiration
+
+- Genre: The genre(s) of the novel (e.g., fantasy, science fiction, romance, thriller).
 
 - Target Audience: The intended audience for the novel (e.g., young adults, adults, children).
 
@@ -15,6 +17,7 @@
 
 - Length: The length of the story in pages.
 
+## Details
 - Characters: 
     - Main Characters: 
     - Supporting Characters:
@@ -23,6 +26,6 @@
 
 - Writing Style
 
-- Inspiration
-
 - Research
+
+- Revelant critical perspectives

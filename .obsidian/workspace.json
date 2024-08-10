@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "stories/Whispers_of_the_Winged_Ones/opening_scene.md",
+                "file": "archive/About author/Academic and Work Background.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "stories/Whispers_of_the_Winged_Ones/opening_scene.md",
+                "file": "archive/About author/Academic and Work Background.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "stories/Whispers_of_the_Winged_Ones/opening_scene.md",
+                "file": "archive/About author/Academic and Work Background.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "stories/Whispers_of_the_Winged_Ones/opening_scene.md"
+                "file": "archive/About author/Academic and Work Background.md"
               }
             }
           }
@@ -148,8 +148,8 @@
   },
   "active": "e8520d3415809b58",
   "lastOpenFiles": [
-    "stories/Echoes_of_Destiny/key_scenes_summary.md",
     "stories/Whispers_of_the_Winged_Ones/opening_scene.md",
+    "stories/Echoes_of_Destiny/key_scenes_summary.md",
     "stories/Whispers_of_the_Winged_Ones/bin/key_scenes.pkl",
     "stories/Whispers_of_the_Winged_Ones/key_scenes_summary.md",
     "stories/Whispers_of_the_Winged_Ones/bin/chapters_breakdown.pkl",

@@ -1,12 +1,10 @@
 import os
-from mythos.planner import Planner
 from mythos.story import Story
 from mythos.story_manager import StoryManager
 
 global story
 global story_manager
 story = Story()
-planner = Planner(story)
 story_manager = StoryManager(story)
 max_iterations = 10
 iteration_count = 0
