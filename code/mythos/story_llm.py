@@ -4,17 +4,6 @@ from openai import OpenAI
 from anthropic import Anthropic
 from mythos.constants import SYSTEM_PROMPT_PLANNING, SYSTEM_PROMPT_NARRATIVE, SYSTEM_PROMPT_JSON
 
-# Initialize clients at module level
-OPENAI_CLIENT = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-ANTHROPIC_CLIENT = Anthropic(api_key=os.getenv("CLAUDE_API_KEY"))
-
-# Set global model names
-OPENAI_MODEL = "gpt-4o-mini"
-ANTHROPIC_MODEL = "claude-3-5-sonnet-20240620"  # Updated to a current model name
-
-DEFAULT_MAX_TOKENS = 4000
-DEFAULT_TEMPERATURE = 1.0
-
 def generate_planning_text(prompt: str, system_prompt: str = SYSTEM_PROMPT_PLANNING) -> str:
     """
     Generates planning text based on the provided prompt and system prompt.
@@ -31,22 +20,23 @@ def generate_planning_text(prompt: str, system_prompt: str = SYSTEM_PROMPT_PLANN
     str
         The generated planning text.
     """
-    max_tokens = DEFAULT_MAX_TOKENS
-    temperature = DEFAULT_TEMPERATURE
+    max_tokens = 4000  # Maximum number of tokens for the response
+    temperature = 1     # Controls randomness of the output
 
-    completion = OPENAI_CLIENT.chat.completions.create(
-        model=OPENAI_MODEL,
+    client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))  # Initialize OpenAI client
+
+    completion = client.chat.completions.create(
+        model="gpt-4o-mini",
         max_tokens=max_tokens,
         temperature=temperature,
         messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": prompt}
+            {"role": "system", "content": system_prompt},  # System message
+            {"role": "user", "content": prompt}            # User prompt
         ]
     )
     response = completion.choices[0].message  # Get the response message
 
     return response.content  # Return the generated text
-
 
 def is_valid_json(json_string: str) -> bool:
     """
@@ -68,7 +58,6 @@ def is_valid_json(json_string: str) -> bool:
     except ValueError:
         return False
 
-
 def generate_narrative_text(prompt: str, system_prompt: str = SYSTEM_PROMPT_NARRATIVE) -> str:
     """
     Generates narrative text based on the provided prompt and system prompt.
@@ -85,42 +74,28 @@ def generate_narrative_text(prompt: str, system_prompt: str = SYSTEM_PROMPT_NARR
     str
         The generated narrative text.
     """
-    max_tokens = DEFAULT_MAX_TOKENS
-    temperature = DEFAULT_TEMPERATURE
+    max_tokens = 4000  # Maximum number of tokens for the response
+    temperature = 1    # Controls randomness of the output
 
-    message = ANTHROPIC_CLIENT.messages.create(
-        model=ANTHROPIC_MODEL,
+    client = Anthropic(api_key=os.getenv('CLAUDE_API_KEY'))  # Initialize Anthropic client
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20240620",
         max_tokens=max_tokens,
         temperature=temperature,
-        system=system_prompt,
+        system=system_prompt,  # System message
         messages=[
             {
                 "role": "user",
                 "content": [
                     {
                         "type": "text",
-                        "text": prompt
+                        "text": prompt  # User prompt
                     }
                 ]
             }
         ]
     )
-    return message.content[0].text  # Return the generated text
-
-
-def _generate_json_response(prompt: str, system_prompt: str, max_tokens: int, temperature: float) -> str:
-    completion = OPENAI_CLIENT.chat.completions.create(
-        model=OPENAI_MODEL,
-        max_tokens=max_tokens,
-        temperature=temperature,
-        response_format={ "type": "json_object" },
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": prompt}
-        ]
-    )
-    return completion.choices[0].message.content
-
+    return message.content  # Return the generated text
 
 def generate_json(prompt: str, system_prompt: str = SYSTEM_PROMPT_JSON) -> str:
     """
@@ -138,12 +113,36 @@ def generate_json(prompt: str, system_prompt: str = SYSTEM_PROMPT_JSON) -> str:
     str
         The generated json.
     """
-    max_tokens = DEFAULT_MAX_TOKENS
-    temperature = DEFAULT_TEMPERATURE
-    response = _generate_json_response(prompt, system_prompt, max_tokens, temperature)
-    
-    if not is_valid_json(response):
-        prompt = f"Please generate a valid JSON object for the following prompt: {response}"
-        response = _generate_json_response(prompt, system_prompt, max_tokens, temperature)
-    
-    return response
+    max_tokens = 4000  # Maximum number of tokens for the response
+    temperature = 1     # Controls randomness of the output
+
+    client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))  # Initialize OpenAI client
+
+    completion = client.chat.completions.create(
+        model="gpt-4o-mini",
+        max_tokens=max_tokens,
+        temperature=temperature,
+        response_format={ "type": "json_object" },
+        messages=[
+            {"role": "system", "content": system_prompt},  # System message
+            {"role": "user", "content": prompt}            # User prompt
+        ]
+    )
+    response = completion.choices[0].message  # Get the response message
+
+    # Validate the generated JSON
+    if not is_valid_json(response.content):
+        # If the JSON is not valid, try generating again
+        prompt = "Please generate a valid JSON object for the following prompt: " + response.content
+        completion = client.chat.completions.create(
+            model="gpt-4o-mini",
+            max_tokens=max_tokens,
+            temperature=temperature,
+            messages=[
+                {"role": "system", "content": system_prompt},  # System message
+                {"role": "user", "content": prompt}            # User prompt
+            ]
+        )
+        response = completion.choices[0].message  # Get the response message
+
+    return response.content  # Return the generated text

@@ -1,22 +1,22 @@
-# Mythos: AI-Powered Story Generation
+# Mythos: AI Writing Assistant
 
-Mythos is an innovative AI-powered tool designed to assist writers in creating compelling stories. It leverages advanced language models to generate story concepts, develop characters, craft settings, and even draft opening scenes.
+Mythos helps writers generate ideas, develop characters, and kickstart their writing process. It's an AI tool designed to combat writer's block and spark creativity.
 
 ## Features
 
-- Story concept generation
-- Character development
-- Setting creation
-- Theme exploration
-- Opening scene drafting
-- Writing style analysis
+- Generate story concepts
+- Develop multifaceted characters
+- Create vivid settings
+- Explore thematic elements
+- Draft engaging opening scenes
+- Analyze writing styles
 
-## Getting Started
+## Setup
 
-### Prerequisites
+### Requirements
 
 - Python 3.7+
-- Required Python packages (see [`requirements.txt`](requirements.txt))
+- Dependencies listed in `requirements.txt`
 
 ### Installation
 
@@ -30,20 +30,20 @@ Mythos is an innovative AI-powered tool designed to assist writers in creating c
    cd mythos
    ```
 
-3. Install the required packages:
+3. Install dependencies:
    ```
    pip install -r requirements.txt
    ```
 
 ## Usage
 
-To create a new story, run:
+Run the program:
 
 ```
 python -m mythos
 ```
 
-Follow the prompts to input your story idea and other details. Mythos will guide you through the story creation process.
+Follow the on-screen prompts to start creating your story.
 
 ## Project Structure
 
@@ -58,4 +58,3 @@ We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.
 ## License
 
 This project is licensed under the [AGPL-3.0](LICENSE).
-

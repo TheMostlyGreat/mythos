@@ -40,49 +40,6 @@ def create_story():
 
     print(f"Checking user prompt:\n\n{story.user_prompt}")
 
-    # #Create high-level plan
-    # print("Starting story high-level planning. \n")
-    # planner.create_high_level_plan(user_prompt)
-    # print("Story high-level planning completed. \n")
-
-    # #Plan story structure
-    # print("Starting story structure planning. \n")
-    # planner.plan_structure()
-    # print("Story structure planning completed. \n")
-    
-    # """   
-    # #Develop characters
-    # print("Starting character development. \n")
-    # planner.develop_characters()
-    # print("Character development completed. \n")
-
-    # #Develop setting
-    # print("Starting setting development. \n")
-    # planner.develop_setting()
-    # print("Setting development completed. \n") 
-    
-    # #Develop themes and motifs
-    # print("Starting theme development. \n")
-    # planner.develop_themes_and_motifs()
-    # print("Theme development completed. \n")
-    # """
-    # # print("Starting timeline development. \n")
-    # # planner.develop_timeline()
-    # # print("Timeline development completed. \n")
-
-    # #Develop chapters and scenes
-    # print("Starting chapter development. \n")
-    # planner.develop_narrative_outline()
-    # print("Chapter development completed. \n")
-
-    # #Develop writing style
-    # print("Starting writing style development. \n")
-    # planner.develop_writing_style()
-    # print("Writing style development completed. \n")
-
-    # print("Starting draft of opening scene. \n")
-    # planner.draft_opening_scene()
-    # print("Opening scene draft completed. \n")
     
 def open_story():
     global story
