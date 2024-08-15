@@ -95,7 +95,7 @@ def generate_narrative_text(prompt: str, system_prompt: str = SYSTEM_PROMPT_NARR
             }
         ]
     )
-    return message.content  # Return the generated text
+    return message.content[0].text  # Return the generated text
 
 def generate_json(prompt: str, system_prompt: str = SYSTEM_PROMPT_JSON) -> str:
     """
