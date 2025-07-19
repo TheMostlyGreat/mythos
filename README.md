@@ -1,4 +1,4 @@
-# Mythos: AI Writing Assistant
+# Mythos: AI Story Writing Assistant
 
 Mythos helps writers generate ideas, develop characters, and kickstart their writing process. It's an AI tool designed to combat writer's block and spark creativity.
 
@@ -40,6 +40,7 @@ Mythos helps writers generate ideas, develop characters, and kickstart their wri
 Run the program:
 
 ```
+cd code/
 python -m mythos
 ```
 

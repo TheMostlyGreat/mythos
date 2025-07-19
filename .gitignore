@@ -11,8 +11,12 @@ stories/*
 # Ignore macOS system files
 .DS_Store
 
-# Ignore archive directory
-archive/
+# Ignore directory
+ignore/
+
+# Ignore environment files with secrets
+.env
+.env.*
 
 # Ignore Python bytecode files
 __pycache__/
@@ -20,3 +24,8 @@ __pycache__/
 
 # Ignore .todos.md in the root directory
 /.todos.md
+
+# misc
+mythos/.old/
+
+

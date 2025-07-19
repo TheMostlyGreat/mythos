@@ -7,7 +7,7 @@ We're excited that you're interested in contributing to Mythos! This document ou
 1. Fork the repository on GitHub.
 2. Clone your fork locally:
    ```
-   git clone https://github.com/yourusername/mythos.git
+   git clone https://github.com/themostlygreat/mythos.git
    ```
 3. Create a new branch for your feature or bug fix:
    ```
