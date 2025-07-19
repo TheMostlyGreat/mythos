@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from enum import Enum
 # LLM Settings
 OPENAI_MODEL = "o4-mini-2025-04-16"
-ANTHROPIC_MODEL = "claude-opus-4-20250514"
+ANTHROPIC_MODEL = "claude-sonnet-4-20250514"
 
 MAX_RETRIES = 2
 
@@ -50,7 +50,7 @@ FILE_SEARCH_TOOL = {
 }
 
 # Enhanced story research with web search
-RESEARCH_WITH_WEB_SEARCH = False
+RESEARCH_WITH_WEB_SEARCH = True
 
 # JSON Schemas for Structured Outputs
 # These provide 100% reliable JSON generation with OpenAI Responses API
@@ -131,24 +131,14 @@ STORY_CONCEPT_SCHEMA = {
     "additionalProperties": False
 }
 
-# Enhanced research schema for web-augmented story development
-RESEARCH_SCHEMA = {
+# Lightweight concept schema - extracts title reliably while keeping rich markdown content
+CONCEPT_TITLE_SCHEMA = {
     "type": "object",
     "properties": {
-        "research_topic": {"type": "string"},
-        "key_findings": {
-            "type": "array",
-            "items": {"type": "string"}
-        },
-        "historical_context": {"type": "string"},
-        "cultural_elements": {
-            "type": "array",
-            "items": {"type": "string"}
-        },
-        "authenticity_notes": {"type": "string"},
-        "source_credibility": {"type": "string"}
+        "title": {"type": "string"},
+        "concept_markdown": {"type": "string"}
     },
-    "required": ["research_topic", "key_findings", "historical_context", "cultural_elements", "authenticity_notes", "source_credibility"],
+    "required": ["title", "concept_markdown"],
     "additionalProperties": False
 }
 

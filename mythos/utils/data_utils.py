@@ -91,7 +91,20 @@ def deserialize_from_json(file_path: str, cls) -> Any:
         with open(file_path, 'r') as file:
             data = json.load(file)
         logger.info(f"Object deserialized from {file_path} successfully.")
-        return cls.from_dict(data)
+        
+        # Check if it's a Pydantic model
+        if hasattr(cls, 'model_validate'):
+            # Use Pydantic's model_validate for v2
+            return cls.model_validate(data)
+        elif hasattr(cls, '__pydantic_model__'):
+            # Use Pydantic's constructor for v1/v2
+            return cls(**data)
+        elif hasattr(cls, 'from_dict'):
+            # Use from_dict method if available
+            return cls.from_dict(data)
+        else:
+            # Try direct constructor as fallback
+            return cls(**data)
     except json.JSONDecodeError as e:
         logger.error(f"JSON decode error in {file_path}: {e}")
         raise

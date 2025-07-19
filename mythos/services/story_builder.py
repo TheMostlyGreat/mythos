@@ -103,7 +103,7 @@ class StoryBuilder:
             story = Story(user_prompt=user_prompt)
             # Generate concept asset and extract title
             concept_asset = self._generate_concept_asset(story)
-            new_title = self._extract_title_from_concept(concept_asset.details)
+            new_title = self._extract_title_from_concept()
             
             self.logger.debug(f"Concept created. Extracted story title: '{new_title}'")
 
@@ -182,9 +182,234 @@ class StoryBuilder:
             self.logger.error(f"Failed to build story content: {e}")
             raise StoryBuildException(f"Story content building failed: {e}") from e
 
+    def smart_resume_story(self, story: Story) -> Story:
+        """
+        Intelligently resumes story generation from its current state.
+        
+        Args:
+            story (Story): Story object to resume.
+            
+        Returns:
+            Story: Updated story object with progress from current state.
+            
+        Raises:
+            StoryBuildException: If the resumption process fails.
+        """
+        self.logger.info(f"Smart resuming story: '{story.title}'")
+        
+        # Get current state
+        state, description = self.story_manager.get_story_state(story)
+        self.logger.info(f"Story state: {state} - {description}")
+        
+        try:
+            if state == "assets_incomplete":
+                # Continue generating missing planning assets
+                self.logger.info("Continuing asset generation...")
+                self._resume_asset_generation(story)
+                
+            elif state == "chapters_not_outlined":
+                # Generate chapter outlines
+                self.logger.info("Generating chapter outlines...")
+                self.generate_chapter_assets(story)
+                
+            elif state in ["chapters_not_written", "chapters_partial"]:
+                # Write remaining chapters
+                self.logger.info("Writing manuscript chapters...")
+                self._resume_chapter_writing(story)
+                
+            elif state == "finalization_needed":
+                # Create final draft and EPUB
+                self.logger.info("Finalizing story...")
+                story.draft = self._create_manuscript_draft(story)
+                create_epub(story)
+                
+            elif state == "complete":
+                self.logger.info("Story is already complete!")
+                return story
+                
+            else:
+                raise StoryBuildException(f"Unknown story state: {state}")
+                
+            # Always save progress
+            self.story_manager.update_story(story)
+            self.logger.info(f"Successfully resumed story: '{story.title}'")
+            
+            return story
+            
+        except Exception as e:
+            self.logger.error(f"Failed to resume story: {e}")
+            raise StoryBuildException(f"Story resumption failed: {e}") from e
+
+    def _resume_asset_generation(self, story: Story) -> None:
+        """
+        Resumes asset generation from where it left off.
+        
+        Args:
+            story (Story): The story object.
+        """
+        from mythos.config.settings import AssetTypeNames
+        
+        # Define the full asset generation sequence
+        asset_sequence = [
+            AssetTypeNames.CONCEPT,  # Should already exist for existing stories
+            AssetTypeNames.RESEARCH,
+            AssetTypeNames.SETTINGS,
+            AssetTypeNames.PLOT,
+            AssetTypeNames.THEMES,
+            AssetTypeNames.CHARACTERS,
+            AssetTypeNames.TIMELINE,
+            AssetTypeNames.CHAPTER_LIST,
+            AssetTypeNames.WRITING_STYLE
+        ]
+        
+        # Find where to start (skip assets that already exist)
+        for asset_type in asset_sequence:
+            if asset_type.value not in story.assets:
+                self.logger.info(f"Generating missing asset: {asset_type.value}")
+                asset = self._create_single_asset(story, asset_type)
+                self._create_asset_with_metadata(story, asset)
+                self.story_manager.update_story(story)
+                self.logger.debug(f"Generated and added asset: '{asset.title}'")
+
+    def _resume_chapter_writing(self, story: Story) -> None:
+        """
+        Resumes chapter writing from where it left off.
+        
+        Args:
+            story (Story): The story object.
+        """
+        from mythos.config.settings import AssetTypeNames
+        
+        # Get all chapter outlines
+        chapter_outlines = {
+            key: asset for key, asset in story.assets.items() 
+            if asset.asset_type == AssetTypeNames.CHAPTER_OUTLINE.name
+        }
+        
+        # Get existing manuscript chapters
+        existing_chapters = {
+            key: asset for key, asset in story.manuscript.items()
+            if asset.asset_type == AssetTypeNames.MANUSCRIPT_CHAPTER.name
+        }
+        
+        if not chapter_outlines:
+            # Need to generate chapter outlines first
+            self.logger.info("No chapter outlines found, generating them first...")
+            self.generate_chapter_assets(story)
+            chapter_outlines = {
+                key: asset for key, asset in story.assets.items() 
+                if asset.asset_type == AssetTypeNames.CHAPTER_OUTLINE.name
+            }
+        
+        # Write only the missing chapters
+        chapters_to_write = {
+            key: asset for key, asset in chapter_outlines.items()
+            if key not in existing_chapters
+        }
+        
+        if chapters_to_write:
+            self.logger.info(f"Writing {len(chapters_to_write)} remaining chapters...")
+            self._write_specific_chapters(story, chapters_to_write)
+        else:
+            self.logger.info("All chapters are already written")
+
+    def _write_specific_chapters(self, story: Story, chapters_to_write: dict) -> None:
+        """
+        Writes specific chapter outlines to manuscript chapters.
+        
+        Args:
+            story (Story): The story object.
+            chapters_to_write (dict): Dictionary of chapter outlines to write.
+        """
+        from mythos.config.settings import AssetTypeNames, AssetTypes
+        from mythos.services.writer import generate_narrative_text, summarize_text
+        import json
+        
+        synopsis = self.story_manager.get_synopsis(story)
+        writing_style = story.assets.get(AssetTypeNames.WRITING_STYLE.value).summary if story.assets.get(AssetTypeNames.WRITING_STYLE.value) else ""
+        
+        # Get existing story context
+        existing_chapters = {
+            key: asset for key, asset in story.manuscript.items()
+            if asset.asset_type == AssetTypeNames.MANUSCRIPT_CHAPTER.name
+        }
+        
+        # Build story so far from existing chapters
+        story_so_far = ""
+        for _, existing_chapter in sorted(existing_chapters.items(), key=lambda x: int(''.join(filter(str.isdigit, x[0])))):
+            story_so_far += existing_chapter.summary
+        
+        # Get chapter data from chapter list
+        chapter_list_asset = story.assets.get(AssetTypeNames.CHAPTER_LIST.value)
+        if chapter_list_asset:
+            try:
+                if isinstance(chapter_list_asset.details, str) and chapter_list_asset.details.startswith('{'):
+                    chapter_list_data = json.loads(chapter_list_asset.details)
+                else:
+                    chapter_list_data = chapter_list_asset.details
+                    if isinstance(chapter_list_data, str):
+                        chapter_list_data = json.loads(chapter_list_data)
+                
+                chapters = chapter_list_data.get("chapters", [])
+                chapters_data = {f"chapter_{ch['chapter_number']}": ch for ch in chapters}
+            except (json.JSONDecodeError, TypeError):
+                chapters_data = {}
+        else:
+            chapters_data = {}
+        
+        # Sort chapters to write in order
+        sorted_chapters = sorted(chapters_to_write.items(), key=lambda x: int(''.join(filter(str.isdigit, x[0]))))
+        
+        for chapter_title, chapter_asset in sorted_chapters:
+            self.logger.info(f"Writing narrative for '{chapter_title}'")
+            
+            try:
+                # Get chapter details from the original chapter list
+                chapter_details = chapters_data.get(chapter_title)
+                if not chapter_details:
+                    self.logger.warning(f"No chapter data found for '{chapter_title}', using outline as fallback")
+                    chapter_details = {"outline": chapter_asset.details, "title": chapter_title}
+                
+                chapter_prompt = self._build_chapter_prompt(
+                    synopsis=synopsis,
+                    chapter_details=chapter_details,
+                    writing_style=writing_style if writing_style else "",
+                    story_so_far=story_so_far,
+                    chapter_title=chapter_title
+                )
+
+                chapter_text = generate_narrative_text(prompt=chapter_prompt)
+                
+                if not chapter_text or chapter_text.startswith("Error:"):
+                    raise ValueError(f"Failed to generate valid content for '{chapter_title}': {chapter_text}")
+
+                chapter_summary = summarize_text(
+                    text=chapter_text,
+                    summary_length=AssetTypes.MANUSCRIPT_CHAPTER.summary_length
+                )
+
+                manuscript_asset = StoryAsset(
+                    asset_type=AssetTypeNames.MANUSCRIPT_CHAPTER.name,
+                    title=chapter_title,
+                    details=chapter_text,
+                    summary=chapter_summary,
+                    relative_file_path=Path(AssetTypes.MANUSCRIPT_CHAPTER.directory, f"{chapter_title}.md")
+                )
+
+                self._create_manuscript_with_metadata(story, manuscript_asset)
+                
+                # Update story so far for next chapter
+                story_so_far += chapter_summary
+                
+                self.logger.info(f"Successfully wrote '{chapter_title}'")
+
+            except Exception as e:
+                self.logger.error(f"Failed to write '{chapter_title}': {e}")
+                raise StoryBuildException(f"Failed to write '{chapter_title}': {e}") from e
+
     def _generate_concept_asset(self, story: Story) -> StoryAsset:
         """
-        Creates the initial concept asset for the story using markdown format.
+        Creates the initial concept asset with reliable title extraction.
 
         Args:
             story (Story): The story object.
@@ -193,15 +418,32 @@ class StoryBuilder:
             StoryAsset: The generated concept asset.
         """
         prompt = self._assemble_planning_prompt(story, AssetTypes.CONCEPT)
-        # Generate concept in markdown format using the template
-        concept_text = generate_story_concept(prompt=prompt)
-        summary = summarize_text(text=concept_text, summary_length=AssetTypes.CONCEPT.summary_length)
+        
+        try:
+            # Get structured JSON with title + markdown content
+            concept_json = generate_story_concept(prompt=prompt)
+            concept_data = json.loads(concept_json)
+            
+            # Extract title and markdown separately
+            title = concept_data.get('title', 'Untitled Story')
+            markdown_content = concept_data.get('concept_markdown', '')
+            
+            # Store the extracted title for later use
+            self._extracted_title = title
+            
+        except (json.JSONDecodeError, KeyError) as e:
+            self.logger.warning(f"Failed to parse concept JSON, falling back to direct generation: {e}")
+            # Fallback to direct markdown generation
+            markdown_content = concept_json if concept_json else "# Concept\n\nFailed to generate concept."
+            self._extracted_title = "Untitled Story"
+        
+        summary = summarize_text(text=markdown_content, summary_length=AssetTypes.CONCEPT.summary_length)
         
         concept_asset = StoryAsset(
             asset_type=AssetTypeNames.CONCEPT.name,
             title=AssetTypes.CONCEPT.title,
             summary=summary,
-            details=concept_text,
+            details=markdown_content,  # Use the markdown content
             relative_file_path=Path(AssetTypes.CONCEPT.directory, f"{AssetTypes.CONCEPT.title}.md")
         )
         
@@ -300,32 +542,17 @@ class StoryBuilder:
         self.logger.debug("Planning prompt assembled.")
         return prompt
 
-    def _extract_title_from_concept(self, concept_text: str) -> str:
+    def _extract_title_from_concept(self) -> str:
         """
-        Extracts the title from concept text.
-
-        Args:
-            concept_text (str): The concept text containing the title.
+        Returns the title extracted from structured concept JSON.
 
         Returns:
             str: The extracted title.
         """
         try:
-            lines = concept_text.split('\n')
-            for line in lines:
-                if line.startswith('## Title:') or line.startswith('# Title:'):
-                    return line.split(':', 1)[1].strip()
-                elif line.startswith('**Title:**'):
-                    return line.replace('**Title:**', '').strip()
-            
-            # Fallback: look for any line that looks like a title
-            for line in lines:
-                if line.strip() and not line.startswith('#') and len(line.strip()) < 100:
-                    return line.strip()
-            
-            return "Untitled Story"
+            return getattr(self, '_extracted_title', 'Untitled Story')
         except Exception as e:
-            self.logger.warning(f"Failed to extract title from concept: {e}")
+            self.logger.warning(f"Failed to get extracted title: {e}")
             return "Untitled Story"
 
     def generate_chapter_assets(self, story: Story) -> Story:
@@ -341,13 +568,32 @@ class StoryBuilder:
             raise StoryBuildException("Chapter list asset is missing.")
 
         try:
-            chapter_list_data = json.loads(chapter_list_asset.details)
+            # Handle both legacy and new chapter list formats
+            if isinstance(chapter_list_asset.details, str) and chapter_list_asset.details.startswith('{'):
+                # Legacy format: details is a JSON string containing the chapter data
+                chapter_list_data = json.loads(chapter_list_asset.details)
+            else:
+                # New format: details is already the chapter data
+                chapter_list_data = chapter_list_asset.details
+                if isinstance(chapter_list_data, str):
+                    chapter_list_data = json.loads(chapter_list_data)
+            
             synopsis = self.story_manager.get_synopsis(story)
             
-            # Handle new array-based chapter format from structured outputs
+            # Handle different chapter data formats
             chapters = chapter_list_data.get("chapters", [])
+            
+            # If no chapters found at top level, check if chapters are in a nested details field (legacy format)
+            if not chapters and "details" in chapter_list_data:
+                try:
+                    nested_details = json.loads(chapter_list_data["details"])
+                    chapters = nested_details.get("chapters", [])
+                except (json.JSONDecodeError, TypeError):
+                    pass
+            
             if not chapters:
                 self.logger.error("No chapters found in chapter list.")
+                self.logger.debug(f"Chapter list data structure: {chapter_list_data}")
                 raise StoryBuildException("No chapters found in chapter list.")
             
             for chapter_data in chapters:
@@ -397,8 +643,28 @@ class StoryBuilder:
             raise StoryBuildException("Chapter list asset is missing.")
         
         try:
-            chapter_list_data = json.loads(chapter_list_asset.details)
-            chapters_data = {f"chapter_{ch['chapter_number']}": ch for ch in chapter_list_data.get("chapters", [])}
+            # Handle both legacy and new chapter list formats
+            if isinstance(chapter_list_asset.details, str) and chapter_list_asset.details.startswith('{'):
+                # Legacy format: details is a JSON string containing the chapter data
+                chapter_list_data = json.loads(chapter_list_asset.details)
+            else:
+                # New format: details is already the chapter data
+                chapter_list_data = chapter_list_asset.details
+                if isinstance(chapter_list_data, str):
+                    chapter_list_data = json.loads(chapter_list_data)
+            
+            # Handle different chapter data formats 
+            chapters = chapter_list_data.get("chapters", [])
+            
+            # If no chapters found at top level, check if chapters are in a nested details field (legacy format)
+            if not chapters and "details" in chapter_list_data:
+                try:
+                    nested_details = json.loads(chapter_list_data["details"])
+                    chapters = nested_details.get("chapters", [])
+                except (json.JSONDecodeError, TypeError):
+                    pass
+                    
+            chapters_data = {f"chapter_{ch['chapter_number']}": ch for ch in chapters}
         except json.JSONDecodeError as e:
             self.logger.error(f"Invalid JSON in chapter list: {e}")
             raise StoryBuildException("Invalid JSON in chapter list.") from e

@@ -89,7 +89,15 @@ def call_OpenAI_API(
             
             # Track token usage
             if hasattr(response, 'usage') and response.usage:
-                token_counter.add_tokens(response.usage.total_tokens)
+                # Check if this is the new responses API or old chat completions
+                if hasattr(response.usage, 'total_tokens'):
+                    token_counter.add_tokens(response.usage.total_tokens)
+                else:
+                    # Fallback for newer API versions that separate input/output tokens
+                    input_tokens = getattr(response.usage, 'input_tokens', 0)
+                    output_tokens = getattr(response.usage, 'output_tokens', 0)
+                    total_tokens = input_tokens + output_tokens
+                    token_counter.add_tokens(total_tokens)
             
             # With Structured Outputs, no manual JSON validation needed!
             # The Responses API guarantees valid JSON when using schemas
@@ -114,24 +122,20 @@ def call_OpenAI_API(
 def call_Anthropic_API(
     prompt: str, 
     system_prompt: str, 
-    use_reasoning: bool = False,
-    max_reasoning_tokens: int = 32000,
     use_web_search: bool = False,
     structured_output: bool = False
 ) -> str:
     """
-    Calls the Anthropic Claude 4 API with enhanced capabilities.
+    Calls the Anthropic Claude API.
 
     Args:
         prompt (str): The user prompt to send to the API.
         system_prompt (str): The system-level instructions for the API.
-        use_reasoning (bool): Enable Claude 4's extended reasoning mode for better performance.
-        max_reasoning_tokens (int): Maximum tokens for reasoning (up to 32K for Opus).
         use_web_search (bool): Enable web search tool for research tasks.
         structured_output (bool): Request more structured, consistent output.
 
     Returns:
-        str: The generated text with enhanced Claude 4 capabilities.
+        str: The generated text from Claude.
 
     Raises:
         Exception: If the API call fails after the maximum retries.
@@ -141,7 +145,7 @@ def call_Anthropic_API(
 
     client = Anthropic()
 
-    # Build tools array for Claude 4
+    # Build tools array for Claude
     tools = []
     if use_web_search:
         tools.append({
@@ -169,14 +173,6 @@ def call_Anthropic_API(
         ]
     }
 
-    # Add Claude 4 reasoning mode for complex tasks
-    if use_reasoning:
-        request_params["reasoning"] = {
-            "effort": "medium",  # Options: low, medium, high
-            "summary": "auto"    # Get reasoning summaries
-        }
-        request_params["max_reasoning_tokens"] = min(max_reasoning_tokens, 32000)
-
     # Add tools if specified
     if tools:
         request_params["tools"] = tools
@@ -187,43 +183,44 @@ def call_Anthropic_API(
 
     for attempt in range(MAX_RETRIES):
         try:
-            logger.debug(f"Claude 4 API call with reasoning={use_reasoning}, web_search={use_web_search}")
+            logger.debug(f"Claude API call with web_search={use_web_search}")
             
             message = client.messages.create(**request_params)
             
-            # Track token usage including reasoning tokens
+            # Track token usage - Updated for new Claude API structure
             if hasattr(message, 'usage') and message.usage:
-                total_tokens = message.usage.total_tokens
-                if hasattr(message.usage, 'reasoning_tokens'):
-                    reasoning_tokens = message.usage.reasoning_tokens
-                    logger.debug(f"Claude 4 tokens - Total: {total_tokens}, Reasoning: {reasoning_tokens}")
+                # New Claude API structure: usage has input_tokens + output_tokens
+                input_tokens = getattr(message.usage, 'input_tokens', 0)
+                output_tokens = getattr(message.usage, 'output_tokens', 0)
+                total_tokens = input_tokens + output_tokens
+                logger.debug(f"Claude tokens - Input: {input_tokens}, Output: {output_tokens}, Total: {total_tokens}")
                 token_counter.add_tokens(total_tokens)
             
-            # Handle Claude 4 refusal responses
+            # Handle Claude refusal responses
             if message.stop_reason == "refusal":
-                logger.warning("Claude 4 refused to generate content for safety reasons")
+                logger.warning("Claude refused to generate content for safety reasons")
                 return "Error: Content generation was declined for safety reasons. Please try rephrasing your request."
             
             # Handle tool use responses
             if message.stop_reason == "tool_use":
-                logger.info("Claude 4 used tools (web search) to enhance response")
+                logger.info("Claude used tools (web search) to enhance response")
             
-            logger.debug(f"Claude 4 API response: {message.content}")
+            logger.debug(f"Claude API response: {message.content}")
             logger.debug(f"Stop reason: {message.stop_reason}")
             
             # Extract and concatenate text from the response
             return_text = ' '.join(block.text for block in message.content if hasattr(block, 'text'))
-            logger.debug(f"Claude 4 API return text: {return_text}")
+            logger.debug(f"Claude API return text: {return_text}")
 
             return return_text
             
         except Exception as e:
             if attempt < MAX_RETRIES - 1:
-                logger.error(f"Error generating LLM content with Claude 4 (attempt {attempt + 1}): {e}")
+                logger.error(f"Error generating LLM content with Claude (attempt {attempt + 1}): {e}")
                 time.sleep(2 ** (attempt + 1))
             else:
-                logger.error(f"Failed to generate LLM content with Claude 4 after {MAX_RETRIES} attempts: {e}")
-                return "Error: Unable to generate LLM content with Claude 4 after multiple attempts."
+                logger.error(f"Failed to generate LLM content with Claude after {MAX_RETRIES} attempts: {e}")
+                return "Error: Unable to generate LLM content with Claude after multiple attempts."
             
 def get_total_token_usage() -> int:
     """

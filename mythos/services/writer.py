@@ -6,7 +6,7 @@ from mythos.config.settings import (
     CHARACTER_LIST_SCHEMA,
     CHAPTER_LIST_SCHEMA,
     STORY_CONCEPT_SCHEMA,
-    RESEARCH_SCHEMA,
+    CONCEPT_TITLE_SCHEMA,
     WEB_SEARCH_TOOL,
     RESEARCH_WITH_WEB_SEARCH
 )
@@ -53,7 +53,8 @@ def generate_web_enhanced_research(prompt: str) -> str:
     Generate enhanced research using web search capabilities of the Responses API.
     
     This function leverages the Responses API's built-in web search to provide
-    real-time, up-to-date research for story development.
+    real-time, up-to-date research for story development. Uses template guidance
+    rather than schema constraints to allow AI creativity while maintaining structure.
     
     Parameters
     ----------
@@ -63,27 +64,57 @@ def generate_web_enhanced_research(prompt: str) -> str:
     Returns
     -------
     str
-        JSON string with research findings following the schema
+        Well-structured markdown research following the template guidance
     """
     if not RESEARCH_WITH_WEB_SEARCH:
         # Fall back to regular research without web search
         return generate_planning_text(
             prompt=prompt,
-            system_prompt="You are a research assistant providing detailed, accurate information for story development.",
-            json_schema=RESEARCH_SCHEMA
+            system_prompt="""You are a research assistant providing detailed, accurate information for story development.
+            
+            Create comprehensive research following the research template structure with these key sections:
+            - Inspirations and Influences
+            - Historical Context
+            - Cultural Context  
+            - Setting Details
+            - Economic Context
+            - Legal and Governance Systems
+            - Belief Systems and Spirituality
+            - Daily Life and Social Norms
+            - Relevant Movements and Ideologies
+            - Critical Perspectives
+            - Genre Research
+            - Scientific/Technological Elements
+            
+            Output as well-organized markdown. Be thorough and story-relevant."""
         )
     
     research_system_prompt = """You are an expert research assistant helping with story development. 
     Use web search to find current, accurate information about the topic. 
     Focus on historical accuracy, cultural authenticity, and credible sources.
-    Provide detailed findings that will help create authentic, well-researched stories."""
     
-    # Use web search tool for enhanced research
+    Create comprehensive research following the research template structure with these key sections:
+    - Inspirations and Influences (literature, films, art that inform the story)
+    - Historical Context (time period, key events, social/political climate)
+    - Cultural Context (primary cultures, practices, intercultural dynamics)
+    - Setting Details (geography, architecture, flora/fauna)
+    - Economic Context (economic systems, trade, class structure)
+    - Legal and Governance Systems (political structure, legal framework)
+    - Belief Systems and Spirituality (religions, mythology, rituals)
+    - Daily Life and Social Norms (family structures, education, entertainment)
+    - Relevant Movements and Ideologies (social, political, cultural movements)
+    - Critical Perspectives (literary/cultural criticism frameworks)
+    - Genre Research (genre conventions, subgenres, opportunities)
+    - Scientific/Technological Elements (relevant science, tech landscape)
+    
+    For factual sections, use web search to find current, accurate information.
+    For creative sections, draw on genre knowledge and artistic influences.
+    Output as well-organized markdown that will help create authentic, well-researched stories."""
+    
+    # Use web search tool for enhanced research without schema constraints
     return call_OpenAI_API(
         prompt=prompt,
         system_prompt=research_system_prompt,
-        json_output=True,
-        json_schema=RESEARCH_SCHEMA,
         tools=[WEB_SEARCH_TOOL]
     )
 
@@ -129,7 +160,7 @@ def generate_chapter_list(prompt: str) -> str:
 
 def generate_story_concept(prompt: str) -> str:
     """
-    Generate a story concept using markdown format.
+    Generate a story concept with reliable title extraction.
     
     Parameters
     ----------
@@ -139,18 +170,19 @@ def generate_story_concept(prompt: str) -> str:
     Returns
     -------
     str
-        Markdown formatted story concept following the template
+        JSON string with title and markdown content
     """
     return generate_planning_text(
         prompt=prompt,
-        system_prompt="You are a creative storyteller developing compelling story concepts. Output in markdown format following the provided template."
+        system_prompt="You are a creative storyteller developing compelling story concepts. Generate a clear title and put all the rich detailed content in markdown format in the concept_markdown field.",
+        json_schema=CONCEPT_TITLE_SCHEMA
     )
 
 def generate_narrative_text(prompt: str, system_prompt: str = NARRATIVE_SYSTEM_PROMPT) -> str:
     """
-    Generates narrative text using Claude 4 with enhanced capabilities.
+    Generates narrative text using Claude with enhanced capabilities.
 
-    Uses Claude 4's reasoning mode for better storytelling and narrative flow.
+    Uses Claude for better storytelling and narrative flow.
 
     Parameters
     ----------
@@ -162,13 +194,12 @@ def generate_narrative_text(prompt: str, system_prompt: str = NARRATIVE_SYSTEM_P
     Returns
     -------
     str
-        The generated narrative text with improved quality from Claude 4 reasoning.
+        The generated narrative text with improved quality from Claude.
     """
-    # Use Claude 4's reasoning mode for better narrative quality
+    # Use Claude for narrative generation
     return call_Anthropic_API(
         prompt=prompt, 
         system_prompt=system_prompt,
-        use_reasoning=True,  # Enable reasoning for better storytelling
         structured_output=True  # Ensure well-formatted narrative output
     )
 

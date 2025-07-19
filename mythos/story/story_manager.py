@@ -204,26 +204,66 @@ class StoryManager:
                 self.logger.info(f"Loaded story '{story_title}' using new format")
                 return story
             else:
-                # Legacy format - load asset paths and reconstruct
-                asset_paths = story_data.pop("asset_paths", {})
+                # Legacy format - assets stored as JSON strings
+                legacy_assets = story_data.pop("assets", {})
+                legacy_manuscript = story_data.pop("manuscript", {})
+                
+                # Create story without assets first
                 story = Story(**story_data)
                 
-                # Load each asset from its path (legacy)
-                for asset_key, asset_path in asset_paths.items():
-                    asset_full_path = Path(asset_path)
-                    if asset_full_path.exists():
-                        asset = deserialize_from_json(str(asset_full_path), StoryAsset)
-                        story.assets[asset_key] = asset
+                # Load each asset from its JSON string and .asset file (legacy)
+                for asset_key, asset_json_str in legacy_assets.items():
+                    try:
+                        # Check if it's already a dictionary or needs JSON parsing
+                        if isinstance(asset_json_str, dict):
+                            asset_info = asset_json_str
+                        else:
+                            asset_info = json.loads(asset_json_str)
+                            
+                        asset_path = Path(story.story_dir, asset_info["relative_file_path"])
                         
-                        # Create metadata for migration
-                        story.asset_metadata[asset_key] = AssetMetadata(
-                            asset_type=asset.asset_type,
-                            title=asset.title,
-                            summary=asset.summary,
-                            relative_file_path=asset.relative_file_path
-                        )
-                    else:
-                        self.logger.warning(f"Asset file not found: {asset_full_path}")
+                        if asset_path.exists():
+                            asset = deserialize_from_json(str(asset_path), StoryAsset)
+                            story.assets[asset_key] = asset
+                            
+                            # Create metadata for migration
+                            story.asset_metadata[asset_key] = AssetMetadata(
+                                asset_type=asset.asset_type,
+                                title=asset.title,
+                                summary=asset.summary,
+                                relative_file_path=asset.relative_file_path
+                            )
+                        else:
+                            self.logger.warning(f"Legacy asset file not found: {asset_path}")
+                    except (json.JSONDecodeError, KeyError) as e:
+                        self.logger.warning(f"Failed to parse legacy asset '{asset_key}': {e}")
+                
+                # Load legacy manuscript assets if any
+                for manuscript_key, manuscript_json_str in legacy_manuscript.items():
+                    try:
+                        # Check if it's already a dictionary or needs JSON parsing
+                        if isinstance(manuscript_json_str, dict):
+                            manuscript_info = manuscript_json_str
+                        else:
+                            manuscript_info = json.loads(manuscript_json_str)
+                            
+                        manuscript_path = Path(story.story_dir, manuscript_info["relative_file_path"])
+                        
+                        if manuscript_path.exists():
+                            manuscript_asset = deserialize_from_json(str(manuscript_path), StoryAsset)
+                            story.manuscript[manuscript_key] = manuscript_asset
+                            
+                            # Create metadata for migration
+                            story.manuscript_metadata[manuscript_key] = AssetMetadata(
+                                asset_type=manuscript_asset.asset_type,
+                                title=manuscript_asset.title,
+                                summary=manuscript_asset.summary,
+                                relative_file_path=manuscript_asset.relative_file_path
+                            )
+                        else:
+                            self.logger.warning(f"Legacy manuscript file not found: {manuscript_path}")
+                    except (json.JSONDecodeError, KeyError) as e:
+                        self.logger.warning(f"Failed to parse legacy manuscript '{manuscript_key}': {e}")
                 
                 self.logger.info(f"Loaded story '{story_title}' using legacy format")
                 return story
@@ -283,3 +323,93 @@ class StoryManager:
             
         self.logger.debug(f"Synopsis: \n{synopsis}")
         return synopsis
+
+    def get_story_state(self, story: Story) -> tuple[str, str]:
+        """
+        Determines the current completion state of a story to enable smart resumption.
+        
+        Args:
+            story (Story): The story object to analyze.
+            
+        Returns:
+            tuple[str, str]: A tuple of (state, description) where state is the key and description is user-friendly.
+        """
+        from mythos.config.settings import AssetTypeNames
+        
+        # Required planning assets (in order of generation)
+        required_assets = [
+            AssetTypeNames.CONCEPT.value,
+            AssetTypeNames.RESEARCH.value, 
+            AssetTypeNames.SETTINGS.value,
+            AssetTypeNames.PLOT.value,
+            AssetTypeNames.THEMES.value,
+            AssetTypeNames.CHARACTERS.value,
+            AssetTypeNames.TIMELINE.value,
+            AssetTypeNames.CHAPTER_LIST.value,
+            AssetTypeNames.WRITING_STYLE.value
+        ]
+        
+        # Check if story has basic assets
+        if not story.assets:
+            return "empty", "Story has no assets (this shouldn't happen for existing stories)"
+        
+        # Check for missing planning assets
+        missing_assets = []
+        for asset_name in required_assets:
+            if asset_name not in story.assets:
+                missing_assets.append(asset_name)
+        
+        if missing_assets:
+            return "assets_incomplete", f"Missing assets: {', '.join(missing_assets)}"
+        
+        # Check if chapter outlines exist
+        chapter_outlines = {
+            key: asset for key, asset in story.assets.items() 
+            if asset.asset_type == AssetTypeNames.CHAPTER_OUTLINE.name
+        }
+        
+        if not chapter_outlines:
+            return "chapters_not_outlined", "Planning complete, but no chapter outlines exist"
+        
+        # Check manuscript chapters vs chapter outlines
+        manuscript_chapters = {
+            key: asset for key, asset in story.manuscript.items()
+            if asset.asset_type == AssetTypeNames.MANUSCRIPT_CHAPTER.name
+        }
+        
+        if not manuscript_chapters:
+            return "chapters_not_written", f"Chapter outlines ready ({len(chapter_outlines)} chapters), but no manuscript chapters written"
+        
+        if len(manuscript_chapters) < len(chapter_outlines):
+            return "chapters_partial", f"Writing in progress: {len(manuscript_chapters)}/{len(chapter_outlines)} chapters complete"
+        
+        # Check for final draft
+        if not story.draft or not story.draft.exists():
+            return "finalization_needed", "All chapters written, needs final draft compilation and EPUB creation"
+        
+        return "complete", "Story is fully complete with draft and EPUB"
+
+    def get_story_progress_summary(self, story: Story) -> str:
+        """
+        Gets a user-friendly progress summary for display in menus.
+        
+        Args:
+            story (Story): The story object.
+            
+        Returns:
+            str: A concise progress description with emoji.
+        """
+        state, description = self.get_story_state(story)
+        
+        # Map states to user-friendly summaries with emojis
+        progress_map = {
+            "empty": "🔴 Empty",
+            "assets_incomplete": "🟡 Planning in progress",
+            "chapters_not_outlined": "🟡 Ready for chapter outlines", 
+            "chapters_not_written": "🟠 Ready to write chapters",
+            "chapters_partial": "🟠 Writing chapters",
+            "finalization_needed": "🔵 Ready to finalize",
+            "complete": "✅ Complete"
+        }
+        
+        return progress_map.get(state, "❓ Unknown state")

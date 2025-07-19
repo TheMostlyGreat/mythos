@@ -189,10 +189,23 @@ def select_existing_story():
         return None
     
     print(f"\n📚 Found {len(existing_stories)} existing stories:")
-    print("-" * 50)
+    print("-" * 60)
+    
+    # Load story manager to get progress info
+    story_manager = StoryManager()
     
     for i, story_name in enumerate(existing_stories, 1):
-        print(f"{i}. {story_name.replace('-', ' ').title()}")
+        # Try to load story to get progress
+        try:
+            story = story_manager.load_story(story_name)
+            if story:
+                progress = story_manager.get_story_progress_summary(story)
+                display_title = story.title if story.title != "Untitled" else story_name.replace('-', ' ').title()
+                print(f"{i}. {display_title} - {progress}")
+            else:
+                print(f"{i}. {story_name.replace('-', ' ').title()} - ❓ Unable to load")
+        except Exception:
+            print(f"{i}. {story_name.replace('-', ' ').title()} - ❌ Error loading")
     
     print(f"{len(existing_stories) + 1}. 🔙 Go back to main menu")
     
@@ -203,7 +216,13 @@ def select_existing_story():
             
             if 1 <= choice_num <= len(existing_stories):
                 selected_story = existing_stories[choice_num - 1]
-                print(f"\n✅ Selected: {selected_story.replace('-', ' ').title()}")
+                # Load story again to get the actual title for confirmation
+                try:
+                    story = story_manager.load_story(selected_story)
+                    display_title = story.title if story and story.title != "Untitled" else selected_story.replace('-', ' ').title()
+                    print(f"\n✅ Selected: {display_title}")
+                except Exception:
+                    print(f"\n✅ Selected: {selected_story.replace('-', ' ').title()}")
                 return selected_story
             elif choice_num == len(existing_stories) + 1:
                 return None
@@ -237,43 +256,51 @@ def continue_existing_story():
         
         print(f"✅ Successfully loaded: {story.title}")
         
-        # Check if the story already has manuscript chapters
-        if story.manuscript:
-            print_warning(f"\n⚠️  This story already has {len(story.manuscript)} manuscript chapters.")
-            overwrite = input("Do you want to regenerate all chapters? (y/n): ").lower().strip()
-            if overwrite in ['y', 'yes']:
-                print("🔄 Will regenerate all chapters...")
-                story.manuscript.clear()
-                story.manuscript_metadata.clear()
-            else:
-                print("📋 Continuing from existing chapters is not yet implemented.")
-                print("For now, choose 'y' to regenerate all chapters.")
-                return False
+        # Get current story state and show progress
+        state, description = story_manager.get_story_state(story)
+        progress_summary = story_manager.get_story_progress_summary(story)
+        
+        print(f"\n📊 Current Progress: {progress_summary}")
+        print(f"📋 Status: {description}")
+        
+        # Handle complete stories
+        if state == "complete":
+            print("\n🎉 This story is already complete!")
+            print(f"📁 Check the 'stories/{story_title}' directory for your story files")
+            print("📖 Look for the .epub file to read your finished story")
+            return True
         
         # Display current story assets
         display_story_assets(story)
         
         # Confirm before proceeding
-        proceed = input(f"\nProceed with chapter generation for '{story.title}'? (y/n): ").lower().strip()
+        proceed = input(f"\nContinue from where you left off? (y/n): ").lower().strip()
         if proceed not in ['y', 'yes']:
-            print("📋 Chapter generation cancelled.")
+            print("📋 Story continuation cancelled.")
             return False
         
-        print("\n📝 Starting chapter generation...")
-        print("This may take several minutes to create your complete manuscript.")
-        print("Please be patient while we write your story!\n")
+        print(f"\n🚀 Resuming story from current state...")
+        print("This may take a few minutes depending on what needs to be completed.")
+        print("Please be patient while we continue your story!\n")
         
-        # Generate chapter content
-        story = story_builder.build_story_content(story)
+        # Smart resume from current state
+        story = story_builder.smart_resume_story(story)
         
         total_tokens = get_total_token_usage()
         
         print("\n" + "="*60)
-        print("✨ SUCCESS! Your story chapters have been generated! ✨")
+        print("✨ SUCCESS! Your story has been updated! ✨")
         print("="*60)
         print(f"\n📊 Total tokens used: {total_tokens:,}")
         print(f"\n📁 Check the 'stories/{story_title}' directory for your complete story files")
-        print("📖 Look for the .epub file to read your finished story")
+        
+        # Check final state to customize success message
+        final_state, _ = story_manager.get_story_state(story)
+        if final_state == "complete":
+            print("📖 Look for the .epub file to read your finished story")
+        else:
+            print("🔄 Run again to continue from the new progress point")
+            
         print("\nThank you for using Mythos! Happy writing! 🌟\n")
         
         return True
