@@ -3,6 +3,7 @@ from mythos.utils.llm_utils import call_OpenAI_API, create_messages
 from mythos.utils.logger import get_logger
 from mythos.config.settings import (
     QUESTIONER_SYSTEM_PROMPT,
+    QUESTIONER_RESPONSE_SCHEMA,
 )
 
 # Import thinking indicator from shared utils
@@ -20,7 +21,8 @@ class StoryQuestioner:
         self.logger = get_logger(__name__)
         self.conversation = []
         self.exchanges_count = 0
-        self.max_exchanges = 10
+        self.max_exchanges = 50  # Safety limit only - LLM should decide when to stop
+        self._last_ready_to_stop = False  # Track if LLM is ready to stop
 
     def conduct_interview(self, initial_prompt: str) -> str:
         """
@@ -46,6 +48,12 @@ class StoryQuestioner:
             # For the first exchange, generate a special opening question from the AI.
             ai_response = self._generate_first_conversation_response(initial_prompt)
             print(f"💬 {ai_response}")
+            
+            # Check if LLM wants to stop after first response
+            if self._llm_wants_to_stop(ai_response):
+                print("Perfect! Let's start developing your story.")
+                return self._build_refined_prompt(initial_prompt)
+            
             user_response = self._get_user_response()
             if self._should_exit(user_response):
                 print("Let's create your story.")
@@ -72,14 +80,18 @@ class StoryQuestioner:
                 self._record_exchange(ai_response, user_response)
                 self.exchanges_count += 1
                 
-                # Stop if we have good depth
-                if self.exchanges_count >= 8:
-                    print("I think I have what I need to start writing.")
+                # Check if LLM indicated it's ready to stop
+                if self._llm_wants_to_stop(ai_response):
+                    print("Perfect! Let's start developing your story.")
                     break
                     
         except Exception as e:
             self.logger.error(f"Error during conversation: {e}")
             print("Let's start writing with what we have!")
+        
+        # Safety check - if we hit max exchanges without LLM stopping
+        if self.exchanges_count >= self.max_exchanges:
+            print(f"\n💡 We've had a great long conversation! Let's start creating your story.")
         
         # Add wrap-up message to set clear expectations
         print("\n✅ Great! I've gathered enough details about your story.")
@@ -90,6 +102,10 @@ class StoryQuestioner:
         self.logger.info(f"Conversation complete. Had {self.exchanges_count} exchanges.")
         
         return refined_prompt
+
+    def _llm_wants_to_stop(self, ai_response: str) -> bool:
+        """Check if LLM has indicated it's ready to stop questioning."""
+        return self._last_ready_to_stop
 
     def _generate_conversation_response(self) -> str:
         """Generate natural conversational response from AI."""
@@ -109,13 +125,31 @@ class StoryQuestioner:
         try:
             response = call_OpenAI_API(
                 input=messages,
-                json_output=False
+                json_output=True,
+                json_schema=QUESTIONER_RESPONSE_SCHEMA
             )
             
-            return response.strip()
+            # Handle both dict and string responses
+            if isinstance(response, dict):
+                # Store the ready_to_stop flag for later checking
+                self._last_ready_to_stop = response.get('ready_to_stop', False)
+                return response.get('response', '').strip()
+            else:
+                # Try to parse JSON string
+                try:
+                    import json
+                    parsed_response = json.loads(response)
+                    self._last_ready_to_stop = parsed_response.get('ready_to_stop', False)
+                    return parsed_response.get('response', '').strip()
+                except (json.JSONDecodeError, AttributeError):
+                    # Fallback for non-JSON string responses
+                    self.logger.warning("Received non-JSON string response, using fallback")
+                    self._last_ready_to_stop = False
+                    return str(response).strip()
             
         except Exception as e:
             self.logger.error(f"Failed to generate response: {e}")
+            self._last_ready_to_stop = False
             return "Tell me more about what excites you most about this story!"
 
     def _generate_first_conversation_response(self, initial_prompt: str) -> str:
@@ -137,13 +171,31 @@ class StoryQuestioner:
             
             response = call_OpenAI_API(
                 input=messages,
-                json_output=False
+                json_output=True,
+                json_schema=QUESTIONER_RESPONSE_SCHEMA
             )
             
-            return response.strip()
+            # Handle both dict and string responses
+            if isinstance(response, dict):
+                # Store the ready_to_stop flag for later checking
+                self._last_ready_to_stop = response.get('ready_to_stop', False)
+                return response.get('response', '').strip()
+            else:
+                # Try to parse JSON string
+                try:
+                    import json
+                    parsed_response = json.loads(response)
+                    self._last_ready_to_stop = parsed_response.get('ready_to_stop', False)
+                    return parsed_response.get('response', '').strip()
+                except (json.JSONDecodeError, AttributeError):
+                    # Fallback for non-JSON string responses
+                    self.logger.warning("Received non-JSON string response, using fallback")
+                    self._last_ready_to_stop = False
+                    return str(response).strip()
             
         except Exception as e:
             self.logger.error(f"Failed to generate first response: {e}")
+            self._last_ready_to_stop = False
             return "That's an interesting concept! What drew you to this particular story idea?"
 
     def _get_user_response(self) -> str:
@@ -157,7 +209,6 @@ class StoryQuestioner:
                     return user_input.lower()
                 
                 if user_input:
-                    print("\n🤔 Thinking...")
                     return user_input
                 else:
                     print("💡 Please share your thoughts or type 'done' to finish")
