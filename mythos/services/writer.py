@@ -84,7 +84,6 @@ def generate_web_enhanced_research(prompt: str) -> str:
             - Belief Systems and Spirituality
             - Daily Life and Social Norms
             - Relevant Movements and Ideologies
-            - Critical Perspectives
             - Genre Research
             - Scientific/Technological Elements
             
@@ -105,7 +104,6 @@ def generate_web_enhanced_research(prompt: str) -> str:
     - Belief Systems and Spirituality (religions, mythology, rituals)
     - Daily Life and Social Norms (family structures, education, entertainment)
     - Relevant Movements and Ideologies (social, political, cultural movements)
-    - Critical Perspectives (literary/cultural criticism frameworks)
     - Genre Research (genre conventions, subgenres, opportunities)
     - Scientific/Technological Elements (relevant science, tech landscape)
     

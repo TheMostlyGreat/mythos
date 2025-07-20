@@ -171,6 +171,7 @@ class AssetTypeNames(str, Enum):
     TIMELINE = "timeline"
     CHAPTER_LIST = "chapter_list"
     WRITING_STYLE = "writing_style"
+    CRITICAL_PERSPECTIVES = "critical_perspectives"
     CHAPTER_OUTLINE = "chapter_outline"
     MANUSCRIPT_CHAPTER = "manuscript_chapter"
     MANUSCRIPT_DRAFT = "manuscript_draft"
@@ -267,6 +268,14 @@ class AssetTypes:
             "summary_length": ASSET_SUMMARY_LENGTH
         },
         {
+            "key": AssetTypeNames.CRITICAL_PERSPECTIVES.name,
+            "title": AssetTypeNames.CRITICAL_PERSPECTIVES.value,
+            "directory": ASSETS_DIR,
+            "file_extension": ".md",
+            "template_path": "templates/critical_perspectives_template.md",
+            "summary_length": ASSET_SUMMARY_LENGTH
+        },
+        {
             "key": AssetTypeNames.CHAPTER_OUTLINE.name,
             "title": AssetTypeNames.CHAPTER_OUTLINE.value,
             "directory": CHAPTER_DIR,
@@ -304,6 +313,7 @@ class AssetTypes:
 SYNOPSIS_ASSET_TYPE = [
     AssetTypeNames.CONCEPT.value,
     AssetTypeNames.RESEARCH.value,
+    AssetTypeNames.CRITICAL_PERSPECTIVES.value,
     AssetTypeNames.SETTINGS.value,
     AssetTypeNames.PLOT.value,
     AssetTypeNames.THEMES.value,

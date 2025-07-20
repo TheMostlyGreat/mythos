@@ -311,6 +311,7 @@ class StoryBuilder:
         asset_sequence = [
             AssetTypeNames.CONCEPT,  # Should already exist for existing stories
             AssetTypeNames.RESEARCH,
+            AssetTypeNames.CRITICAL_PERSPECTIVES,
             AssetTypeNames.SETTINGS,
             AssetTypeNames.PLOT,
             AssetTypeNames.THEMES,
@@ -518,6 +519,7 @@ class StoryBuilder:
         """
         asset_types = [
             AssetTypeNames.RESEARCH,
+            AssetTypeNames.CRITICAL_PERSPECTIVES,
             AssetTypeNames.SETTINGS,
             AssetTypeNames.PLOT,
             AssetTypeNames.THEMES,

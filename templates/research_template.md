@@ -56,42 +56,30 @@ List and briefly describe relevant movements and ideologies in rank order based 
    - Relevant theorists or works to reference
 3. etc
 
-## 10. Critical Perspectives
-Define the relevant critical perspectives in rank order base on their importance to the story. 
-(e.g., Feminist Criticism, Marxist Criticism, Psychoanalytic Criticism, Postcolonial Criticism, New Historicism, Reader-Response Criticism, Cultural Studies, Queer Theory, Ecocriticism, Race Theory, Gender Studies, Postmodernism, Narratology, Structuralism, Post-structuralism, Deconstruction, New Criticism, Formalism, Intersectionality, Disability Studies, Trauma Theory, Archetypal Criticism, Biographical Criticism, Sociological Criticism, Mythological Criticism, Intertextuality, Postcolonial Feminism, Media Studies, Performance Studies, Affect Theory, Cognitive Literary Studies, Digital Humanities, Posthumanism, Animal Studies, Indigenous Studies, Diaspora Studies, Transnationalism, Semiotics, Anthropological Criticism, Phenomenology, Existentialism, Hermeneutics, Reception Theory, Orientalism, Subaltern Studies, Afrofuturism, Cosmopolitanism, Transhumanism, New Materialism)
-
-1. [Critical perspective]
-   - Key concepts and how they apply to the story
-   - Relevant theorists or works to reference
-2. [Critical perspective]
-   - Key concepts and how they apply to the story
-   - Relevant theorists or works to reference
-3. etc
-
-## 11. Genre Research
+## 10. Genre Research
 - Primary Genre: [Specify the main genre of the novel]
 - Genre Conventions: [List typical elements and expectations of the genre]
 - Subgenre Elements: [If applicable, note any subgenre features]
 - Genre-Bending Opportunities: [Ideas for innovating within or subverting the genre]
 
-## 12. Scientific or Technological Elements
+## 11. Scientific or Technological Elements
 - Relevant Scientific Concepts: [List and briefly explain key scientific ideas]
 - Technological Landscape: [Describe the level of technology in the story world]
 - Scientific or Technological Research Needs: [Note areas requiring further research]
 
-## 13. Linguistic and Communication Research
+## 12. Linguistic and Communication Research
 - Languages and Dialects: [List languages or dialects featured in the story]
 - Communication Norms: [Describe how characters typically communicate]
 - Linguistic Research Needs: [Note areas requiring further language study]
 
-## 14. Expert Consultations
+## 13. Expert Consultations
 - Areas Requiring Expert Input: [List topics needing professional consultation]
 - Potential Experts or Sources: [Name individuals or organizations to contact]
 
-## 15. Research Questions
+## 14. Research Questions
 - [List specific questions that need further investigation]
 
-## 16. Bibliography
+## 15. Bibliography
 - [List all sources consulted during research]
 
 -- 
@@ -164,18 +152,18 @@ Define the relevant critical perspectives in rank order base on their importance
    - Key concepts: Representation of "otherness," cultural hierarchies
    - Relevant theorists: Edward Said, Homi Bhabha
 
-## 11. Genre Research
+## 10. Genre Research
 - Primary Genre: High Fantasy
 - Genre Conventions: Epic quest, good vs. evil, magical elements, heroic characters
 - Subgenre Elements: Epic fantasy, sword and sorcery
 - Genre-Bending Opportunities: Incorporation of linguistic elements, deep world-building
 
-## 12. Scientific or Technological Elements
+## 11. Scientific or Technological Elements
 - Relevant Scientific Concepts: Basic metallurgy, herbalism
 - Technological Landscape: Pre-industrial, with some advanced craftsmanship (e.g., Elven and Dwarven creations)
 - Scientific or Technological Research Needs: Medieval weaponry, armor-making techniques
 
-## 13. Linguistic and Communication Research
+## 12. Linguistic and Communication Research
 - Languages and Dialects: Multiple invented languages (e.g., Quenya, Sindarin, Khuzdul)
 - Communication Norms: Formal speech patterns, use of songs and poetry
 - Linguistic Research Needs: Old English, Welsh, and Finnish influences on invented languages
