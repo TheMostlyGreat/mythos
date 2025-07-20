@@ -199,7 +199,6 @@ class StoryQuestioner:
         
         refined_prompt = "\n".join(refined_parts)
         
-        self.logger.debug(f"Built refined prompt: {refined_prompt}")
         print(f"\n✨ Your enhanced story concept:\n{refined_prompt}\n")
         
         return refined_prompt 

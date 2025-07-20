@@ -23,7 +23,6 @@ class StoryAssetManager:
             base_dir (str): Base directory path for storing all story assets.
         """
         self.logger = get_logger(self.__class__.__name__)
-        self.logger.debug("Initializing StoryAssetManager")
 
     def create_asset(self, asset: StoryAsset, story_dir: str, use_markdown: bool = True) -> None:
         """

@@ -1,5 +1,10 @@
+import os
 from dataclasses import dataclass
 from enum import Enum
+
+# Logging Settings
+LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()  # Default to INFO, allow DEBUG for development
+
 # LLM Settings
 OPENAI_MODEL = "o4-mini-2025-04-16"
 ANTHROPIC_MODEL = "claude-sonnet-4-20250514"

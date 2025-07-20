@@ -1,5 +1,6 @@
 import logging
 import sys
+from mythos.config.settings import LOG_LEVEL
 
 
 class ColoredFormatter(logging.Formatter):
@@ -49,12 +50,15 @@ def get_logger(name: str) -> logging.Logger:
         logging.Logger: Configured logger instance with color support.
     """
     logger = logging.getLogger(name)
-    logger.setLevel(logging.DEBUG)
+    
+    # Use configured log level instead of hardcoded DEBUG
+    log_level = getattr(logging, LOG_LEVEL, logging.INFO)
+    logger.setLevel(log_level)
 
     if not logger.handlers:
         # Console handler for output to stdout
         console_handler = logging.StreamHandler(sys.stdout)
-        console_handler.setLevel(logging.DEBUG)
+        console_handler.setLevel(log_level)
 
         # Colored formatter for log messages
         formatter = ColoredFormatter(

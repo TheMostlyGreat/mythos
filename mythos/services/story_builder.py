@@ -34,7 +34,6 @@ class StoryBuilder:
         Initializes the StoryBuilder with necessary managers.
         """
         self.logger = get_logger(self.__class__.__name__)
-        self.logger.debug("Initializing StoryBuilder")
         self.story_manager = StoryManager()
         self.asset_manager = StoryAssetManager()
 
@@ -110,7 +109,6 @@ class StoryBuilder:
             self.story_manager.set_story_title(story, new_title)
             
             self._create_asset_with_metadata(story, concept_asset)
-            self.logger.debug(f"Added concept asset: '{concept_asset.title}'")
 
             # Step 1 Complete: Concept generated
             # Ask if user wants to continue to assets generation
@@ -328,7 +326,6 @@ class StoryBuilder:
                 asset = self._create_single_asset(story, asset_type)
                 self._create_asset_with_metadata(story, asset)
                 self.story_manager.update_story(story)
-                self.logger.debug(f"Generated and added asset: '{asset.title}'")
 
     def _resume_chapter_writing(self, story: Story) -> None:
         """
@@ -530,7 +527,6 @@ class StoryBuilder:
             asset = self._create_single_asset(story, asset_type)
             self._create_asset_with_metadata(story, asset)
             self.story_manager.update_story(story)
-            self.logger.debug(f"Generated and added asset: '{asset.title}'")
             
             # After generating baseline research, create deep dive research
             if asset_type == AssetTypeNames.RESEARCH:
@@ -1341,10 +1337,7 @@ class StoryBuilder:
         for asset_key, asset in story.manuscript.items():
             # Only process manuscript chapter assets
             if asset.asset_type == AssetTypeNames.MANUSCRIPT_CHAPTER.name:
-                self.logger.debug(f"Adding chapter content from {asset.title}")
                 draft_content += f"\n\n{asset.details}\n\n"
-        
-        self.logger.debug(f"Draft content: {draft_content}")
         
         # Define the directory and file name for the draft markdown
         draft_directory = Path(story.story_dir, AssetTypes.MANUSCRIPT_DRAFT.directory)
@@ -1354,7 +1347,6 @@ class StoryBuilder:
         try:
             # Ensure the draft directory exists
             draft_directory.mkdir(parents=True, exist_ok=True)
-            self.logger.debug(f"Draft directory ensured at: {draft_directory}")
             
             # Write the compiled content to the markdown file
             draft_file_path.write_text(draft_content.strip(), encoding='utf-8')

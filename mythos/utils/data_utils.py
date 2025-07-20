@@ -66,8 +66,6 @@ def serialize_to_json(obj, file_path: str) -> None:
         ValueError: If a circular reference is detected in a Pydantic model.
         Exception: If serialization fails.
     """
-    logger.debug(f"Starting serialization for object type: {type(obj).__name__}")
-
     try:
         if isinstance(obj, BaseModel):
             logger.debug("Object is a Pydantic model. Using built-in serialization.")

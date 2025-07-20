@@ -23,7 +23,6 @@ class StoryManager:
         Initializes the StoryManager with the directory to store story files.
         """
         self.logger = get_logger(self.__class__.__name__)
-        self.logger.debug("Initializing StoryManager")
 
     # def create_story(self, story: Story) -> Story:
     #     """
@@ -121,8 +120,6 @@ class StoryManager:
         # Convert the JSON string to a dictionary
         story_data = json.loads(story_data_json)
 
-        self.logger.debug(f"Story data: {story_data}")
-
         if use_new_format:
             # Save asset metadata directly in story file (new format)
             story_data['asset_metadata'] = {
@@ -141,7 +138,6 @@ class StoryManager:
                 for key, asset in story.assets.items()
             }
             story_data['assets'] = serialized_assets
-            self.logger.debug(f"Serialized assets (legacy): {serialized_assets}")
 
         # **Updated: Use sanitized title instead of UUID for the story file name**
         sanitized_title = sanitize_string(story.title)
@@ -301,17 +297,12 @@ class StoryManager:
         Returns:
             str: The synopsis of the story.
         """
-        self.logger.debug(f"Building synopsis for story: '{story.title}'\n"
-                          f"Story assets: {story.assets}"
-                          )
-        
         synopsis = f"## Story Title:\n{story.title}\n"
 
         for key, asset in story.assets.items():
             if key in settings.SYNOPSIS_ASSET_TYPE:
                 synopsis += f"## {asset.title}:\n{asset.summary}\n"
             
-        self.logger.debug(f"Synopsis: \n{synopsis}")
         return synopsis
 
     def get_story_state(self, story: Story) -> tuple[str, str]:

@@ -220,12 +220,10 @@ def call_Anthropic_API(
             if message.stop_reason == "tool_use":
                 logger.info("Claude used tools (web search) to enhance response")
             
-            logger.debug(f"Claude API response: {message.content}")
             logger.debug(f"Stop reason: {message.stop_reason}")
             
             # Extract and concatenate text from the response
             return_text = ' '.join(block.text for block in message.content if hasattr(block, 'text'))
-            logger.debug(f"Claude API return text: {return_text}")
 
             return return_text
             
