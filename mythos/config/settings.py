@@ -36,6 +36,8 @@ JSON_DIR = "json"
 ASSETS_DIR = "assets"
 CHAPTER_DIR = f"{ASSETS_DIR}/chapters"
 MANUSCRIPT_DIR = "manuscript"
+RESEARCH_DIR = f"{ASSETS_DIR}/research"  # New research directory
+SETTINGS_DIR = f"{ASSETS_DIR}/settings"  # New settings directory
 
 #Asset Settings
 ASSET_SUMMARY_LENGTH = 300
@@ -50,7 +52,7 @@ FILE_SEARCH_TOOL = {
 }
 
 # Enhanced story research with web search
-RESEARCH_WITH_WEB_SEARCH = True
+RESEARCH_WITH_WEB_SEARCH = False
 
 # JSON Schemas for Structured Outputs
 # These provide 100% reliable JSON generation with OpenAI Responses API
@@ -187,7 +189,7 @@ class AssetTypes:
         {
             "key": AssetTypeNames.RESEARCH.name,
             "title": AssetTypeNames.RESEARCH.value,
-            "directory": ASSETS_DIR,
+            "directory": RESEARCH_DIR,
             "file_extension": ".md",
             "template_path": "templates/research_template.md",
             "summary_length": ASSET_SUMMARY_LENGTH
@@ -195,7 +197,7 @@ class AssetTypes:
         {
             "key": AssetTypeNames.SETTINGS.name,
             "title": AssetTypeNames.SETTINGS.value,
-            "directory": ASSETS_DIR,
+            "directory": SETTINGS_DIR,
             "file_extension": ".md",
             "template_path": "templates/setting_template.md",
             "summary_length": ASSET_SUMMARY_LENGTH
@@ -294,3 +296,65 @@ SYNOPSIS_ASSET_TYPE = [
     AssetTypeNames.CHAPTER_LIST.value,
     AssetTypeNames.WRITING_STYLE.value
 ]
+
+# Story Questioner Configuration
+# Interactive story refinement through conversational AI questioning
+
+QUESTIONER_SYSTEM_PROMPT = (
+    "You are a story consultant helping users develop their story ideas through simple, engaging questions. "
+    "Your goal is to ask ONE clear question at a time that helps make their story more compelling, "
+    "engrossing, page turner for the user that they will rave about.\n"
+    "Be concise, clear, direct, and understandable. Don't use bullets or lists.\n"
+    
+    "Core Approach:\n"
+    "- Always ask the next most important question to help flesh out the story \n"
+    "- Ask simple conversational questions requiring minimal thought (yes/no, multiple choice, short answer)\n"
+    "- Acknowledge each answer positively ('Great', 'Perfect', 'Nice', 'Got it')\n"
+    "- When user says 'unsure' or 'don't know', offer 2-5 specific options to choose from\n"
+    "- If user asks for different questions, immediately adjust your approach\n"
+    "- Accept 'skip' gracefully and move to the next logical topic\n"
+    "- Never ask about endings or spoil potential mysteries\n\n"
+    
+    "Response Format:\n"
+    "- Acknowledge their answer briefly\n"
+    "- Ask your next question clearly\n"
+    "- Use phrases like 'Next question:' to maintain conversation flow\n"
+    "- When offering options, present them as a simple list\n\n"
+    
+    "Example progression:\n"
+    "'Great prompt. To make this story unforgettable, I need to understand your vision better.\n\n"
+    "First question:\n"
+    "Is the main character a [specific options based on their prompt]?'\n\n"
+    
+    "Always show genuine interest in their creative vision and help them build something they're excited to write."
+)
+# Example questions for the story questioner agent.
+# These are used to guide the user in shaping their story prompt into a more compelling narrative.
+# Each question is simple, specific, and easy to answer (yes/no, multiple choice, or short answer).
+# These examples are for developer reference and not shown to the user.
+
+QUESTIONER_EXAMPLE_QUESTIONS = [
+    "Do you want the romance to be slow-burn, forbidden, love triangle, reunited lovers, or something else?",
+    "Is the main character a man, woman, or someone else?",
+    "Is she a witch, a detective, a reporter, or something else?",
+    "Is she new to the magical world, or has she grown up in it?",
+    "Where does the story take place—big city, small town, boarding school, or somewhere else?",
+    "Does she know she's a witch at the start, or does she discover it during the story?",
+    "What kind of mystery is at the center—murder, missing person, secret society, cursed object, or something else?",
+    "Does she stumble into the secret society by accident, or is she drawn in on purpose?",
+    "What kind of magic is this society hiding—dark and dangerous, ancient and sacred, quirky and rule-bending, or something else?",
+    "Is the love interest part of the secret society?",
+    "Is the love interest helping her—or hiding things from her?",
+    "What’s one trait you want her to have that makes her stand out? (e.g. clever, stubborn, charming, reckless…)",
+    "What’s one trait the love interest has that makes him hard to read? (e.g. aloof, witty, wounded, charming, stoic)",
+    "Is the story more fast-paced and twisty, or moody and atmospheric?",
+    "Do you want the magic system to feel structured and rule-based, or wild and instinctual?",
+    "Should the setting feel historically accurate 1920s, or more alternate-history magical 1920s?",
+    "Should the secret society be tied to something real from the 1920s, or totally invented?",
+    "Is the main character originally from the city, or did she just arrive?",
+    "What brought her to the city? (e.g. job, family, running from something, chasing a dream?)",
+    "How old is she? (late teens, 20s, 30s?)",
+    "Do you want the tone to lean more romantic and sexy, or more mysterious and tense (with romance as a subplot)?",
+    "How should the story end—happy, tragic, open-ended, or twisty and unresolved?",
+    "Do you want the story to be a standalone, or the first in a series?"
+]   

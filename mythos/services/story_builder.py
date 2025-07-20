@@ -13,7 +13,7 @@ from mythos.services.writer import (
 )
 from mythos.utils.logger import get_logger
 import json
-from typing import Optional
+from typing import Optional, List
 from mythos.utils.epub import create_epub
 
 class StoryBuildException(Exception):
@@ -112,22 +112,50 @@ class StoryBuilder:
             self._create_asset_with_metadata(story, concept_asset)
             self.logger.debug(f"Added concept asset: '{concept_asset.title}'")
 
+            # Step 1 Complete: Concept generated
+            # Ask if user wants to continue to assets generation
+            from __main__ import confirm_next_step
+            if not confirm_next_step(
+                current_step="Story concept created",
+                next_step="Generate planning assets (research, settings, plot, characters, etc.)",
+                story_title=story.title
+            ):
+                # Save story and return early
+                self.story_manager.update_story(story)
+                return story
+
             self._generate_related_assets(story)
             
+            # Step 2 Complete: Assets generated
             # Stop here if requested (for user review of assets)
             if stop_after_assets:
                 self.logger.info(f"Story assets generated for: '{story.title}'. Stopping for user review.")
+                return story
+                
+            # Ask if user wants to continue to chapter outlines
+            if not confirm_next_step(
+                current_step="Planning assets generated",
+                next_step="Create chapter outlines",
+                story_title=story.title
+            ):
+                # Save story and return early
+                self.story_manager.update_story(story)
                 return story
             
             # Generate chapter structure and content
             self._generate_story_content(story)
             
-            self.logger.info(f"Successfully built story: '{story.title}'")
-
-            # Abstracted draft creation
-            story.draft = self._create_manuscript_draft(story)
-
-            create_epub(story)
+            # Check if user confirmed finalization (by checking story state)
+            state, _ = self.story_manager.get_story_state(story)
+            if state == "finalization_needed":
+                # User confirmed they want finalization - proceed with draft and EPUB creation
+                self.logger.info(f"Finalizing story: '{story.title}'")
+                story.draft = self._create_manuscript_draft(story)
+                create_epub(story)
+                self.logger.info(f"Successfully built and finalized story: '{story.title}'")
+            else:
+                # User stopped before finalization or story is in a different state
+                self.logger.info(f"Story building paused at current state: {state}")
             
             return story
 
@@ -202,23 +230,54 @@ class StoryBuilder:
         self.logger.info(f"Story state: {state} - {description}")
         
         try:
+            from __main__ import confirm_next_step
+            
             if state == "assets_incomplete":
-                # Continue generating missing planning assets
+                # Ask before continuing asset generation
+                if not confirm_next_step(
+                    current_step="Story partially complete",
+                    next_step="Continue generating missing planning assets",
+                    story_title=story.title
+                ):
+                    return story
+                    
                 self.logger.info("Continuing asset generation...")
                 self._resume_asset_generation(story)
                 
             elif state == "chapters_not_outlined":
-                # Generate chapter outlines
+                # Ask before generating chapter outlines
+                if not confirm_next_step(
+                    current_step="Planning assets complete",
+                    next_step="Generate chapter outlines",
+                    story_title=story.title
+                ):
+                    return story
+                    
                 self.logger.info("Generating chapter outlines...")
                 self.generate_chapter_assets(story)
                 
             elif state in ["chapters_not_written", "chapters_partial"]:
-                # Write remaining chapters
+                # Ask before writing chapters
+                chapter_status = "some chapters written" if state == "chapters_partial" else "chapter outlines ready"
+                if not confirm_next_step(
+                    current_step=f"Story ready for writing ({chapter_status})",
+                    next_step="Write remaining manuscript chapters",
+                    story_title=story.title
+                ):
+                    return story
+                    
                 self.logger.info("Writing manuscript chapters...")
                 self._resume_chapter_writing(story)
                 
             elif state == "finalization_needed":
-                # Create final draft and EPUB
+                # Ask before finalizing
+                if not confirm_next_step(
+                    current_step="All chapters written",
+                    next_step="Create final draft and EPUB",
+                    story_title=story.title
+                ):
+                    return story
+                    
                 self.logger.info("Finalizing story...")
                 story.draft = self._create_manuscript_draft(story)
                 create_epub(story)
@@ -473,6 +532,26 @@ class StoryBuilder:
             self.story_manager.update_story(story)
             self.logger.debug(f"Generated and added asset: '{asset.title}'")
             
+            # After generating baseline research, create deep dive research
+            if asset_type == AssetTypeNames.RESEARCH:
+                self.logger.info("Baseline research complete. Analyzing need for deep dive research...")
+                try:
+                    self.generate_deep_dive_research(story)
+                    self.logger.info("Deep dive research generation completed")
+                except Exception as e:
+                    self.logger.warning(f"Deep dive research generation failed, continuing with story: {e}")
+                    # Don't fail the entire story generation if deep dive research fails
+            
+            # After generating baseline settings, create deep dive settings  
+            if asset_type == AssetTypeNames.SETTINGS:
+                self.logger.info("Baseline settings complete. Analyzing need for deep dive settings...")
+                try:
+                    self.generate_deep_dive_settings(story)
+                    self.logger.info("Deep dive settings generation completed")
+                except Exception as e:
+                    self.logger.warning(f"Deep dive settings generation failed, continuing with story: {e}")
+                    # Don't fail the entire story generation if deep dive settings fails
+            
         return story
 
     def _create_single_asset(self, story: Story, asset_type_enum: AssetTypeNames) -> StoryAsset:
@@ -503,15 +582,422 @@ class StoryBuilder:
             
         summary = summarize_text(text=asset_text, summary_length=asset_type.summary_length)
         
+        # Special handling for research and settings assets - save as baseline.md in their respective folders
+        if asset_type_enum == AssetTypeNames.RESEARCH:
+            file_name = "baseline.md"
+        elif asset_type_enum == AssetTypeNames.SETTINGS:
+            file_name = "baseline.md"
+        else:
+            file_name = f"{asset_type.title}.md"
+        
         asset = StoryAsset(
             asset_type=asset_type_enum.name,
             title=asset_type.title,
             summary=summary,
             details=asset_text,
-            relative_file_path=Path(asset_type.directory, f"{asset_type.title}.md")
+            relative_file_path=Path(asset_type.directory, file_name)
         )
         
         return asset
+
+    def analyze_research_depth_needs(self, story: Story) -> List[str]:
+        """
+        Analyzes the story concept and baseline research to identify areas needing deep dive research.
+        
+        Args:
+            story (Story): The story object with concept and baseline research.
+            
+        Returns:
+            List[str]: List of research topics that need deep dive investigation.
+        """
+        self.logger.info(f"Analyzing research depth needs for: '{story.title}'")
+        
+        # Get story context
+        concept_text = story.assets.get(AssetTypeNames.CONCEPT.value, {}).details or ""
+        baseline_research = story.assets.get(AssetTypeNames.RESEARCH.value, {}).details or ""
+        
+        analysis_prompt = f"""
+        Analyze this story concept and baseline research to identify 2-3 specific areas that would benefit from deep dive research.
+        
+        ## Story Concept:
+        {concept_text}
+        
+        ## Baseline Research:
+        {baseline_research}
+        
+        ## Instructions:
+        - Identify the most critical areas where deeper research would enhance story authenticity
+        - Focus on elements that are central to the plot, setting, or character development
+        - Prioritize areas where factual accuracy or cultural sensitivity is important
+        - Consider genre-specific research needs (e.g., technology for sci-fi, magic systems for fantasy)
+        
+        Return a JSON list of 2-3 research topics that need deep investigation:
+        - Each topic should be specific and actionable
+        - Use clear, descriptive names (e.g., "medieval_warfare", "quantum_physics", "japanese_folklore")
+        - Topics should be substantial enough to warrant dedicated research
+        
+        Format: {{"research_topics": ["topic1", "topic2", "topic3"]}}
+        """
+        
+        try:
+            from mythos.services.writer import generate_planning_text
+            import json
+            
+            # Get structured analysis
+            analysis_result = generate_planning_text(
+                prompt=analysis_prompt,
+                json_schema={
+                    "type": "object",
+                    "properties": {
+                        "research_topics": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                            "minItems": 1,
+                            "maxItems": 3
+                        }
+                    },
+                    "required": ["research_topics"],
+                    "additionalProperties": False
+                }
+            )
+            
+            analysis_data = json.loads(analysis_result)
+            topics = analysis_data.get("research_topics", [])
+            
+            self.logger.info(f"Identified {len(topics)} research areas: {topics}")
+            return topics
+            
+        except Exception as e:
+            self.logger.error(f"Failed to analyze research depth needs: {e}")
+            # Fallback to common research areas based on concept keywords
+            concept_lower = concept_text.lower()
+            fallback_topics = []
+            
+            if any(word in concept_lower for word in ["fantasy", "magic", "medieval", "kingdom"]):
+                fallback_topics.append("medieval_culture")
+            if any(word in concept_lower for word in ["sci-fi", "space", "future", "technology"]):
+                fallback_topics.append("technology_systems")
+            if any(word in concept_lower for word in ["historical", "period", "war", "ancient"]):
+                fallback_topics.append("historical_context")
+                
+            return fallback_topics[:2] if fallback_topics else ["cultural_context"]
+
+    def create_deep_dive_research(self, story: Story, topic: str) -> StoryAsset:
+        """
+        Creates a deep dive research asset for a specific topic.
+        
+        Args:
+            story (Story): The story object.
+            topic (str): The research topic to investigate.
+            
+        Returns:
+            StoryAsset: The deep dive research asset.
+        """
+        self.logger.info(f"Creating deep dive research for topic: '{topic}'")
+        
+        # Get story context for focused research
+        concept_text = story.assets.get(AssetTypeNames.CONCEPT.value, {}).details or ""
+        baseline_research = story.assets.get(AssetTypeNames.RESEARCH.value, {}).details or ""
+        
+        research_prompt = f"""
+        Create expert-level deep dive research on "{topic}" specifically for this story.
+        
+        ## Story Concept:
+        {concept_text}
+        
+        ## Baseline Research Context:
+        {baseline_research}
+        
+        ## Deep Dive Research Instructions:
+        Create comprehensive, expert-level research focused specifically on "{topic}" as it relates to this story.
+        
+        **Research Focus Areas:**
+        - Historical accuracy and factual foundations
+        - Cultural authenticity and sensitivity
+        - Technical/scientific accuracy (if applicable) 
+        - Genre conventions and opportunities for innovation
+        - Narrative implications and story integration
+        
+        **Structure your research as:**
+        # {topic.title().replace('_', ' ')} - Deep Dive Research
+        
+        ## Overview
+        [Brief overview of why this research is critical for the story]
+        
+        ## Key Findings
+        [Major research discoveries and facts]
+        
+        ## Historical/Cultural Context
+        [Detailed background information]
+        
+        ## Technical Details
+        [Specific technical, scientific, or procedural information]
+        
+        ## Narrative Applications
+        [How this research can be applied in the story]
+        
+        ## Sources and Further Reading
+        [Credible sources and references]
+        
+        ## Story Integration Notes
+        [Specific ways to weave this research into the narrative]
+        
+        Use web search to find current, accurate information. Focus on credible sources and expert knowledge.
+        Output comprehensive, well-organized markdown that provides deep expertise for authentic storytelling.
+        """
+        
+        try:
+            from mythos.services.writer import generate_web_enhanced_research, summarize_text
+            
+            # Generate deep dive research with web search
+            research_text = generate_web_enhanced_research(prompt=research_prompt)
+            summary = summarize_text(text=research_text, summary_length=AssetTypes.RESEARCH.summary_length)
+            
+            # Create asset with topic-specific file name
+            research_asset = StoryAsset(
+                asset_type=AssetTypeNames.RESEARCH.name,
+                title=f"{topic}_research",
+                summary=summary,
+                details=research_text,
+                relative_file_path=Path(AssetTypes.RESEARCH.directory, f"{topic}.md")
+            )
+            
+            self.logger.info(f"Successfully created deep dive research for: '{topic}'")
+            return research_asset
+            
+        except Exception as e:
+            self.logger.error(f"Failed to create deep dive research for '{topic}': {e}")
+            raise StoryBuildException(f"Failed to create deep dive research for '{topic}': {e}") from e
+
+    def generate_deep_dive_research(self, story: Story) -> Story:
+        """
+        Generates deep dive research for identified areas that need more detailed investigation.
+        
+        Args:
+            story (Story): The story object with baseline research.
+            
+        Returns:
+            Story: Updated story object with deep dive research assets.
+        """
+        self.logger.info(f"Generating deep dive research for: '{story.title}'")
+        
+        try:
+            # Analyze what research areas need deep dives
+            research_topics = self.analyze_research_depth_needs(story)
+            
+            if not research_topics:
+                self.logger.info("No deep dive research areas identified")
+                return story
+            
+            # Generate deep dive research for each identified topic
+            for topic in research_topics:
+                try:
+                    deep_dive_asset = self.create_deep_dive_research(story, topic)
+                    self._create_asset_with_metadata(story, deep_dive_asset)
+                    self.logger.info(f"Generated deep dive research: '{topic}'")
+                    
+                except Exception as e:
+                    self.logger.error(f"Failed to generate deep dive for '{topic}': {e}")
+                    # Continue with other topics even if one fails
+                    continue
+            
+            # Save story with new research assets
+            self.story_manager.update_story(story)
+            self.logger.info(f"Successfully generated deep dive research for {len(research_topics)} topics")
+            
+            return story
+            
+        except Exception as e:
+            self.logger.error(f"Failed to generate deep dive research: {e}")
+            raise StoryBuildException(f"Deep dive research generation failed: {e}") from e
+
+    def analyze_settings_depth_needs(self, story: Story) -> List[str]:
+        """
+        Analyzes the story concept and baseline settings to identify specific setting components needing deep dive development.
+        
+        Args:
+            story (Story): The story object with concept and baseline settings.
+            
+        Returns:
+            List[str]: List of setting components that need detailed development.
+        """
+        self.logger.info(f"Analyzing settings depth needs for: '{story.title}'")
+        
+        # Get story context
+        concept_text = story.assets.get(AssetTypeNames.CONCEPT.value, {}).details or ""
+        baseline_settings = story.assets.get(AssetTypeNames.SETTINGS.value, {}).details or ""
+        
+        analysis_prompt = f"""
+        Analyze this story concept and baseline settings to identify which setting components need detailed development.
+        
+        ## Story Concept:
+        {concept_text}
+        
+        ## Baseline Settings:
+        {baseline_settings}
+        
+        ## Analysis Instructions:
+        Based on the story concept and genre, identify 2-4 setting components that are CRITICAL for this specific story and need expert-level detail. Consider:
+        
+        **Possible Setting Components:**
+        - geography (physical landscape, climate, natural features)
+        - locations (specific places, buildings, landmarks) 
+        - culture (customs, traditions, social norms, religion)
+        - politics (government, laws, political tensions)
+        - economy (trade, currency, class systems, economics)
+        - technology (tech level, magic systems, innovations)
+        - daily_life (occupations, clothing, food, entertainment)
+        - history (past events, conflicts, founding myths)
+        
+        **Selection Criteria:**
+        - Which components are central to the plot or character development?
+        - Which components need authentic detail for reader immersion?
+        - Which components present unique challenges or opportunities?
+        - Which components are most likely to be researched by readers?
+        
+        Return ONLY a comma-separated list of 2-4 component names from the list above.
+        Example: "geography, politics, technology"
+        """
+        
+        try:
+            result = generate_planning_text(prompt=analysis_prompt)
+            
+            # Parse the result to extract component names
+            if result and not result.startswith("Error"):
+                # Clean and split the result
+                components = [comp.strip().lower() for comp in result.replace('\n', '').split(',')]
+                # Validate components against known types
+                valid_components = ['geography', 'locations', 'culture', 'politics', 'economy', 'technology', 'daily_life', 'history']
+                selected_components = [comp for comp in components if comp in valid_components]
+                
+                self.logger.info(f"Selected setting components for deep dive: {selected_components}")
+                return selected_components[:4]  # Limit to max 4 components
+            else:
+                self.logger.warning(f"Failed to analyze settings depth needs: {result}")
+                return []
+                
+        except Exception as e:
+            self.logger.error(f"Error analyzing settings depth needs: {e}")
+            return []
+
+    def generate_deep_dive_settings(self, story: Story) -> None:
+        """
+        Generates deep dive settings for components identified as needing detailed development.
+        
+        Args:
+            story (Story): The story object.
+        """
+        self.logger.info(f"Generating deep dive settings for: '{story.title}'")
+        
+        # Analyze which setting components need deep dive research
+        setting_components = self.analyze_settings_depth_needs(story)
+        
+        if not setting_components:
+            self.logger.info("No specific setting components identified for deep dive development")
+            return
+            
+        self.logger.info(f"Generating deep dive settings for: {', '.join(setting_components)}")
+        
+        # Generate deep dive settings for each identified component
+        for component in setting_components:
+            try:
+                deep_dive_asset = self.create_deep_dive_settings(story, component)
+                self._create_asset_with_metadata(story, deep_dive_asset)
+                self.logger.info(f"Generated deep dive settings: '{component}'")
+                
+            except Exception as e:
+                self.logger.error(f"Failed to generate deep dive settings for '{component}': {e}")
+                # Continue with other components even if one fails
+
+    def create_deep_dive_settings(self, story: Story, component: str) -> StoryAsset:
+        """
+        Creates a deep dive settings asset for a specific setting component.
+        
+        Args:
+            story (Story): The story object.
+            component (str): The setting component to develop in detail.
+            
+        Returns:
+            StoryAsset: The deep dive settings asset.
+        """
+        self.logger.info(f"Creating deep dive settings for component: '{component}'")
+        
+        # Get story context for focused settings development
+        concept_text = story.assets.get(AssetTypeNames.CONCEPT.value, {}).details or ""
+        baseline_settings = story.assets.get(AssetTypeNames.SETTINGS.value, {}).details or ""
+        baseline_research = story.assets.get(AssetTypeNames.RESEARCH.value, {}).details or ""
+        
+        settings_prompt = f"""
+        Create detailed, expert-level setting development for "{component}" specifically for this story.
+        
+        ## Story Concept:
+        {concept_text}
+        
+        ## Baseline Settings Context:
+        {baseline_settings}
+        
+        ## Research Context:
+        {baseline_research}
+        
+        ## Deep Dive Settings Instructions:
+        Create comprehensive, detailed world-building for "{component}" as it relates to this story.
+        
+        **Setting Development Focus Areas:**
+        - Authentic detail that enhances reader immersion
+        - Story-relevant elements that support plot and character development
+        - Cultural accuracy and sensitivity (if based on real-world cultures)
+        - Internal consistency within the story world
+        - Practical considerations for narrative integration
+        
+        **Structure your settings as:**
+        # {component.title().replace('_', ' ')} Settings
+        
+        ## Overview
+        [Brief overview of why this component is critical for the story]
+        
+        ## Detailed Description
+        [Comprehensive details about this setting component]
+        
+        ## Story Integration
+        [How this component directly supports the plot and characters]
+        
+        ## Cultural Context
+        [Cultural background and authenticity considerations]
+        
+        ## Practical Details
+        [Specific details that writers can use in scenes]
+        
+        ## Visual Elements
+        [Sensory details for immersive description]
+        
+        ## Character Interaction
+        [How characters would realistically interact with this component]
+        
+        ## Plot Implications
+        [How this component creates opportunities or constraints for the story]
+        
+        Focus on practical, story-relevant details that enhance authenticity and support narrative goals.
+        Output comprehensive, well-organized markdown that provides detailed world-building for compelling storytelling.
+        """
+        
+        # Generate the deep dive settings content
+        settings_content = generate_planning_text(prompt=settings_prompt)
+        
+        if not settings_content or settings_content.startswith("Error"):
+            raise ValueError(f"Failed to generate settings content for component '{component}': {settings_content}")
+        
+        summary = summarize_text(text=settings_content, summary_length=AssetTypes.SETTINGS.summary_length)
+        
+        # Create settings asset in the settings folder
+        deep_dive_asset = StoryAsset(
+            asset_type=AssetTypeNames.SETTINGS.name,
+            title=f"{component}_settings",
+            summary=summary,
+            details=settings_content,
+            relative_file_path=Path(AssetTypes.SETTINGS.directory, f"{component}.md")
+        )
+        
+        return deep_dive_asset
 
     def _assemble_planning_prompt(self, story: Story, asset_type: AssetTypes, current_asset: Optional[StoryAsset] = None) -> str:
         """
@@ -783,7 +1269,32 @@ class StoryBuilder:
     def _generate_story_content(self, story: Story) -> Story:
         """Generates chapter structure and content."""
         self.generate_chapter_assets(story)
+        
+        # Step 3 Complete: Chapter outlines generated
+        # Ask if user wants to continue to writing chapters
+        from __main__ import confirm_next_step
+        if not confirm_next_step(
+            current_step="Chapter outlines created",
+            next_step="Write full manuscript chapters",
+            story_title=story.title
+        ):
+            # Save story and return early
+            self.story_manager.update_story(story)
+            return story
+        
         self.write_chapters(story)
+        
+        # Step 4 Complete: Chapters written
+        # Ask if user wants to continue to finalization
+        if not confirm_next_step(
+            current_step="All chapters written",
+            next_step="Create final draft and EPUB",
+            story_title=story.title
+        ):
+            # Save story and return early
+            self.story_manager.update_story(story)
+            return story
+            
         return story
 
     def _build_chapter_prompt(self, synopsis: str, chapter_details: dict, writing_style: str, story_so_far: str, chapter_title: str) -> str:

@@ -214,12 +214,7 @@ class StoryManager:
                 # Load each asset from its JSON string and .asset file (legacy)
                 for asset_key, asset_json_str in legacy_assets.items():
                     try:
-                        # Check if it's already a dictionary or needs JSON parsing
-                        if isinstance(asset_json_str, dict):
-                            asset_info = asset_json_str
-                        else:
-                            asset_info = json.loads(asset_json_str)
-                            
+                        asset_info = json.loads(asset_json_str)
                         asset_path = Path(story.story_dir, asset_info["relative_file_path"])
                         
                         if asset_path.exists():
@@ -241,12 +236,7 @@ class StoryManager:
                 # Load legacy manuscript assets if any
                 for manuscript_key, manuscript_json_str in legacy_manuscript.items():
                     try:
-                        # Check if it's already a dictionary or needs JSON parsing
-                        if isinstance(manuscript_json_str, dict):
-                            manuscript_info = manuscript_json_str
-                        else:
-                            manuscript_info = json.loads(manuscript_json_str)
-                            
+                        manuscript_info = json.loads(manuscript_json_str)
                         manuscript_path = Path(story.story_dir, manuscript_info["relative_file_path"])
                         
                         if manuscript_path.exists():

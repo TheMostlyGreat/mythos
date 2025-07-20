@@ -3,7 +3,8 @@ import pytest
 from unittest.mock import patch, MagicMock, call
 from mythos.utils.llm_utils import (
     call_OpenAI_API,
-    call_Anthropic_API
+    call_Anthropic_API,
+    create_messages
 )
 from mythos.config.settings import OPENAI_MODEL, ANTHROPIC_MODEL, MAX_RETRIES, NARRATIVE_SYSTEM_PROMPT
 
@@ -44,7 +45,8 @@ def test_call_OpenAI_API_success(mock_openai):
 
     prompt = "Once upon a time"
     system_prompt = "You are a storyteller."
-    result = call_OpenAI_API(prompt, system_prompt)
+    messages = create_messages(prompt, system_prompt)
+    result = call_OpenAI_API(input=messages, json_output=True)
 
     assert result == "Generated narrative text."
     mock_client.responses.create.assert_called_once()
@@ -52,8 +54,7 @@ def test_call_OpenAI_API_success(mock_openai):
     # Verify the call was made with the correct Responses API parameters
     call_args = mock_client.responses.create.call_args
     assert call_args[1]['model'] == OPENAI_MODEL
-    assert call_args[1]['input'] == prompt
-    assert call_args[1]['instructions'] == system_prompt + "You are a machine that only returns and replies with valid, iterable RFC8259 compliantJSON in your responses. Ensure the JSON is well-formed and does not include any extraneous characters or formattingYour responses should be in the following format: {'key': 'value'}"
+    assert call_args[1]['input'] == messages
     assert call_args[1]['max_output_tokens'] == 4000
     assert call_args[1]['temperature'] == 1
 
@@ -73,8 +74,9 @@ def test_call_OpenAI_API_with_schema(mock_openai):
     schema = {"type": "object", "properties": {"name": {"type": "string"}}}
     prompt = "Generate a name"
     system_prompt = "You are helpful."
+    messages = create_messages(prompt, system_prompt)
     
-    result = call_OpenAI_API(prompt, system_prompt, json_schema=schema)
+    result = call_OpenAI_API(input=messages, json_output=True, json_schema=schema)
 
     assert result == '{"name": "test"}'
     
@@ -82,7 +84,7 @@ def test_call_OpenAI_API_with_schema(mock_openai):
     call_args = mock_client.responses.create.call_args
     assert 'text' in call_args[1]
     assert call_args[1]['text']['format']['type'] == 'json_schema'
-    assert call_args[1]['text']['format']['schema'] == schema
+    assert call_args[1]['text']['format']['schema']['additionalProperties'] == False
     assert call_args[1]['text']['format']['strict'] == True
 
 @patch('mythos.utils.llm_utils.OpenAI')
@@ -100,9 +102,10 @@ def test_call_OpenAI_API_with_previous_response_id(mock_openai):
 
     prompt = "Tell me more"
     system_prompt = "You are helpful."
+    messages = create_messages(prompt, system_prompt)
     previous_id = "resp_123456789"
     
-    result = call_OpenAI_API(prompt, system_prompt, previous_response_id=previous_id)
+    result = call_OpenAI_API(input=messages, previous_response_id=previous_id)
 
     assert result == "Continuing the conversation."
     
@@ -121,7 +124,8 @@ def test_call_OpenAI_API_failure(mock_openai):
 
     prompt = "Test prompt"
     system_prompt = "Test system"
-    result = call_OpenAI_API(prompt, system_prompt)
+    messages = create_messages(prompt, system_prompt)
+    result = call_OpenAI_API(input=messages)
 
     assert result.startswith("Error: Unable to generate LLM content with OpenAI Responses API")
     assert mock_client.responses.create.call_count == MAX_RETRIES
@@ -185,7 +189,8 @@ def test_OpenAI_API_real_api():
     Ensure that the OPENAI_API_KEY environment variable is set before running this test.
     """
     prompt = "Tell me a story that starts with 'In a galaxy far, far away' and includes a 'Jedi' character."
-    result = call_OpenAI_API(prompt=prompt, system_prompt=NARRATIVE_SYSTEM_PROMPT)
+    messages = create_messages(prompt, NARRATIVE_SYSTEM_PROMPT)
+    result = call_OpenAI_API(input=messages, json_output=False)
     
     assert isinstance(result, str), "Result should be a string."
     assert len(result) > 0, "Result should not be empty."

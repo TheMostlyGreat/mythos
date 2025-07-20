@@ -1,5 +1,5 @@
 import time
-from typing import Optional, Dict, Any, Union
+from typing import Optional, Dict, Any, Union, List
 from openai import OpenAI
 from anthropic import Anthropic
 from mythos.config.settings import OPENAI_MODEL, MAX_RETRIES, ANTHROPIC_MODEL, JSON_SYSTEM_PROMPT
@@ -9,23 +9,38 @@ from mythos.utils.token_counter import TokenCounter
 logger = get_logger(__name__)
 token_counter = TokenCounter()
 
+def create_messages(prompt: str, system_prompt: Optional[str] = None) -> List[Dict[str, Any]]:
+    """
+    Helper function to convert prompt + system_prompt to message format.
+    
+    Args:
+        prompt: The user prompt
+        system_prompt: Optional system prompt
+        
+    Returns:
+        List of messages in the format expected by the Responses API
+    """
+    messages = []
+    if system_prompt:
+        messages.append({"role": "system", "content": system_prompt})
+    messages.append({"role": "user", "content": prompt})
+    return messages
+
 def call_OpenAI_API(
-    prompt: str, 
-    system_prompt: str, 
-    json_output: bool = True,
+    input: List[Dict[str, Any]],
+    json_output: bool = False,
     json_schema: Optional[Dict[str, Any]] = None,
     previous_response_id: Optional[str] = None,
     tools: Optional[list] = None,
     return_response_id: bool = False
 ) -> Union[str, tuple[str, str]]:
     """
-    Call OpenAI Responses API - the new stateful API that replaces Chat Completions.
+    Call OpenAI Responses API using message-based input format.
     
     Args:
-        prompt: The user prompt
-        system_prompt: The system prompt (uses instructions parameter)
+        input: List of messages with roles (developer, system, user, assistant)
         json_output: Whether to expect JSON output
-        json_schema: Optional JSON schema for Structured Outputs (recommended)
+        json_schema: Optional JSON schema for Structured Outputs
         previous_response_id: ID from previous response for conversation continuity
         tools: Optional list of tools to enable (e.g., web_search, file_search)
         return_response_id: If True, returns (content, response_id) tuple
@@ -34,53 +49,45 @@ def call_OpenAI_API(
         If return_response_id is False: The API response as a string
         If return_response_id is True: Tuple of (response_string, response_id)
     """
-    max_tokens = 4000  # Maximum number of tokens for the response
-    temperature = 1    # Controls randomness of the output
-
+    max_output_tokens = 4000
+    temperature = 1
     client = OpenAI()
 
     for attempt in range(MAX_RETRIES):
         try:
-            # Prepare text format for structured outputs
-            text_format = None
+            # Build request parameters
+            request_params = {
+                "model": OPENAI_MODEL,
+                "input": input,
+                "max_output_tokens": max_output_tokens,
+                "temperature": temperature,
+            }
+            
+            # Add JSON format if requested
             if json_output:
                 if json_schema:
-                    # Use enhanced Structured Outputs (recommended)
-                    text_format = {
+                    # Structured outputs
+                    validated_schema = json_schema.copy()
+                    if "additionalProperties" not in validated_schema:
+                        validated_schema["additionalProperties"] = False
+                    
+                    request_params["text"] = {
                         "format": {
                             "type": "json_schema",
                             "name": "response",
-                            "schema": json_schema,
+                            "schema": validated_schema,
                             "strict": True
                         }
                     }
                 else:
-                    # Fall back to basic JSON mode
-                    text_format = {"format": {"type": "json_object"}}
-
-            # Ensure prompt contains "json" when JSON output is requested
-            input_prompt = prompt
-            if json_output and "json" not in prompt.lower():
-                input_prompt = f"{prompt}\n\nPlease provide your response in JSON format."
-            
-            # Build the request parameters
-            request_params = {
-                "model": OPENAI_MODEL,
-                "input": input_prompt,
-                "instructions": system_prompt if not (json_output and not json_schema) else system_prompt + JSON_SYSTEM_PROMPT,
-                "max_output_tokens": max_tokens,
-                "temperature": temperature,
-            }
-            
-            # Add text format if JSON output is requested
-            if text_format:
-                request_params["text"] = text_format
+                    # Basic JSON mode
+                    request_params["text"] = {
+                        "format": {"type": "json_object"}
+                    }
                 
-            # Add previous response ID for conversation continuity
+            # Add optional parameters
             if previous_response_id:
                 request_params["previous_response_id"] = previous_response_id
-                
-            # Add tools if provided (e.g., web search, file search)
             if tools:
                 request_params["tools"] = tools
 
@@ -89,24 +96,19 @@ def call_OpenAI_API(
             
             # Track token usage
             if hasattr(response, 'usage') and response.usage:
-                # Check if this is the new responses API or old chat completions
-                if hasattr(response.usage, 'total_tokens'):
-                    token_counter.add_tokens(response.usage.total_tokens)
-                else:
-                    # Fallback for newer API versions that separate input/output tokens
-                    input_tokens = getattr(response.usage, 'input_tokens', 0)
-                    output_tokens = getattr(response.usage, 'output_tokens', 0)
-                    total_tokens = input_tokens + output_tokens
-                    token_counter.add_tokens(total_tokens)
+                input_tokens = getattr(response.usage, 'input_tokens', 0)
+                output_tokens = getattr(response.usage, 'output_tokens', 0)
+                total_tokens = input_tokens + output_tokens
+                logger.debug(f"OpenAI Responses API tokens - Input: {input_tokens}, Output: {output_tokens}, Total: {total_tokens}")
+                token_counter.add_tokens(total_tokens)
             
-            # With Structured Outputs, no manual JSON validation needed!
-            # The Responses API guarantees valid JSON when using schemas
+            response_content = response.output_text
             
             if return_response_id:
-                return response.output_text, response.id
+                return response_content, response.id
             else:
-                return response.output_text
-            
+                return response_content
+                
         except Exception as e:
             if attempt < MAX_RETRIES - 1:
                 logger.error(f"Error generating LLM content with OpenAI Responses API (attempt {attempt + 1}): {e}")
@@ -123,7 +125,9 @@ def call_Anthropic_API(
     prompt: str, 
     system_prompt: str, 
     use_web_search: bool = False,
-    structured_output: bool = False
+    structured_output: bool = False,
+    thinking_mode: bool = False,
+    thinking_budget_tokens: int = 4000
 ) -> str:
     """
     Calls the Anthropic Claude API.
@@ -133,6 +137,8 @@ def call_Anthropic_API(
         system_prompt (str): The system-level instructions for the API.
         use_web_search (bool): Enable web search tool for research tasks.
         structured_output (bool): Request more structured, consistent output.
+        thinking_mode (bool): Enable Claude's extended thinking capabilities.
+        thinking_budget_tokens (int): Token budget for thinking (min 1024, max < max_tokens).
 
     Returns:
         str: The generated text from Claude.
@@ -176,6 +182,15 @@ def call_Anthropic_API(
     # Add tools if specified
     if tools:
         request_params["tools"] = tools
+
+    # Add thinking mode if enabled
+    if thinking_mode:
+        # Ensure thinking budget is within valid range
+        thinking_budget = max(1024, min(thinking_budget_tokens, max_tokens - 100))
+        request_params["thinking"] = {
+            "type": "enabled",
+            "budget_tokens": thinking_budget
+        }
 
     # Enhance system prompt for structured output if requested
     if structured_output:

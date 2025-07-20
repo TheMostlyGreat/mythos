@@ -1,5 +1,5 @@
 from typing import Optional, Dict, Any, List
-from mythos.utils.llm_utils import call_Anthropic_API, call_OpenAI_API
+from mythos.utils.llm_utils import call_Anthropic_API, call_OpenAI_API, create_messages
 from mythos.config.settings import (
     NARRATIVE_SYSTEM_PROMPT, 
     PLANNING_SYSTEM_PROMPT,
@@ -39,10 +39,12 @@ def generate_planning_text(
     str
         The generated planning text or an error message if generation fails.
     """
+    # Convert to message format using helper function
+    messages = create_messages(prompt, system_prompt)
+    
     # Use Structured Outputs and tools when provided
     return call_OpenAI_API(
-        prompt=prompt, 
-        system_prompt=system_prompt,
+        input=messages,
         json_output=json_schema is not None,
         json_schema=json_schema,
         tools=tools
@@ -111,10 +113,11 @@ def generate_web_enhanced_research(prompt: str) -> str:
     For creative sections, draw on genre knowledge and artistic influences.
     Output as well-organized markdown that will help create authentic, well-researched stories."""
     
-    # Use web search tool for enhanced research without schema constraints
+    # Convert to message format and use web search tool
+    messages = create_messages(prompt, research_system_prompt)
+    
     return call_OpenAI_API(
-        prompt=prompt,
-        system_prompt=research_system_prompt,
+        input=messages,
         tools=[WEB_SEARCH_TOOL]
     )
 
@@ -230,10 +233,12 @@ def generate_conversation_aware_content(
     tuple[str, str]
         A tuple of (generated_content, response_id) for future conversation continuity
     """
+    # Convert to message format using helper function
+    messages = create_messages(prompt, system_prompt)
+    
     # Use the enhanced API to get both content and response ID
     result = call_OpenAI_API(
-        prompt=prompt,
-        system_prompt=system_prompt,
+        input=messages,
         json_output=json_schema is not None,
         json_schema=json_schema,
         previous_response_id=previous_response_id,
@@ -257,4 +262,7 @@ def summarize_text(text: str, summary_length: int) -> str:
     prompt = (f"## Text to summarize:\n{text}\n"
               f"## Prompt: Please summarize the text to {summary_length} words.")
     
-    return call_OpenAI_API(prompt=prompt, system_prompt=PLANNING_SYSTEM_PROMPT)
+    # Convert to message format using helper function
+    messages = create_messages(prompt, PLANNING_SYSTEM_PROMPT)
+    
+    return call_OpenAI_API(input=messages)

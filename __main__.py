@@ -1,4 +1,5 @@
 from mythos.services.story_builder import StoryBuilder
+from mythos.services.story_questioner import StoryQuestioner
 from mythos.story.story_manager import StoryManager
 from mythos.utils.llm_utils import get_total_token_usage
 from pathlib import Path
@@ -139,11 +140,46 @@ def confirm_proceed_to_chapters():
             print_warning("Please enter 'y' for yes or 'n' for no.")
 
 
+def confirm_next_step(current_step: str, next_step: str, story_title: str = "") -> bool:
+    """
+    Ask user if they want to proceed to the next step in story creation.
+    
+    Args:
+        current_step (str): Description of what was just completed
+        next_step (str): Description of what will happen next
+        story_title (str): Optional story title for context
+        
+    Returns:
+        bool: True if user wants to continue, False otherwise
+    """
+    title_context = f" for '{story_title}'" if story_title else ""
+    
+    print(f"\n✅ {current_step} completed{title_context}!")
+    print(f"📋 Next step: {next_step}")
+    print("\nWould you like to continue to the next step?")
+    print("1. ✅ Yes, continue")
+    print("2. 📋 No, stop here (you can resume later)")
+    
+    while True:
+        try:
+            choice = input("\nEnter your choice (1 or 2): ").strip()
+            if choice == "1":
+                return True
+            elif choice == "2":
+                print(f"\n📋 Stopping here. You can resume this story later by selecting 'Resume an existing story'.")
+                return False
+            else:
+                print_warning("Please enter 1 or 2.")
+        except KeyboardInterrupt:
+            print_warning("\n\nExiting Mythos. Happy writing! ✨")
+            exit(0)
+
+
 def get_user_choice():
     """Ask user whether to create a new story or continue an existing one."""
     print("\nWhat would you like to do?")
     print("1. 📝 Create a new story from scratch")
-    print("2. 📖 Continue writing chapters for an existing story")
+    print("2. 📖 Resume an existing story from where you left off")
     print("3. 🚪 Exit")
     
     while True:
@@ -236,7 +272,7 @@ def select_existing_story():
 
 
 def continue_existing_story():
-    """Continue writing chapters for an existing story."""
+    """Resume an existing story from where you left off."""
     story_title = select_existing_story()
     if not story_title:
         return False  # User chose to go back
@@ -321,42 +357,42 @@ def create_new_story():
         else:
             print("\nLet's try again with a different concept.\n")
     
-    print("\n🚀 Starting story asset generation...")
-    print("This will create the foundation for your story (characters, plot, themes, etc.)")
-    print("Please be patient while the AI works its magic!\n")
+    # NEW: Interactive story refinement
+    print("\n🎯 Let's refine your concept to make it amazing!")
+    questioner = StoryQuestioner()
+    refined_concept = questioner.conduct_interview(concept)
+    
+    print("\n🚀 Starting story creation...")
+    print("We'll guide you through each step of the process.")
+    print("You can choose to stop at any stage and resume later!\n")
     
     try:
         story_builder = StoryBuilder()
         
-        # Phase 1: Generate story assets only
-        story = story_builder.build_story_assets(concept)
+        # Use the refined concept for story building
+        story = story_builder.build_story(refined_concept)
         
-        # Display assets for user review
-        display_story_assets(story)
+        total_tokens = get_total_token_usage()
         
-        # Ask user if they want to proceed to chapter generation
-        if confirm_proceed_to_chapters():
-            print("\n📝 Starting chapter generation...")
-            print("This may take several minutes to create your complete manuscript.")
-            print("Please be patient while we write your story!\n")
-            
-            # Phase 2: Generate chapter content
-            story = story_builder.build_story_content(story)
-            
-            total_tokens = get_total_token_usage()
-            
-            print("\n" + "="*60)
-            print("✨ SUCCESS! Your complete story has been generated! ✨")
-            print("="*60)
-            print(f"\n📊 Total tokens used: {total_tokens:,}")
-            print("\n📁 Check the 'stories' directory for your complete story files")
+        # Check final state to provide appropriate success message
+        from mythos.story import StoryManager
+        story_manager = StoryManager()
+        final_state, description = story_manager.get_story_state(story)
+        
+        print("\n" + "="*60)
+        print("✨ STORY CREATION COMPLETE! ✨")
+        print("="*60)
+        print(f"\n📊 Total tokens used: {total_tokens:,}")
+        print(f"\n📁 Check the 'stories/{story.title}' directory for your story files")
+        
+        if final_state == "complete":
             print("📖 Look for the .epub file to read your finished story")
-            print("\nThank you for using Mythos! Happy writing! 🌟\n")
+            print("\n🎉 Your complete story is ready to read!")
         else:
-            print("\n📋 Story assets saved! You can use these as a foundation for your writing.")
-            print(f"📁 Check the 'stories/{story.title}' directory for your story assets")
-            print("\nTo generate chapters later, you can run Mythos again and select option 2.")
-            print("\nThank you for using Mythos! Happy writing! 🌟\n")
+            print(f"📋 Current status: {description}")
+            print("🔄 You can resume this story later by selecting 'Resume an existing story'")
+            
+        print("\nThank you for using Mythos! Happy writing! 🌟\n")
         
         return True
         
