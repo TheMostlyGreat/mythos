@@ -5,6 +5,9 @@ from mythos.config.settings import (
     QUESTIONER_SYSTEM_PROMPT,
 )
 
+# Import thinking indicator from shared utils
+from mythos.utils.ui_utils import print_thinking
+
 
 class StoryQuestioner:
     """
@@ -78,6 +81,10 @@ class StoryQuestioner:
             self.logger.error(f"Error during conversation: {e}")
             print("Let's start writing with what we have!")
         
+        # Add wrap-up message to set clear expectations
+        print("\n✅ Great! I've gathered enough details about your story.")
+        print("🎯 Now I'll use everything we discussed to create your enhanced story concept.")
+        
         # Build final refined prompt
         refined_prompt = self._build_refined_prompt(initial_prompt)
         self.logger.info(f"Conversation complete. Had {self.exchanges_count} exchanges.")
@@ -86,6 +93,9 @@ class StoryQuestioner:
 
     def _generate_conversation_response(self) -> str:
         """Generate natural conversational response from AI."""
+        
+        # Show thinking indicator before LLM call
+        print("\n🤔 Thinking of the next question...")
         
         # Build the full conversation context
         messages = self.conversation.copy()
@@ -110,6 +120,9 @@ class StoryQuestioner:
 
     def _generate_first_conversation_response(self, initial_prompt: str) -> str:
         """Generate the opening conversational response from AI for the first exchange."""
+        
+        # Show thinking indicator before LLM call
+        print("\n🤔 Thinking of questions to help develop your story...")
         
         prompt = f"""
         The user has shared this story concept: {initial_prompt}

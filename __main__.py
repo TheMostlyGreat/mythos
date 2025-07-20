@@ -2,27 +2,9 @@ from mythos.services.story_builder import StoryBuilder
 from mythos.services.story_questioner import StoryQuestioner
 from mythos.story.story_manager import StoryManager
 from mythos.utils.llm_utils import get_total_token_usage
+from mythos.utils.ui_utils import print_error, print_warning, print_thinking, confirm_next_step
 from pathlib import Path
 import os
-
-
-# ANSI color codes for terminal output
-class Colors:
-    RED = '\033[31m'
-    YELLOW = '\033[33m'
-    GREEN = '\033[32m'
-    CYAN = '\033[36m'
-    RESET = '\033[0m'
-
-
-def print_error(message: str):
-    """Print error message in red color."""
-    print(f"{Colors.RED}{message}{Colors.RESET}")
-
-
-def print_warning(message: str):
-    """Print warning message in yellow color."""
-    print(f"{Colors.YELLOW}{message}{Colors.RESET}")
 
 
 def display_welcome():
@@ -364,7 +346,9 @@ def create_new_story():
     
     print("\n🚀 Starting story creation...")
     print("We'll guide you through each step of the process.")
-    print("You can choose to stop at any stage and resume later!\n")
+    print("You can choose to stop at any stage and resume later!")
+    
+    print_thinking("Creating your story concept...")
     
     try:
         story_builder = StoryBuilder()

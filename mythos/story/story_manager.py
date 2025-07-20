@@ -290,6 +290,9 @@ class StoryManager:
     def get_synopsis(self, story: Story) -> str:
         """
         Builds and returns a synopsis for the story by combining the story's title, concept, and all its assets.
+        
+        For the concept asset, includes full details to preserve character names and key specifics.
+        For other assets, uses summaries to keep the synopsis manageable.
 
         Args:
             story (Story): The story object.
@@ -301,7 +304,12 @@ class StoryManager:
 
         for key, asset in story.assets.items():
             if key in settings.SYNOPSIS_ASSET_TYPE:
-                synopsis += f"## {asset.title}:\n{asset.summary}\n"
+                # For concept, include full details to preserve character names and specifics
+                if key == settings.AssetTypeNames.CONCEPT.value:
+                    synopsis += f"## {asset.title}:\n{asset.details}\n"
+                else:
+                    # For other assets, use summaries to keep synopsis manageable
+                    synopsis += f"## {asset.title}:\n{asset.summary}\n"
             
         return synopsis
 

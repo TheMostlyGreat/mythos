@@ -16,6 +16,9 @@ import json
 from typing import Optional, List
 from mythos.utils.epub import create_epub
 
+# Import UI utilities from shared utils
+from mythos.utils.ui_utils import print_thinking, confirm_next_step
+
 class StoryBuildException(Exception):
     """Raised when story building process fails."""
     pass
@@ -112,7 +115,6 @@ class StoryBuilder:
 
             # Step 1 Complete: Concept generated
             # Ask if user wants to continue to assets generation
-            from __main__ import confirm_next_step
             if not confirm_next_step(
                 current_step="Story concept created",
                 next_step="Generate planning assets (research, settings, plot, characters, etc.)",
@@ -228,7 +230,6 @@ class StoryBuilder:
         self.logger.info(f"Story state: {state} - {description}")
         
         try:
-            from __main__ import confirm_next_step
             
             if state == "assets_incomplete":
                 # Ask before continuing asset generation
@@ -434,6 +435,7 @@ class StoryBuilder:
                     chapter_title=chapter_title
                 )
 
+                print_thinking(f"Writing full narrative for {chapter_title}...")
                 chapter_text = generate_narrative_text(prompt=chapter_prompt)
                 
                 if not chapter_text or chapter_text.startswith("Error:"):
@@ -474,6 +476,8 @@ class StoryBuilder:
             StoryAsset: The generated concept asset.
         """
         prompt = self._assemble_planning_prompt(story, AssetTypes.CONCEPT)
+        
+        print_thinking("Analyzing your story idea and creating the concept...")
         
         try:
             # Get structured JSON with title + markdown content
@@ -563,6 +567,9 @@ class StoryBuilder:
         """
         asset_type = getattr(AssetTypes, asset_type_enum.name)
         prompt = self._assemble_planning_prompt(story, asset_type)
+        
+        # Show thinking indicator with specific asset type
+        print_thinking(f"Creating {asset_type.title.lower()}...")
         
         # Use Structured Outputs for specific asset types that need reliable JSON
         if asset_type_enum == AssetTypeNames.CHARACTERS:
@@ -745,6 +752,7 @@ class StoryBuilder:
         try:
             from mythos.services.writer import generate_web_enhanced_research, summarize_text
             
+            print_thinking(f"Researching {topic} with web search...")
             # Generate deep dive research with web search
             research_text = generate_web_enhanced_research(prompt=research_prompt)
             summary = summarize_text(text=research_text, summary_length=AssetTypes.RESEARCH.summary_length)
@@ -976,6 +984,7 @@ class StoryBuilder:
         Output comprehensive, well-organized markdown that provides detailed world-building for compelling storytelling.
         """
         
+        print_thinking(f"Creating detailed settings for {component}...")
         # Generate the deep dive settings content
         settings_content = generate_planning_text(prompt=settings_prompt)
         
@@ -1179,6 +1188,7 @@ class StoryBuilder:
                     chapter_title=chapter_title
                 )
 
+                print_thinking(f"Writing full narrative for {chapter_title}...")
                 chapter_text = generate_narrative_text(prompt=chapter_prompt)
                 
                 # Handle Claude 4 refusal responses
@@ -1250,6 +1260,7 @@ class StoryBuilder:
             f"{template_text}\n"
         )
 
+        print_thinking(f"Creating outline for Chapter {chapter_num}...")
         chapter_asset.details = generate_planning_text(prompt=chapter_prompt)
         chapter_asset.summary = summarize_text(
             text=chapter_asset.details,
@@ -1268,7 +1279,6 @@ class StoryBuilder:
         
         # Step 3 Complete: Chapter outlines generated
         # Ask if user wants to continue to writing chapters
-        from __main__ import confirm_next_step
         if not confirm_next_step(
             current_step="Chapter outlines created",
             next_step="Write full manuscript chapters",
