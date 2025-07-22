@@ -1,7 +1,7 @@
 from pathlib import Path
 from mythos.story_asset import StoryAsset, StoryAssetManager, AssetMetadata
 from mythos.story import Story, StoryManager
-from mythos.config.settings import AssetTypes, AssetTypeNames
+from mythos.config.settings import AssetTypes, AssetTypeNames, CRITICAL_PERSPECTIVES_SCHEMA
 from mythos.services.writer import (
     generate_narrative_text, 
     generate_planning_text, 
@@ -15,6 +15,8 @@ from mythos.utils.logger import get_logger
 import json
 from typing import Optional, List
 from mythos.utils.epub import create_epub
+import concurrent.futures
+import re
 
 # Import UI utilities from shared utils
 from mythos.utils.ui_utils import print_thinking, confirm_next_step
@@ -519,7 +521,6 @@ class StoryBuilder:
         """
         asset_types = [
             AssetTypeNames.RESEARCH,
-            AssetTypeNames.CRITICAL_PERSPECTIVES,
             AssetTypeNames.SETTINGS,
             AssetTypeNames.PLOT,
             AssetTypeNames.THEMES,
@@ -543,6 +544,15 @@ class StoryBuilder:
                 except Exception as e:
                     self.logger.warning(f"Deep dive research generation failed, continuing with story: {e}")
                     # Don't fail the entire story generation if deep dive research fails
+                
+                # After research is complete, generate critical perspectives
+                self.logger.info("Research complete. Generating critical perspectives analysis...")
+                try:
+                    self.generate_critical_perspectives(story)
+                    self.logger.info("Critical perspectives generation completed")
+                except Exception as e:
+                    self.logger.warning(f"Critical perspectives generation failed, continuing with story: {e}")
+                    # Don't fail the entire story generation if critical perspectives fails
             
             # After generating baseline settings, create deep dive settings  
             if asset_type == AssetTypeNames.SETTINGS:
@@ -1369,3 +1379,190 @@ class StoryBuilder:
             raise StoryBuildException(f"Failed to write draft markdown file: {e}") from e
         
         return draft_file_path
+
+    def generate_critical_perspectives(self, story: Story) -> None:
+        """
+        Generates critical perspectives analysis for the story.
+        
+        Args:
+            story (Story): The story object with existing assets.
+        """
+        self.logger.info(f"Generating critical perspectives for: '{story.title}'")
+        
+        try:
+            # Select relevant critical perspectives using LLM analysis
+            selected_perspectives = self._select_critical_perspectives(story)
+            
+            if not selected_perspectives:
+                self.logger.info("No critical perspectives identified")
+                return
+            
+            # Generate individual critical analysis assets in parallel
+            with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+                futures = [
+                    executor.submit(self._create_critical_perspective_asset, story, perspective)
+                    for perspective in selected_perspectives
+                ]
+                
+                # Wait for all analyses to complete
+                for future in concurrent.futures.as_completed(futures):
+                    try:
+                        asset = future.result()
+                        if asset:
+                            self._create_asset_with_metadata(story, asset)
+                            self.logger.info(f"Generated critical analysis: '{asset.title}'")
+                    except Exception as e:
+                        self.logger.error(f"Failed to generate critical analysis: {e}")
+                        continue
+            
+            # Save story with new critical analysis assets
+            self.story_manager.update_story(story)
+            self.logger.info(f"Successfully generated critical perspectives analysis")
+            
+        except Exception as e:
+            self.logger.error(f"Failed to generate critical perspectives: {e}")
+            raise StoryBuildException(f"Critical perspectives generation failed: {e}") from e
+
+    def _select_critical_perspectives(self, story: Story) -> List[str]:
+        """
+        Uses LLM to select 1-3 relevant critical perspectives based on story synopsis.
+        
+        Args:
+            story (Story): The story object with existing assets.
+            
+        Returns:
+            List[str]: List of selected critical perspective names.
+        """
+        self.logger.info(f"Selecting critical perspectives for: '{story.title}'")
+        
+        # Get full story synopsis for analysis
+        synopsis = self.story_manager.get_synopsis(story)
+        
+        selection_prompt = f"""
+        Analyze this story synopsis and select 1-3 critical perspectives that would provide the most valuable insights for improving this story.
+
+        ## Story Synopsis:
+        {synopsis}
+
+        ## Available Critical Perspectives:
+        - Feminist Criticism (gender dynamics, power structures, representation)
+        - Marxist Criticism (class, economics, social structures) 
+        - Psychoanalytic Criticism (unconscious motivations, psychological depth)
+        - Postcolonial Criticism (cultural identity, power dynamics, representation)
+        - Reader-Response Criticism (audience impact, emotional engagement)
+        - Queer Theory (sexual/gender identity, heteronormativity)
+        - Critical Race Theory (racial dynamics, representation, systemic issues)
+        - Formalist/New Criticism (structure, literary techniques, language)
+        - Archetypal/Mythological Criticism (universal patterns, symbols)
+        - Historical Criticism (historical context, period accuracy)
+
+        ## Selection Criteria:
+        - Choose perspectives most relevant to the story's themes and conflicts
+        - Prioritize those that will reveal actionable insights for the writer
+        - Consider the story's genre, setting, and character dynamics
+        - Select 1-3 perspectives maximum for focused analysis
+
+        Respond with your selected perspectives and brief rationale.
+        """
+        
+        try:
+            response = generate_planning_text(
+                prompt=selection_prompt,
+                json_output=True,
+                json_schema=CRITICAL_PERSPECTIVES_SCHEMA
+            )
+            
+            if isinstance(response, dict) and "selected_perspectives" in response:
+                perspectives = response["selected_perspectives"]
+                rationale = response.get("rationale", "No rationale provided")
+                self.logger.info(f"Selected {len(perspectives)} perspectives: {', '.join(perspectives)}")
+                self.logger.debug(f"Selection rationale: {rationale}")
+                return perspectives
+            else:
+                self.logger.warning("Invalid response format from LLM for perspective selection")
+                return []
+                
+        except Exception as e:
+            self.logger.error(f"Failed to select critical perspectives: {e}")
+            return []
+
+    def _create_critical_perspective_asset(self, story: Story, perspective: str) -> Optional[StoryAsset]:
+        """
+        Creates a focused critical analysis asset for a specific perspective.
+        
+        Args:
+            story (Story): The story object.
+            perspective (str): The name of the critical perspective.
+            
+        Returns:
+            Optional[StoryAsset]: The created critical analysis asset, or None if failed.
+        """
+        self.logger.info(f"Creating critical analysis for perspective: '{perspective}'")
+        
+        try:
+            # Get full story synopsis for analysis
+            synopsis = self.story_manager.get_synopsis(story)
+            
+            # Generate a focused critical framework for this perspective
+            framework_prompt = f"""
+            Create a focused critical analysis framework for applying {perspective} to story development.
+
+            ## Story Synopsis:
+            {synopsis}
+
+            ## Instructions:
+            Create a practical framework specifically for analyzing THIS story through the lens of {perspective}. Include:
+
+            1. **Core Analytical Focus**: What this perspective examines in THIS specific story
+            2. **Key Questions**: 5-7 specific questions about this story's elements
+            3. **Story Elements to Examine**: Which characters, relationships, settings, themes to analyze
+            4. **Actionable Insights**: What the writer should look for to improve the story
+            5. **Potential Issues**: What problems this lens might reveal
+            6. **Recommendations**: Specific suggestions for strengthening the story
+
+            Make this practical and actionable for the writer, not academic theory.
+            Focus on how to improve THIS specific story.
+            """
+            
+            framework = generate_planning_text(prompt=framework_prompt)
+            
+            # Apply the framework to analyze the story
+            analysis_prompt = f"""
+            Using the framework below, analyze this story and provide specific, actionable insights.
+
+            ## Critical Framework ({perspective}):
+            {framework}
+
+            ## Story to Analyze:
+            {synopsis}
+
+            ## Analysis Instructions:
+            Apply the framework above to analyze this story. Provide:
+
+            1. **Analysis**: Detailed examination using the framework questions
+            2. **Strengths**: What the story does well from this perspective  
+            3. **Areas for Improvement**: Specific issues or gaps identified
+            4. **Recommendations**: Concrete suggestions for the writer
+            5. **Implementation Notes**: How to apply these insights during writing
+
+            Be specific, practical, and actionable. Focus on improving the story.
+            """
+            
+            analysis = generate_planning_text(prompt=analysis_prompt)
+            
+            # Create the asset with a safe filename
+            safe_perspective_name = re.sub(r'[^\w\-_]', '_', perspective.lower().replace(" ", "_"))
+            filename = f"{safe_perspective_name}_analysis.md"
+            
+            asset = StoryAsset(
+                asset_type=AssetTypeNames.CRITICAL_PERSPECTIVES.name,
+                title=f"{perspective} Analysis",
+                filename=filename,
+                details=analysis
+            )
+            
+            return asset
+            
+        except Exception as e:
+            self.logger.error(f"Failed to create critical perspective asset for '{perspective}': {e}")
+            return None

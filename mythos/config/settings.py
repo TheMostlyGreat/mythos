@@ -43,6 +43,7 @@ CHAPTER_DIR = f"{ASSETS_DIR}/chapters"
 MANUSCRIPT_DIR = "manuscript"
 RESEARCH_DIR = f"{ASSETS_DIR}/research"  # New research directory
 SETTINGS_DIR = f"{ASSETS_DIR}/settings"  # New settings directory
+CRITICAL_ANALYSIS_DIR = f"{ASSETS_DIR}/critical-analysis"  # Critical analysis directory
 
 #Asset Settings
 ASSET_SUMMARY_LENGTH = 300
@@ -160,6 +161,22 @@ QUESTIONER_RESPONSE_SCHEMA = {
     "additionalProperties": False
 }
 
+# Critical perspectives selection schema
+CRITICAL_PERSPECTIVES_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "selected_perspectives": {
+            "type": "array",
+            "items": {"type": "string"},
+            "minItems": 1,
+            "maxItems": 3
+        },
+        "rationale": {"type": "string"}
+    },
+    "required": ["selected_perspectives", "rationale"],
+    "additionalProperties": False
+}
+
 # Asset Type Names. Example usage: AssetTypesNames.RESEARCH.value outputs "research"
 class AssetTypeNames(str, Enum):
     CONCEPT = "concept"
@@ -270,9 +287,9 @@ class AssetTypes:
         {
             "key": AssetTypeNames.CRITICAL_PERSPECTIVES.name,
             "title": AssetTypeNames.CRITICAL_PERSPECTIVES.value,
-            "directory": ASSETS_DIR,
+            "directory": CRITICAL_ANALYSIS_DIR,
             "file_extension": ".md",
-            "template_path": "templates/critical_perspectives_template.md",
+            "template_path": "templates/critical_perspective_template_generator.md",
             "summary_length": ASSET_SUMMARY_LENGTH
         },
         {
@@ -417,4 +434,4 @@ QUESTIONER_SYSTEM_PROMPT = (
     "  \"ready_to_stop\": false\n"
     "}\n\n"
     "Set ready_to_stop to true when you've gathered sufficient foundation (15-20 questions) and are ready to begin story development."
-)  
+)

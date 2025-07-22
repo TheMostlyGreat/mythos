@@ -9,6 +9,55 @@ from mythos.utils.token_counter import TokenCounter
 logger = get_logger(__name__)
 token_counter = TokenCounter()
 
+def _has_refusal(response) -> bool:
+    """
+    Check for official OpenAI Responses API refusal fields.
+    
+    Based on the latest OpenAI Responses API documentation (2025), refusals appear as:
+    1. Content items with refusal field in message outputs
+    2. Specific error conditions related to safety/content policy
+    
+    Args:
+        response: The response object from OpenAI Responses API
+        
+    Returns:
+        True if the response contains an official refusal
+    """
+    if not response:
+        return False
+    
+    # Check for refusal in output items (Responses API)
+    if hasattr(response, 'output') and response.output:
+        for item in response.output:
+            # Check message-type items for refusal content
+            if hasattr(item, 'type') and item.type == 'message':
+                if hasattr(item, 'content') and item.content:
+                    for content_item in item.content:
+                        # Primary refusal detection: official refusal field
+                        if hasattr(content_item, 'refusal') and content_item.refusal:
+                            return True
+                        # Also check if content item itself has a refusal field
+                        if hasattr(content_item, 'type') and content_item.type == 'refusal':
+                            return True
+            
+            # Check for explicit refusal output types
+            if hasattr(item, 'type') and item.type == 'refusal':
+                return True
+    
+    # Check for safety-related errors that indicate content refusal
+    if hasattr(response, 'error') and response.error:
+        error_obj = response.error
+        if hasattr(error_obj, 'type'):
+            # Only specific error types indicate content refusal
+            if error_obj.type == 'content_policy_violation':
+                return True
+        if hasattr(error_obj, 'code'):
+            # Specific error codes for refusals
+            if error_obj.code in ['content_filter', 'policy_violation']:
+                return True
+    
+    return False
+
 def create_messages(prompt: str, system_prompt: Optional[str] = None) -> List[Dict[str, Any]]:
     """
     Helper function to convert prompt + system_prompt to message format.
@@ -94,6 +143,15 @@ def call_OpenAI_API(
             # Call the Responses API
             response = client.responses.create(**request_params)
             
+            # Handle refusals according to latest OpenAI Responses API docs
+            if _has_refusal(response):
+                logger.warning("OpenAI API refused to generate content for safety reasons")
+                refusal_msg = "Error: Content generation was declined for safety reasons. Please try rephrasing your request."
+                if return_response_id:
+                    return refusal_msg, response.id if hasattr(response, 'id') else None
+                else:
+                    return refusal_msg
+            
             # Track token usage
             if hasattr(response, 'usage') and response.usage:
                 input_tokens = getattr(response.usage, 'input_tokens', 0)
@@ -102,6 +160,7 @@ def call_OpenAI_API(
                 logger.debug(f"OpenAI Responses API tokens - Input: {input_tokens}, Output: {output_tokens}, Total: {total_tokens}")
                 token_counter.add_tokens(total_tokens)
             
+            # Get response content
             response_content = response.output_text
             
             if return_response_id:

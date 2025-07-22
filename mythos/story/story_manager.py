@@ -329,6 +329,7 @@ class StoryManager:
         required_assets = [
             AssetTypeNames.CONCEPT.value,
             AssetTypeNames.RESEARCH.value, 
+            AssetTypeNames.CRITICAL_PERSPECTIVES.value,
             AssetTypeNames.SETTINGS.value,
             AssetTypeNames.PLOT.value,
             AssetTypeNames.THEMES.value,
