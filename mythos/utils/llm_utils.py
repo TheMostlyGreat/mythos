@@ -152,6 +152,16 @@ def call_OpenAI_API(
                 else:
                     return refusal_msg
             
+            # Safety net: Check for refusal in content when API doesn't set official refusal fields
+            response_content = response.output_text
+            if response_content and response_content.strip().lower().startswith(("i'm sorry, but i can't", "i cannot help", "i can't help")):
+                logger.warning("OpenAI returned refusal as content (unofficial refusal detection)")
+                refusal_msg = "Error: Content generation was declined for safety reasons. Please try rephrasing your request."
+                if return_response_id:
+                    return refusal_msg, response.id if hasattr(response, 'id') else None
+                else:
+                    return refusal_msg
+            
             # Track token usage
             if hasattr(response, 'usage') and response.usage:
                 input_tokens = getattr(response.usage, 'input_tokens', 0)
