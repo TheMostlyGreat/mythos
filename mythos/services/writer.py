@@ -1,5 +1,5 @@
 from typing import Optional, Dict, Any, List
-from mythos.utils.llm_utils import call_Anthropic_API, call_OpenAI_API, create_messages
+from mythos.utils.llm_utils import call_llm, call_Anthropic_API, call_OpenAI_API, create_messages
 from mythos.config.settings import (
     NARRATIVE_SYSTEM_PROMPT, 
     PLANNING_SYSTEM_PROMPT,
@@ -15,12 +15,13 @@ def generate_planning_text(
     prompt: str, 
     system_prompt: str = PLANNING_SYSTEM_PROMPT,
     json_schema: Optional[Dict[str, Any]] = None,
-    tools: Optional[List[Dict[str, Any]]] = None
+    tools: Optional[List[Dict[str, Any]]] = None,
+    **kwargs
 ) -> str:
     """
-    Generates planning text based on the provided prompt and system prompt.
+    Generates planning text using MEDIUM tier model for balanced cost/quality.
 
-    Utilizes the OpenAI Responses API to create structured planning content that can be 
+    Utilizes the unified LLM interface to create structured planning content that can be 
     used for outlining stories, projects, or other planning needs.
 
     Parameters
@@ -33,175 +34,172 @@ def generate_planning_text(
         JSON schema for Structured Outputs (provides 100% reliable JSON)
     tools : list, optional
         List of tools to enable (e.g., web search for research)
+    **kwargs : additional parameters passed to call_llm
 
     Returns
     -------
     str
         The generated planning text or an error message if generation fails.
     """
-    # Convert to message format using helper function
-    messages = create_messages(prompt, system_prompt)
-    
-    # Use Structured Outputs and tools when provided
-    return call_OpenAI_API(
-        input=messages,
+    return call_llm(
+        prompt=prompt,
+        system_prompt=system_prompt,
+        tier="medium",
         json_output=json_schema is not None,
         json_schema=json_schema,
-        tools=tools
+        tools=tools,
+        **kwargs
     )
 
-def generate_web_enhanced_research(prompt: str) -> str:
+def generate_narrative_text(prompt: str, system_prompt: str = NARRATIVE_SYSTEM_PROMPT, **kwargs) -> str:
     """
-    Generate enhanced research using web search capabilities of the Responses API.
-    
-    This function leverages the Responses API's built-in web search to provide
-    real-time, up-to-date research for story development. Uses template guidance
-    rather than schema constraints to allow AI creativity while maintaining structure.
-    
-    Parameters
-    ----------
-    prompt : str
-        The research prompt or topic
-        
-    Returns
-    -------
-    str
-        Well-structured markdown research following the template guidance
-    """
-    if not RESEARCH_WITH_WEB_SEARCH:
-        # Fall back to regular research without web search
-        return generate_planning_text(
-            prompt=prompt,
-            system_prompt="""You are a research assistant providing detailed, accurate information for story development.
-            
-            Create comprehensive research following the research template structure with these key sections:
-            - Inspirations and Influences
-            - Historical Context
-            - Cultural Context  
-            - Setting Details
-            - Economic Context
-            - Legal and Governance Systems
-            - Belief Systems and Spirituality
-            - Daily Life and Social Norms
-            - Relevant Movements and Ideologies
-            - Genre Research
-            - Scientific/Technological Elements
-            
-            Output as well-organized markdown. Be thorough and story-relevant."""
-        )
-    
-    research_system_prompt = """You are an expert research assistant helping with story development. 
-    Use web search to find current, accurate information about the topic. 
-    Focus on historical accuracy, cultural authenticity, and credible sources.
-    
-    Create comprehensive research following the research template structure with these key sections:
-    - Inspirations and Influences (literature, films, art that inform the story)
-    - Historical Context (time period, key events, social/political climate)
-    - Cultural Context (primary cultures, practices, intercultural dynamics)
-    - Setting Details (geography, architecture, flora/fauna)
-    - Economic Context (economic systems, trade, class structure)
-    - Legal and Governance Systems (political structure, legal framework)
-    - Belief Systems and Spirituality (religions, mythology, rituals)
-    - Daily Life and Social Norms (family structures, education, entertainment)
-    - Relevant Movements and Ideologies (social, political, cultural movements)
-    - Genre Research (genre conventions, subgenres, opportunities)
-    - Scientific/Technological Elements (relevant science, tech landscape)
-    
-    For factual sections, use web search to find current, accurate information.
-    For creative sections, draw on genre knowledge and artistic influences.
-    Output as well-organized markdown that will help create authentic, well-researched stories."""
-    
-    # Convert to message format and use web search tool
-    messages = create_messages(prompt, research_system_prompt)
-    
-    return call_OpenAI_API(
-        input=messages,
-        tools=[WEB_SEARCH_TOOL]
-    )
+    Generates narrative text using BIG tier model for maximum quality.
 
-def generate_character_list(prompt: str) -> str:
-    """
-    Generate a character list using Structured Outputs for 100% reliable JSON.
-    
-    Parameters
-    ----------
-    prompt : str
-        The prompt for character generation
-        
-    Returns
-    -------
-    str
-        JSON string with character list following the schema
-    """
-    return generate_planning_text(
-        prompt=prompt,
-        system_prompt="You are a creative writer creating compelling characters for a story.",
-        json_schema=CHARACTER_LIST_SCHEMA
-    )
-
-def generate_chapter_list(prompt: str) -> str:
-    """
-    Generate a chapter list using Structured Outputs for 100% reliable JSON.
-    
-    Parameters
-    ----------
-    prompt : str
-        The prompt for chapter list generation
-        
-    Returns
-    -------
-    str
-        JSON string with chapter list following the schema
-    """
-    return generate_planning_text(
-        prompt=prompt,
-        system_prompt="You are a skilled story planner creating a detailed chapter outline.",
-        json_schema=CHAPTER_LIST_SCHEMA
-    )
-
-def generate_story_concept(prompt: str) -> str:
-    """
-    Generate a story concept with reliable title extraction.
-    
-    Parameters
-    ----------
-    prompt : str
-        The prompt for story concept generation
-        
-    Returns
-    -------
-    str
-        JSON string with title and markdown content
-    """
-    return generate_planning_text(
-        prompt=prompt,
-        system_prompt="You are a creative storyteller developing compelling story concepts. Generate a clear title and put all the rich detailed content in markdown format in the concept_markdown field.",
-        json_schema=CONCEPT_TITLE_SCHEMA
-    )
-
-def generate_narrative_text(prompt: str, system_prompt: str = NARRATIVE_SYSTEM_PROMPT) -> str:
-    """
-    Generates narrative text using Claude with enhanced capabilities.
-
-    Uses Claude for better storytelling and narrative flow.
+    Uses the highest quality tier for better storytelling and narrative flow.
 
     Parameters
     ----------
     prompt : str
         The user prompt to generate narrative text for.
     system_prompt : str, optional
-        The system prompt to guide the generation (default is SYSTEM_PROMPT_NARRATIVE).
+        The system prompt to guide the generation (default is NARRATIVE_SYSTEM_PROMPT).
+    **kwargs : additional parameters passed to call_llm
 
     Returns
     -------
     str
-        The generated narrative text with improved quality from Claude.
+        The generated narrative text with improved quality from BIG tier model.
     """
-    # Use Claude for narrative generation
-    return call_Anthropic_API(
-        prompt=prompt, 
+    return call_llm(
+        prompt=prompt,
         system_prompt=system_prompt,
-        structured_output=True  # Ensure well-formatted narrative output
+        tier="big",
+        **kwargs
+    )
+
+def summarize_text(text: str, summary_length: Optional[int] = None, **kwargs) -> str:
+    """
+    Summarize text using FAST tier model for cost-effective processing.
+
+    Parameters
+    ----------
+    text : str
+        The text to summarize.
+    summary_length : int, optional
+        Target length for the summary.
+    **kwargs : additional parameters passed to call_llm
+
+    Returns
+    -------
+    str
+        The summarized text.
+    """
+    length_instruction = f" in approximately {summary_length} words" if summary_length else ""
+    prompt = f"Summarize the following text concisely{length_instruction}:\n\n{text}"
+    
+    return call_llm(
+        prompt=prompt,
+        system_prompt=PLANNING_SYSTEM_PROMPT,
+        tier="fast",
+        **kwargs
+    )
+
+def generate_character_list(prompt: str, **kwargs) -> str:
+    """
+    Generate character list using MEDIUM tier model with JSON output.
+
+    Parameters
+    ----------
+    prompt : str
+        The prompt for character generation.
+    **kwargs : additional parameters passed to call_llm
+
+    Returns
+    -------
+    str
+        JSON-formatted character list.
+    """
+    return call_llm(
+        prompt=prompt,
+        system_prompt=PLANNING_SYSTEM_PROMPT,
+        tier="medium",
+        json_output=True,
+        json_schema=CHARACTER_LIST_SCHEMA,
+        **kwargs
+    )
+
+def generate_chapter_list(prompt: str, **kwargs) -> str:
+    """
+    Generate chapter list using MEDIUM tier model with JSON output.
+
+    Parameters
+    ----------
+    prompt : str
+        The prompt for chapter list generation.
+    **kwargs : additional parameters passed to call_llm
+
+    Returns
+    -------
+    str
+        JSON-formatted chapter list.
+    """
+    return call_llm(
+        prompt=prompt,
+        system_prompt=PLANNING_SYSTEM_PROMPT,
+        tier="medium",
+        json_output=True,
+        json_schema=CHAPTER_LIST_SCHEMA,
+        **kwargs
+    )
+
+def generate_story_concept(prompt: str, **kwargs) -> str:
+    """
+    Generate story concept using MEDIUM tier model.
+
+    Parameters
+    ----------
+    prompt : str
+        The prompt for story concept generation.
+    **kwargs : additional parameters passed to call_llm
+
+    Returns
+    -------
+    str
+        The generated story concept.
+    """
+    return call_llm(
+        prompt=prompt,
+        system_prompt=PLANNING_SYSTEM_PROMPT,
+        tier="medium",
+        **kwargs
+    )
+
+def generate_web_enhanced_research(prompt: str, **kwargs) -> str:
+    """
+    Generate research using MEDIUM tier model with optional web search.
+
+    Parameters
+    ----------
+    prompt : str
+        The research prompt.
+    **kwargs : additional parameters passed to call_llm
+
+    Returns
+    -------
+    str
+        The generated research content.
+    """
+    # Add web search tool if research enhancement is enabled
+    tools = None
+    if RESEARCH_WITH_WEB_SEARCH:
+        tools = [WEB_SEARCH_TOOL]
+    
+    return call_llm(
+        prompt=prompt,
+        system_prompt=PLANNING_SYSTEM_PROMPT,
+        tier="medium",
+        tools=tools,
+        **kwargs
     )
 
 def generate_conversation_aware_content(
@@ -252,15 +250,3 @@ def generate_conversation_aware_content(
         response_id = None
     
     return content, response_id
-
-def summarize_text(text: str, summary_length: int) -> str:
-    """
-    Summarizes the provided text.
-    """
-    prompt = (f"## Text to summarize:\n{text}\n"
-              f"## Prompt: Please summarize the text to {summary_length} words.")
-    
-    # Convert to message format using helper function
-    messages = create_messages(prompt, PLANNING_SYSTEM_PROMPT)
-    
-    return call_OpenAI_API(input=messages)

@@ -20,7 +20,7 @@ from typing import Optional, List, Dict
 from mythos.utils.epub import create_epub
 import concurrent.futures
 import re
-from mythos.utils.llm_utils import call_OpenAI_API, create_messages, ContentRefusalError
+from mythos.utils.llm_utils import call_llm, call_OpenAI_API, create_messages, ContentRefusalError
 
 # Import UI utilities from shared utils
 from mythos.utils.ui_utils import print_thinking, confirm_next_step
@@ -1472,11 +1472,11 @@ class StoryBuilder:
         """
         
         try:
-            # Use the same pattern as the questioner - call OpenAI API directly
-            messages = create_messages(selection_prompt)
-            
-            response = call_OpenAI_API(
-                input=messages,
+            # Use unified LLM interface with MEDIUM tier for critical analysis
+            response = call_llm(
+                prompt=selection_prompt,
+                system_prompt=PLANNING_SYSTEM_PROMPT,
+                tier="medium",
                 json_output=True,
                 json_schema=CRITICAL_PERSPECTIVES_SCHEMA
             )

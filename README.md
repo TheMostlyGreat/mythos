@@ -1,61 +1,121 @@
-# Mythos: AI Story Writing Assistant
+# Mythos - AI-Powered Story Builder
 
-Mythos helps writers generate ideas, develop characters, and kickstart their writing process. It's an AI tool designed to combat writer's block and spark creativity.
+An intelligent storytelling assistant that uses multi-tier AI models to create compelling narratives with rich world-building, character development, and narrative structure.
 
-## Features
+## 🚀 Multi-Tier LLM System
 
-- Generate story concepts
-- Develop multifaceted characters
-- Create vivid settings
-- Explore thematic elements
-- Draft engaging opening scenes
-- Analyze writing styles
+Mythos uses a sophisticated multi-tier LLM system that automatically selects the best AI model for each task:
 
-## Setup
+- **FAST Tier**: Quick tasks like summarization and simple analysis
+- **MEDIUM Tier**: Balanced tasks like planning, research, and asset creation  
+- **BIG Tier**: Complex creative work like narrative writing and deep reasoning
 
-### Requirements
+### Current Configuration
 
-- Python 3.7+
-- Dependencies listed in `requirements.txt`
+```python
+FAST_MODEL = ("openai", "gpt-4o-mini")                    # Ultra-fast + cost-effective
+MEDIUM_MODEL = ("openai", "gpt-4o")                       # Good balance of speed/cost/quality  
+BIG_MODEL = ("anthropic", "claude-3-5-sonnet-20241022")   # High quality reasoning
+PREMIUM_MODEL = ("anthropic", "claude-3-5-sonnet-20241022") # Maximum capability
+```
 
-### Installation
+### Mix-and-Match Flexibility
 
-1. Clone the repository:
-   ```
-   git clone https://github.com/TheMostlyGreat/mythos.git
-   ```
+You can easily customize which models to use for each tier by editing `mythos/config/settings.py`:
 
-2. Navigate to the project directory:
-   ```
-   cd mythos
-   ```
+```python
+# All OpenAI (simpler setup)
+FAST_MODEL = ("openai", "gpt-4o-mini")
+MEDIUM_MODEL = ("openai", "gpt-4o")
+BIG_MODEL = ("openai", "gpt-4o")
+PREMIUM_MODEL = ("openai", "gpt-4o")
 
-3. Install dependencies:
-   ```
-   pip install -r requirements.txt
-   ```
+# All Anthropic (constitutional AI focused)
+FAST_MODEL = ("anthropic", "claude-3-5-haiku-20241022")
+MEDIUM_MODEL = ("anthropic", "claude-3-5-sonnet-20241022")
+BIG_MODEL = ("anthropic", "claude-3-5-sonnet-20241022")
+PREMIUM_MODEL = ("anthropic", "claude-3-5-sonnet-20241022")
+
+# Cost-optimized (all fast models)
+FAST_MODEL = ("openai", "gpt-4o-mini")
+MEDIUM_MODEL = ("openai", "gpt-4o-mini")
+BIG_MODEL = ("openai", "gpt-4o")
+PREMIUM_MODEL = ("openai", "gpt-4o")
+```
+
+## Installation
+
+1. Clone this repository:
+```bash
+git clone https://github.com/yourusername/mythos.git
+cd mythos
+```
+
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+3. Set up environment variables:
+```bash
+export OPENAI_API_KEY="your_openai_api_key_here"
+export ANTHROPIC_API_KEY="your_anthropic_api_key_here"
+```
 
 ## Usage
 
-Run the program:
-
-```
-cd code/
-python -m mythos
+### Command Line Interface
+```bash
+python -m mythos create "A story about a time-traveling detective"
 ```
 
-Follow the on-screen prompts to start creating your story.
+### Python API
+```python
+from mythos.services.story_builder import StoryBuilder
+from mythos.utils.llm_utils import call_llm
 
-## Project Structure
+# Build a complete story
+builder = StoryBuilder()
+story = builder.build_story("A cyberpunk thriller set in Neo Tokyo")
 
-- `code/mythos/`: Main application code
-- `code/templates/`: Templates for various story elements
-- `code/`: Other project-related code
+# Use the unified LLM interface directly
+response = call_llm("Describe a futuristic city", tier="medium")
+narrative = call_llm("Write a dramatic scene", tier="big")
+summary = call_llm("Summarize this text...", tier="fast")
+```
+
+## Features
+
+- **Automated Story Structure**: Uses the Snowflake method for structured storytelling
+- **Rich Asset Generation**: Creates characters, settings, plots, themes, and research
+- **Multi-Provider Support**: Mix OpenAI and Anthropic models for optimal results
+- **Cost Optimization**: Automatically uses appropriate model tiers to minimize costs
+- **JSON Structured Outputs**: Reliable data extraction with schema validation
+- **Interactive Refinement**: Conversational story development process
+- **EPUB Export**: Generate professional ebook formats
+- **Version Control**: Track story iterations and changes
+
+## Architecture
+
+The system is built with a modular architecture:
+
+- **Configuration Layer**: Flexible model tier management
+- **Unified LLM Interface**: Single API for all providers and models
+- **Story Management**: Comprehensive story and asset tracking
+- **Writer Services**: Specialized functions for different content types
+- **Asset Management**: Organized storage of story components
+
+## Testing
+
+Run the test suite:
+```bash
+python -m pytest tests/ -v
+```
 
 ## Contributing
 
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for more details.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on contributing to this project.
 
 ## License
 
-This project is licensed under the [AGPL-3.0](LICENSE).
+This project is licensed under the MIT License - see the LICENSE file for details.

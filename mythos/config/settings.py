@@ -2,13 +2,51 @@ import os
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
+from typing import Tuple
 
 # Logging Settings
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()  # Default to INFO, allow DEBUG for development
 
-# LLM Settings
-OPENAI_MODEL = "o4-mini-2025-04-16"
-ANTHROPIC_MODEL = "claude-sonnet-4-20250514"
+# Multi-Tier LLM Configuration
+# Mix-and-match model configuration - verified 2025 models from official docs
+FAST_MODEL = ("openai", "gpt-4o-mini")                    # Ultra-fast + cost-effective
+MEDIUM_MODEL = ("openai", "gpt-4o")                       # Good balance of speed/cost/quality  
+BIG_MODEL = ("anthropic", "claude-3-5-sonnet-20241022")   # High quality reasoning
+PREMIUM_MODEL = ("anthropic", "claude-3-5-sonnet-20241022")   # Maximum capability (using available model)
+
+# Alternative configurations - uncomment to use:
+
+# All OpenAI (simpler setup)
+#FAST_MODEL = ("openai", "gpt-4o-mini")
+#MEDIUM_MODEL = ("openai", "gpt-4o")
+#BIG_MODEL = ("openai", "gpt-4o")
+#PREMIUM_MODEL = ("openai", "gpt-4o")
+
+# All Anthropic (constitutional AI focused)
+#FAST_MODEL = ("anthropic", "claude-3-5-haiku-20241022")
+#MEDIUM_MODEL = ("anthropic", "claude-3-5-sonnet-20241022")
+#BIG_MODEL = ("anthropic", "claude-3-5-sonnet-20241022")
+#PREMIUM_MODEL = ("anthropic", "claude-3-5-sonnet-20241022")
+
+# Cost-optimized (all fast models)
+#FAST_MODEL = ("openai", "gpt-4o-mini")
+#MEDIUM_MODEL = ("openai", "gpt-4o-mini")
+#BIG_MODEL = ("openai", "gpt-4o")
+#PREMIUM_MODEL = ("openai", "gpt-4o")
+
+# Quality-first (all premium models)
+#FAST_MODEL = ("anthropic", "claude-3-5-sonnet-20241022")
+#MEDIUM_MODEL = ("anthropic", "claude-3-5-sonnet-20241022") 
+#BIG_MODEL = ("anthropic", "claude-3-5-sonnet-20241022")
+#PREMIUM_MODEL = ("anthropic", "claude-3-5-sonnet-20241022")
+
+# API Keys (only sensitive data in environment variables)
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
+
+# Legacy model settings for backward compatibility
+OPENAI_MODEL = MEDIUM_MODEL[1] if MEDIUM_MODEL[0] == "openai" else "gpt-4o"
+ANTHROPIC_MODEL = BIG_MODEL[1] if BIG_MODEL[0] == "anthropic" else "claude-3-5-sonnet-20241022"
 
 MAX_RETRIES = 2
 

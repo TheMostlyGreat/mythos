@@ -1,5 +1,5 @@
 from typing import List, Dict, Any
-from mythos.utils.llm_utils import call_OpenAI_API, create_messages
+from mythos.utils.llm_utils import call_llm, call_OpenAI_API, create_messages
 from mythos.utils.logger import get_logger
 from mythos.config.settings import (
     QUESTIONER_SYSTEM_PROMPT,
@@ -123,8 +123,10 @@ class StoryQuestioner:
         })
         
         try:
-            response = call_OpenAI_API(
-                input=messages,
+            response = call_llm(
+                prompt=f"Original story concept: {self.conversation[1]['content']}\n\nConversation so far:\n{self._format_conversation()}",
+                system_prompt=QUESTIONER_SYSTEM_PROMPT,
+                tier="fast",  # Use fast tier for quick interactive responses
                 json_output=True,
                 json_schema=QUESTIONER_RESPONSE_SCHEMA
             )
@@ -166,11 +168,10 @@ class StoryQuestioner:
         """
         
         try:
-            # Convert to message format using helper function
-            messages = create_messages(prompt, QUESTIONER_SYSTEM_PROMPT)
-            
-            response = call_OpenAI_API(
-                input=messages,
+            response = call_llm(
+                prompt=prompt,
+                system_prompt=QUESTIONER_SYSTEM_PROMPT,
+                tier="fast",  # Use fast tier for quick interactive responses
                 json_output=True,
                 json_schema=QUESTIONER_RESPONSE_SCHEMA
             )
