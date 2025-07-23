@@ -1,13 +1,18 @@
 import time
-from typing import Optional, Dict, Any, Union, List
+from typing import Optional, Dict, Any, Union, List, Tuple
 from openai import OpenAI
 from anthropic import Anthropic
 from mythos.config.settings import OPENAI_MODEL, MAX_RETRIES, ANTHROPIC_MODEL, JSON_SYSTEM_PROMPT
 from mythos.utils.logger import get_logger
 from mythos.utils.token_counter import TokenCounter
+import json
 
 logger = get_logger(__name__)
 token_counter = TokenCounter()
+
+class ContentRefusalError(Exception):
+    """Raised when OpenAI/Anthropic refuses to generate content due to safety policies."""
+    pass
 
 def _has_refusal(response) -> bool:
     """
@@ -136,11 +141,7 @@ def call_OpenAI_API(
             # Handle refusals according to latest OpenAI Responses API docs
             if _has_refusal(response):
                 logger.warning("OpenAI API refused to generate content for safety reasons")
-                refusal_msg = "Error: Content generation was declined for safety reasons. Please try rephrasing your request."
-                if return_response_id:
-                    return refusal_msg, response.id if hasattr(response, 'id') else None
-                else:
-                    return refusal_msg
+                raise ContentRefusalError("Content generation was declined for safety reasons. Please try rephrasing your request.")
             
             # Safety net: Check for refusal in content when API doesn't set official refusal fields
             # Handle Unicode smart quotes that OpenAI sometimes uses in refusals
@@ -148,11 +149,7 @@ def call_OpenAI_API(
                 normalized_content = response.output_text.strip().lower().replace('’', "'").replace('‘', "'")
                 if normalized_content.startswith(("i'm sorry, but i can't", "i cannot help", "i can't help")):
                     logger.warning("OpenAI returned refusal as content (unofficial refusal detection)")
-                    refusal_msg = "Error: Content generation was declined for safety reasons. Please try rephrasing your request."
-                    if return_response_id:
-                        return refusal_msg, response.id if hasattr(response, 'id') else None
-                    else:
-                        return refusal_msg
+                    raise ContentRefusalError("Content generation was declined for safety reasons. Please try rephrasing your request.")
             
             # Track token usage
             if hasattr(response, 'usage') and response.usage:
@@ -169,6 +166,9 @@ def call_OpenAI_API(
             else:
                 return response_content
                 
+        except ContentRefusalError:
+            # Content refusals should not be retried - re-raise immediately
+            raise
         except Exception as e:
             if attempt < MAX_RETRIES - 1:
                 logger.error(f"Error generating LLM content with OpenAI Responses API (attempt {attempt + 1}): {e}")
@@ -274,7 +274,7 @@ def call_Anthropic_API(
             # Handle Claude refusal responses
             if message.stop_reason == "refusal":
                 logger.warning("Claude refused to generate content for safety reasons")
-                return "Error: Content generation was declined for safety reasons. Please try rephrasing your request."
+                raise ContentRefusalError("Content generation was declined for safety reasons. Please try rephrasing your request.")
             
             # Handle tool use responses
             if message.stop_reason == "tool_use":
@@ -287,13 +287,16 @@ def call_Anthropic_API(
 
             return return_text
             
+        except ContentRefusalError:
+            # Content refusals should not be retried - re-raise immediately
+            raise
         except Exception as e:
             if attempt < MAX_RETRIES - 1:
                 logger.error(f"Error generating LLM content with Claude (attempt {attempt + 1}): {e}")
                 time.sleep(2 ** (attempt + 1))
             else:
                 logger.error(f"Failed to generate LLM content with Claude after {MAX_RETRIES} attempts: {e}")
-                return "Error: Unable to generate LLM content with Claude after multiple attempts."
+                raise ContentRefusalError("Unable to generate LLM content with Claude after multiple attempts.")
             
 def get_total_token_usage() -> int:
     """

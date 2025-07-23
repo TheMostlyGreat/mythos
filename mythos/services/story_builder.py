@@ -17,6 +17,7 @@ from typing import Optional, List
 from mythos.utils.epub import create_epub
 import concurrent.futures
 import re
+from mythos.utils.llm_utils import call_OpenAI_API, create_messages, ContentRefusalError
 
 # Import UI utilities from shared utils
 from mythos.utils.ui_utils import print_thinking, confirm_next_step
@@ -493,6 +494,11 @@ class StoryBuilder:
             
             # Store the extracted title for later use
             self._extracted_title = title
+            
+        except ContentRefusalError as e:
+            # Content was refused by AI safety policies - stop story creation
+            self.logger.error(f"Story concept creation refused: {e}")
+            raise StoryBuildException(f"Unable to create story concept: {e}") from e
             
         except (json.JSONDecodeError, KeyError) as e:
             self.logger.warning(f"Failed to parse concept JSON, falling back to direct generation: {e}")
@@ -1444,43 +1450,47 @@ class StoryBuilder:
         ## Story Synopsis:
         {synopsis}
 
-        ## Available Critical Perspectives:
-        - Feminist Criticism (gender dynamics, power structures, representation)
-        - Marxist Criticism (class, economics, social structures) 
-        - Psychoanalytic Criticism (unconscious motivations, psychological depth)
-        - Postcolonial Criticism (cultural identity, power dynamics, representation)
-        - Reader-Response Criticism (audience impact, emotional engagement)
-        - Queer Theory (sexual/gender identity, heteronormativity)
-        - Critical Race Theory (racial dynamics, representation, systemic issues)
-        - Formalist/New Criticism (structure, literary techniques, language)
-        - Archetypal/Mythological Criticism (universal patterns, symbols)
-        - Historical Criticism (historical context, period accuracy)
+
 
         ## Selection Criteria:
         - Choose perspectives most relevant to the story's themes and conflicts
         - Prioritize those that will reveal actionable insights for the writer
         - Consider the story's genre, setting, and character dynamics
-        - Select 1-3 perspectives maximum for focused analysis
 
         Respond with your selected perspectives and brief rationale.
         """
         
         try:
-            response = generate_planning_text(
-                prompt=selection_prompt,
+            # Use the same pattern as the questioner - call OpenAI API directly
+            messages = create_messages(selection_prompt)
+            
+            response = call_OpenAI_API(
+                input=messages,
                 json_output=True,
                 json_schema=CRITICAL_PERSPECTIVES_SCHEMA
             )
             
-            if isinstance(response, dict) and "selected_perspectives" in response:
-                perspectives = response["selected_perspectives"]
+            self.logger.debug(f"Raw LLM response: {response} (type: {type(response)})")
+            
+            # Handle both dict and string responses (same pattern as questioner)
+            if isinstance(response, dict):
+                perspectives = response.get("selected_perspectives", [])
                 rationale = response.get("rationale", "No rationale provided")
                 self.logger.info(f"Selected {len(perspectives)} perspectives: {', '.join(perspectives)}")
                 self.logger.debug(f"Selection rationale: {rationale}")
                 return perspectives
             else:
-                self.logger.warning("Invalid response format from LLM for perspective selection")
-                return []
+                # Try to parse JSON string
+                try:
+                    parsed_response = json.loads(response)
+                    perspectives = parsed_response.get("selected_perspectives", [])
+                    rationale = parsed_response.get("rationale", "No rationale provided")
+                    self.logger.info(f"Selected {len(perspectives)} perspectives: {', '.join(perspectives)}")
+                    self.logger.debug(f"Selection rationale: {rationale}")
+                    return perspectives
+                except (json.JSONDecodeError, AttributeError) as je:
+                    self.logger.warning(f"Could not parse JSON from response: {je}. Response: {response}")
+                    return []
                 
         except Exception as e:
             self.logger.error(f"Failed to select critical perspectives: {e}")
@@ -1550,6 +1560,9 @@ class StoryBuilder:
             
             analysis = generate_planning_text(prompt=analysis_prompt)
             
+            # Create the asset summary
+            summary = summarize_text(text=analysis, summary_length=AssetTypes.CRITICAL_PERSPECTIVES.summary_length)
+            
             # Create the asset with a safe filename
             safe_perspective_name = re.sub(r'[^\w\-_]', '_', perspective.lower().replace(" ", "_"))
             filename = f"{safe_perspective_name}_analysis.md"
@@ -1557,8 +1570,9 @@ class StoryBuilder:
             asset = StoryAsset(
                 asset_type=AssetTypeNames.CRITICAL_PERSPECTIVES.name,
                 title=f"{perspective} Analysis",
-                filename=filename,
-                details=analysis
+                summary=summary,
+                details=analysis,
+                relative_file_path=Path(AssetTypes.CRITICAL_PERSPECTIVES.directory, filename)
             )
             
             return asset
