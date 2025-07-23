@@ -1,7 +1,10 @@
 from pathlib import Path
 from mythos.story_asset import StoryAsset, StoryAssetManager, AssetMetadata
 from mythos.story import Story, StoryManager
-from mythos.config.settings import AssetTypes, AssetTypeNames, CRITICAL_PERSPECTIVES_SCHEMA
+from mythos.config.settings import (
+    AssetTypes, AssetTypeNames, CRITICAL_PERSPECTIVES_SCHEMA, CRITICAL_ANALYSIS_DIR,
+    META_TEMPLATE_PATH, TEMPLATE_SUBDIR
+)
 from mythos.services.writer import (
     generate_narrative_text, 
     generate_planning_text, 
@@ -13,7 +16,7 @@ from mythos.services.writer import (
 )
 from mythos.utils.logger import get_logger
 import json
-from typing import Optional, List
+from typing import Optional, List, Dict
 from mythos.utils.epub import create_epub
 import concurrent.futures
 import re
@@ -42,6 +45,11 @@ class StoryBuilder:
         self.logger = get_logger(self.__class__.__name__)
         self.story_manager = StoryManager()
         self.asset_manager = StoryAssetManager()
+
+    @staticmethod
+    def _make_safe_filename(name: str) -> str:
+        """Create a safe filename from a perspective name."""
+        return re.sub(r'[^\w\-_]', '_', name.lower().replace(" ", "_"))
 
     def _create_asset_with_metadata(self, story: Story, asset: StoryAsset) -> None:
         """
@@ -1403,6 +1411,9 @@ class StoryBuilder:
                 self.logger.info("No critical perspectives identified")
                 return
             
+            # Ensure templates exist for selected perspectives in this story's directory
+            self._ensure_perspective_templates_exist(story, selected_perspectives)
+            
             # Generate individual critical analysis assets in parallel
             with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
                 futures = [
@@ -1498,7 +1509,7 @@ class StoryBuilder:
 
     def _create_critical_perspective_asset(self, story: Story, perspective: str) -> Optional[StoryAsset]:
         """
-        Creates a focused critical analysis asset for a specific perspective.
+        Creates a focused critical analysis asset for a specific perspective using pre-generated templates.
         
         Args:
             story (Story): The story object.
@@ -1513,58 +1524,93 @@ class StoryBuilder:
             # Get full story synopsis for analysis
             synopsis = self.story_manager.get_synopsis(story)
             
-            # Generate a focused critical framework for this perspective
-            framework_prompt = f"""
-            Create a focused critical analysis framework for applying {perspective} to story development.
-
-            ## Story Synopsis:
-            {synopsis}
-
-            ## Instructions:
-            Create a practical framework specifically for analyzing THIS story through the lens of {perspective}. Include:
-
-            1. **Core Analytical Focus**: What this perspective examines in THIS specific story
-            2. **Key Questions**: 5-7 specific questions about this story's elements
-            3. **Story Elements to Examine**: Which characters, relationships, settings, themes to analyze
-            4. **Actionable Insights**: What the writer should look for to improve the story
-            5. **Potential Issues**: What problems this lens might reveal
-            6. **Recommendations**: Specific suggestions for strengthening the story
-
-            Make this practical and actionable for the writer, not academic theory.
-            Focus on how to improve THIS specific story.
-            """
+            # Check if we have a pre-generated template for this perspective in the story's directory
+            safe_perspective_name = self._make_safe_filename(perspective)
+            templates_dir = Path(story.story_dir, CRITICAL_ANALYSIS_DIR, TEMPLATE_SUBDIR)
+            template_path = templates_dir / f"{safe_perspective_name}_template.md"
             
-            framework = generate_planning_text(prompt=framework_prompt)
+            if template_path.exists():
+                # Use the pre-generated template
+                template_content = template_path.read_text()
+                self.logger.info(f"Using pre-generated template: {template_path}")
+                
+                analysis_prompt = f"""
+                Using the {perspective} framework below, analyze this story and provide specific, actionable insights.
+
+                ## {perspective} Framework:
+                {template_content}
+
+                ## Story to Analyze:
+                {synopsis}
+
+                ## Analysis Instructions:
+                Apply the framework above to analyze this story. Provide:
+
+                1. **Analysis**: Detailed examination using the framework questions
+                2. **Strengths**: What the story does well from this perspective  
+                3. **Areas for Improvement**: Specific issues or gaps identified
+                4. **Recommendations**: Concrete suggestions for the writer
+                5. **Implementation Notes**: How to apply these insights during writing
+
+                Be specific, practical, and actionable. Focus on improving the story.
+                Use the framework questions as a guide but don't just repeat them - provide actual analysis.
+                """
+                
+            else:
+                # Fallback to generating a framework on-the-fly (existing behavior)
+                self.logger.warning(f"No template found for '{perspective}', generating framework on-the-fly")
+                
+                framework_prompt = f"""
+                Create a focused critical analysis framework for applying {perspective} to story development.
+
+                ## Story Synopsis:
+                {synopsis}
+
+                ## Instructions:
+                Create a practical framework specifically for analyzing THIS story through the lens of {perspective}. Include:
+
+                1. **Core Analytical Focus**: What this perspective examines in THIS specific story
+                2. **Key Questions**: 5-7 specific questions about this story's elements
+                3. **Story Elements to Examine**: Which characters, relationships, settings, themes to analyze
+                4. **Actionable Insights**: What the writer should look for to improve the story
+                5. **Potential Issues**: What problems this lens might reveal
+                6. **Recommendations**: Specific suggestions for strengthening the story
+
+                Make this practical and actionable for the writer, not academic theory.
+                Focus on how to improve THIS specific story.
+                """
+                
+                framework = generate_planning_text(prompt=framework_prompt)
+                
+                # Apply the framework to analyze the story
+                analysis_prompt = f"""
+                Using the framework below, analyze this story and provide specific, actionable insights.
+
+                ## Critical Framework ({perspective}):
+                {framework}
+
+                ## Story to Analyze:
+                {synopsis}
+
+                ## Analysis Instructions:
+                Apply the framework above to analyze this story. Provide:
+
+                1. **Analysis**: Detailed examination using the framework questions
+                2. **Strengths**: What the story does well from this perspective  
+                3. **Areas for Improvement**: Specific issues or gaps identified
+                4. **Recommendations**: Concrete suggestions for the writer
+                5. **Implementation Notes**: How to apply these insights during writing
+
+                Be specific, practical, and actionable. Focus on improving the story.
+                """
             
-            # Apply the framework to analyze the story
-            analysis_prompt = f"""
-            Using the framework below, analyze this story and provide specific, actionable insights.
-
-            ## Critical Framework ({perspective}):
-            {framework}
-
-            ## Story to Analyze:
-            {synopsis}
-
-            ## Analysis Instructions:
-            Apply the framework above to analyze this story. Provide:
-
-            1. **Analysis**: Detailed examination using the framework questions
-            2. **Strengths**: What the story does well from this perspective  
-            3. **Areas for Improvement**: Specific issues or gaps identified
-            4. **Recommendations**: Concrete suggestions for the writer
-            5. **Implementation Notes**: How to apply these insights during writing
-
-            Be specific, practical, and actionable. Focus on improving the story.
-            """
-            
+            # Generate the analysis
             analysis = generate_planning_text(prompt=analysis_prompt)
             
             # Create the asset summary
             summary = summarize_text(text=analysis, summary_length=AssetTypes.CRITICAL_PERSPECTIVES.summary_length)
             
             # Create the asset with a safe filename
-            safe_perspective_name = re.sub(r'[^\w\-_]', '_', perspective.lower().replace(" ", "_"))
             filename = f"{safe_perspective_name}_analysis.md"
             
             asset = StoryAsset(
@@ -1580,3 +1626,163 @@ class StoryBuilder:
         except Exception as e:
             self.logger.error(f"Failed to create critical perspective asset for '{perspective}': {e}")
             return None
+
+    def generate_critical_perspective_templates(self, story: Story, perspectives: List[str]) -> None:
+        """
+        Generates reusable critical perspective templates from the meta-template for a specific story.
+        
+        Args:
+            story (Story): The story object to generate templates for.
+            perspectives (List[str]): Specific perspectives to generate.
+        """
+        self.logger.info(f"Generating {len(perspectives)} critical perspective templates for story: '{story.title}'")
+        
+        # Create templates directory
+        templates_dir = Path(story.story_dir, CRITICAL_ANALYSIS_DIR, TEMPLATE_SUBDIR)
+        templates_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Read the meta-template
+        try:
+            meta_template_text = META_TEMPLATE_PATH.read_text(encoding='utf-8')
+        except FileNotFoundError:
+            self.logger.error(f"Meta-template not found: {META_TEMPLATE_PATH}")
+            raise
+        except IOError as e:
+            self.logger.error(f"Failed to read meta-template: {e}")
+            raise
+        
+        # Generate templates in parallel
+        with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+            futures = [
+                executor.submit(self._generate_single_perspective_template, perspective, meta_template_text, templates_dir)
+                for perspective in perspectives
+            ]
+            
+            # Wait for all templates to complete
+            for future in concurrent.futures.as_completed(futures):
+                try:
+                    template_path = future.result()
+                    if template_path:
+                        self.logger.info(f"Generated template: {template_path}")
+                except Exception as e:
+                    self.logger.error(f"Failed to generate perspective template: {e}")
+                    continue
+        
+        self.logger.info("Critical perspective template generation completed")
+
+    def _generate_single_perspective_template(self, perspective: str, meta_template_text: str, templates_dir: Path) -> Optional[str]:
+        """
+        Generates a single critical perspective template.
+        
+        Args:
+            perspective (str): The name of the critical perspective.
+            meta_template_text (str): The meta-template content.
+            templates_dir (Path): Directory to save the template in.
+            
+        Returns:
+            Optional[str]: The path to the generated template file, or None if failed.
+        """
+        try:
+            # Create the generation prompt
+            generation_prompt = f"""
+            Using the Critical Perspective Template Generator, create a comprehensive analytical framework for {perspective}. 
+            Focus on practical questions that help writers apply this critical lens while creating stories. 
+            Balance theoretical insights with hands-on storytelling guidance, making the perspective accessible to working writers.
+
+            ## Meta-Template:
+            {meta_template_text}
+
+            ## Instructions:
+            Replace all [VARIABLES] in the template structure with {perspective}-specific content while maintaining the exact structure and formatting.
+            Make this a reusable template that writers can apply to any story, not specific to one story.
+            """
+            
+            # Generate the template using the planning text function
+            template_content = generate_planning_text(prompt=generation_prompt)
+            
+            # Create safe filename
+            safe_perspective_name = self._make_safe_filename(perspective)
+            template_filename = f"{safe_perspective_name}_template.md"
+            template_path = templates_dir / template_filename
+            
+            # Write the template file
+            try:
+                template_path.write_text(template_content, encoding='utf-8')
+            except IOError as e:
+                self.logger.error(f"Failed to write template file {template_path}: {e}")
+                raise
+            
+            return str(template_path)
+            
+        except Exception as e:
+            self.logger.error(f"Failed to generate template for '{perspective}': {e}")
+            return None
+
+    def _ensure_perspective_templates_exist(self, story: Story, perspectives: List[str]) -> None:
+        """
+        Ensures that templates exist for the specified perspectives, generating them if needed.
+        
+        Args:
+            story (Story): The story object.
+            perspectives (List[str]): List of perspective names to check.
+        """
+        missing_perspectives = []
+        
+        # Create templates directory if it doesn't exist
+        templates_dir = Path(story.story_dir, CRITICAL_ANALYSIS_DIR, TEMPLATE_SUBDIR)
+        templates_dir.mkdir(parents=True, exist_ok=True)
+        
+        for perspective in perspectives:
+            safe_perspective_name = self._make_safe_filename(perspective)
+            template_path = templates_dir / f"{safe_perspective_name}_template.md"
+            
+            if not template_path.exists():
+                missing_perspectives.append(perspective)
+        
+        if missing_perspectives:
+            self.logger.info(f"Generating missing templates for: {', '.join(missing_perspectives)}")
+            self.generate_critical_perspective_templates(story, missing_perspectives)
+        else:
+            self.logger.info("All required perspective templates already exist")
+
+    def generate_critical_perspective_templates_cli(self, perspectives: List[str]) -> None:
+        """
+        Generates reusable critical perspective templates for CLI usage (saves to global templates directory).
+        
+        Args:
+            perspectives (List[str]): Specific perspectives to generate.
+        """
+        self.logger.info(f"Generating {len(perspectives)} critical perspective templates (CLI mode)")
+        
+        # Create global templates directory
+        templates_dir = Path("templates")
+        templates_dir.mkdir(exist_ok=True)
+        
+        # Read the meta-template
+        try:
+            meta_template_text = META_TEMPLATE_PATH.read_text(encoding='utf-8')
+        except FileNotFoundError:
+            self.logger.error(f"Meta-template not found: {META_TEMPLATE_PATH}")
+            raise
+        except IOError as e:
+            self.logger.error(f"Failed to read meta-template: {e}")
+            raise
+        
+        # Generate templates in parallel
+        with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+            futures = [
+                executor.submit(self._generate_single_perspective_template, perspective, meta_template_text, templates_dir)
+                for perspective in perspectives
+            ]
+            
+            # Wait for all templates to complete
+            for future in concurrent.futures.as_completed(futures):
+                try:
+                    template_path = future.result()
+                    if template_path:
+                        self.logger.info(f"Generated template: {template_path}")
+                except Exception as e:
+                    self.logger.error(f"Failed to generate perspective template: {e}")
+                    continue
+        
+        self.logger.info("Critical perspective template generation completed (CLI mode)")

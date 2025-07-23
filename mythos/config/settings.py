@@ -1,6 +1,7 @@
 import os
 from dataclasses import dataclass
 from enum import Enum
+from pathlib import Path
 
 # Logging Settings
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()  # Default to INFO, allow DEBUG for development
@@ -45,7 +46,11 @@ RESEARCH_DIR = f"{ASSETS_DIR}/research"  # New research directory
 SETTINGS_DIR = f"{ASSETS_DIR}/settings"  # New settings directory
 CRITICAL_ANALYSIS_DIR = f"{ASSETS_DIR}/critical-analysis"  # Critical analysis directory
 
-#Asset Settings
+# Critical Perspective Constants
+META_TEMPLATE_PATH = Path("templates/critical_perspective_template_generator.md")
+TEMPLATE_SUBDIR = "templates"
+
+# Asset Settings
 ASSET_SUMMARY_LENGTH = 300
 
 # Responses API Tools - New capabilities enabled by the Responses API
