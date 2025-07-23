@@ -137,25 +137,21 @@ class TestProviderFunctions:
 class TestErrorHandling:
     """Test error handling and edge cases"""
     
-    def test_unsupported_provider(self):
+    @patch('mythos.utils.llm_utils._call_openai')
+    @patch('mythos.utils.llm_utils._call_anthropic')
+    def test_unsupported_provider(self, mock_anthropic, mock_openai):
         """Test handling of unsupported providers"""
-        # Temporarily modify a model config to test error handling
-        from mythos.config import settings
-        original = settings.FAST_MODEL
-        settings.FAST_MODEL = ("unsupported", "model")
-        
-        try:
-            with pytest.raises(ValueError, match="Unsupported provider: unsupported"):
+        # Test by directly patching the tier_models lookup
+        with patch('mythos.utils.llm_utils.FAST_MODEL', ("unsupported", "model")):
+            with pytest.raises(LLMError, match="LLM call failed: Unsupported provider: unsupported"):
                 call_llm("test", tier="fast")
-        finally:
-            settings.FAST_MODEL = original
     
     @patch('mythos.utils.llm_utils._call_openai')
     def test_network_error_handling(self, mock_openai):
         """Test network error handling"""
         mock_openai.side_effect = ProviderError("Network error")
         
-        with pytest.raises(ProviderError, match="Network error"):
+        with pytest.raises(LLMError, match="LLM call failed: Network error"):
             call_llm("test", tier="fast" if FAST_MODEL[0] == "openai" else "medium")
 
 class TestBackwardCompatibility:
@@ -190,7 +186,7 @@ class TestBackwardCompatibility:
 class TestWriterIntegration:
     """Test that writer functions use correct tiers"""
     
-    @patch('mythos.utils.llm_utils.call_llm')
+    @patch('mythos.services.writer.call_llm')
     def test_planning_text_uses_medium_tier(self, mock_call_llm):
         """Test that generate_planning_text uses medium tier"""
         mock_call_llm.return_value = "planning response"
@@ -203,7 +199,7 @@ class TestWriterIntegration:
         assert kwargs['tier'] == "medium"
         assert result == "planning response"
     
-    @patch('mythos.utils.llm_utils.call_llm')
+    @patch('mythos.services.writer.call_llm')
     def test_narrative_text_uses_big_tier(self, mock_call_llm):
         """Test that generate_narrative_text uses big tier"""
         mock_call_llm.return_value = "narrative response"
@@ -216,7 +212,7 @@ class TestWriterIntegration:
         assert kwargs['tier'] == "big"
         assert result == "narrative response"
     
-    @patch('mythos.utils.llm_utils.call_llm')
+    @patch('mythos.services.writer.call_llm')
     def test_summarize_text_uses_fast_tier(self, mock_call_llm):
         """Test that summarize_text uses fast tier"""
         mock_call_llm.return_value = "summary response"
