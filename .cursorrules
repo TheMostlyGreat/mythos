@@ -1,0 +1,719 @@
+# Mythos Project - Cursor Rules & Configuration
+
+## 🚀 Quick Reference
+
+### Critical Rules
+- **OpenAI**: ALWAYS use Responses API - `https://api.openai.com/v1/responses`
+- **Anthropic**: Use Messages API - `https://api.anthropic.com/v1/messages`  
+- **Environment**: Pull API keys from shell (no .env files)
+- **Parameters**: Named only, never positional
+- **Comments**: Thorough explanations for everything
+
+### Model Quick Selection
+| Speed Needed | Model | Provider | Use Case |
+|--------------|-------|----------|----------|
+| **Ultra Fast** | `gpt-4.1-nano` | OpenAI | Simple tasks, rapid iteration |
+| **Production** | `gpt-4.1` | OpenAI | Main application logic |
+| **Reasoning** | `o3-mini` | OpenAI | Complex analysis, cheaper reasoning |
+| **Max Reasoning** | `o3` | OpenAI | Most complex problems |
+| **Balanced** | `claude-3-5-sonnet-20241022` | Anthropic | Reliable production work |
+
+### Essential Code Pattern
+```python
+# ✅ CORRECT - OpenAI Responses API
+response = requests.post(
+    "https://api.openai.com/v1/responses",
+    headers={"Authorization": f"Bearer {OPENAI_API_KEY}"},
+    json={
+        "model": "gpt-4.1",
+        "input": prompt,
+        "instructions": system_prompt
+    }
+)
+content = response.json()["output_text"]
+
+# ❌ WRONG - Never use Chat Completions
+response = requests.post("https://api.openai.com/v1/chat/completions", ...)
+```
+
+---
+
+## 📚 Table of Contents
+
+1. [Core Principles](#core-principles)
+2. [Environment Setup](#environment-setup)
+3. [OpenAI Implementation](#openai-implementation)
+4. [Anthropic Implementation](#anthropic-implementation)
+5. [Code Standards](#code-standards)
+6. [Project Structure](#project-structure)
+7. [Development Guidelines](#development-guidelines)
+
+---
+
+## Core Principles
+
+### API Usage Rules
+- **OpenAI**: Use Responses API exclusively (`/v1/responses`) - never Chat Completions
+- **Anthropic**: Use Messages API (`/v1/messages`) with proper headers
+- **Environment Variables**: Pull from shell, never use .env files
+- **Error Handling**: Always handle `ProviderError` and `ContentRefusalError`
+- **Retries**: Use exponential backoff with `MAX_RETRIES = 3`
+
+### Code Quality Standards
+- Named parameters only (no positional arguments)
+- Thorough code comments explaining everything
+- Built-in packages preferred over custom implementations
+- Keep it simple and readable
+- Follow language best practices
+
+### Memory Management
+- User prefers Git branches before changes [[memory:3776565]]
+- Project uses shell environment variables [[memory:2983846]]
+- Always use OpenAI Responses API with correct structure [[memory:3665592]]
+
+---
+
+## Environment Setup
+
+### Required Environment Variables
+```bash
+# Required API keys (pull from shell)
+export OPENAI_API_KEY="your-openai-key"
+export ANTHROPIC_API_KEY="your-anthropic-key"
+```
+
+### Timeout Configuration
+```python
+# Standard timeouts for different operations
+STANDARD_TIMEOUT = 180      # Most operations
+CONCEPT_TIMEOUT = 300       # Concept generation
+NARRATIVE_TIMEOUT = 240     # Story generation
+```
+
+### Error Handling Pattern
+```python
+import time
+from typing import Any, Dict
+
+MAX_RETRIES = 3
+
+def make_api_call_with_retry(api_call_func, **kwargs) -> Dict[str, Any]:
+    """Standard retry pattern for all API calls."""
+    for attempt in range(MAX_RETRIES):
+        try:
+            return api_call_func(**kwargs)
+        except ProviderError as e:
+            if attempt == MAX_RETRIES - 1:
+                raise
+            wait_time = 2 ** attempt  # Exponential backoff
+            time.sleep(wait_time)
+        except ContentRefusalError as e:
+            # Don't retry refusals
+            raise
+```
+
+---
+
+## OpenAI Implementation
+
+### Core Models (2025)
+
+#### Production Models
+| Model | Use Case | Speed | Context | Cost |
+|-------|----------|-------|---------|------|
+| `gpt-4.1` | Main production | Fast | 128K | Medium |
+| `gpt-4.1-mini` | Balanced tasks | Fast | 128K | Low |
+| `gpt-4.1-nano` | Ultra-fast tasks | Very Fast | 128K | Very Low |
+
+#### Reasoning Models
+| Model | Use Case | Speed | Reasoning Quality |
+|-------|----------|-------|-------------------|
+| `o3` | Maximum reasoning | Slow | Highest |
+| `o3-mini` | Cost-effective reasoning | Medium | High |
+| `o4-mini` | Fast reasoning | Fast | Good |
+| `o1` | Original reasoning | Medium | High |
+
+#### Specialized Models
+| Model | Capability | Use Case |
+|-------|------------|----------|
+| `gpt-image-1` | Image generation | Text-to-image, editing |
+| `dall-e-3` | Image generation | Standalone images |
+| `whisper-1` | Speech-to-text | Audio transcription |
+| `text-embedding-3-large` | Embeddings | Semantic search |
+
+### Basic Responses API Usage
+
+#### Simple Text Generation
+```python
+from openai import OpenAI
+
+client = OpenAI()
+
+# Basic request
+response = client.responses.create(
+    model="gpt-4.1",
+    input="Explain quantum computing"
+)
+print(response.output_text)
+
+# With system instructions
+response = client.responses.create(
+    model="gpt-4.1",
+    input="What is machine learning?",
+    instructions="Explain like I'm 5 years old"
+)
+```
+
+#### Conversation Management
+```python
+# Automatic conversation state (recommended)
+response1 = client.responses.create(
+    model="gpt-4.1",
+    input="What is AI?"
+)
+
+# Chain responses together
+response2 = client.responses.create(
+    model="gpt-4.1",
+    previous_response_id=response1.id,
+    input="How does it work?"
+)
+
+# Manual conversation state (when needed)
+response = client.responses.create(
+    model="gpt-4.1",
+    input=[
+        {"role": "system", "content": "You are a helpful assistant"},
+        {"role": "user", "content": "Hello"},
+        {"role": "assistant", "content": "Hi! How can I help?"},
+        {"role": "user", "content": "Tell me about AI"}
+    ]
+)
+```
+
+### Structured Outputs
+
+#### JSON Schema Approach
+```python
+# Define strict JSON schema
+schema = {
+    "type": "object",
+    "properties": {
+        "steps": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "explanation": {"type": "string"},
+                    "output": {"type": "string"}
+                },
+                "required": ["explanation", "output"],
+                "additionalProperties": False
+            }
+        },
+        "final_answer": {"type": "string"}
+    },
+    "required": ["steps", "final_answer"],
+    "additionalProperties": False
+}
+
+response = client.responses.create(
+    model="gpt-4.1",
+    input="Solve 8x + 7 = -23",
+    text={
+        "format": {
+            "type": "json_schema",
+            "name": "math_solution",
+            "schema": schema,
+            "strict": True  # Ensures 100% compliance
+        }
+    }
+)
+```
+
+#### Pydantic Integration (Recommended)
+```python
+from pydantic import BaseModel
+from typing import List
+
+class MathStep(BaseModel):
+    explanation: str
+    output: str
+
+class MathSolution(BaseModel):
+    steps: List[MathStep]
+    final_answer: str
+
+# Use parse method for automatic schema generation
+response = client.responses.parse(
+    model="gpt-4.1",
+    input="Solve 8x + 7 = -23",
+    instructions="Show step-by-step solution",
+    text_format=MathSolution,
+)
+
+result = response.output[0].content[0].parsed
+```
+
+### Advanced Features
+
+#### Built-in Tools
+```python
+# Web search
+response = client.responses.create(
+    model="gpt-4.1",
+    tools=[{"type": "web_search_preview"}],
+    input="What are the latest AI developments?"
+)
+
+# File search
+response = client.responses.create(
+    model="gpt-4.1",
+    tools=[{
+        "type": "file_search",
+        "vector_store_ids": ["vs_abc123"]
+    }],
+    input="What does this document say about climate change?"
+)
+
+# Function calling
+tools = [{
+    "type": "function",
+    "name": "get_weather",
+    "description": "Get weather for a location",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "location": {"type": "string"}
+        },
+        "required": ["location"],
+        "additionalProperties": False
+    }
+}]
+
+response = client.responses.create(
+    model="gpt-4.1",
+    tools=tools,
+    input="What's the weather in New York?"
+)
+```
+
+#### Background Tasks & Streaming
+```python
+# Long-running background task
+response = client.responses.create(
+    model="o3",
+    input="Write a detailed analysis of climate change",
+    background=True
+)
+
+# Poll for completion
+while response.status in {"queued", "in_progress"}:
+    time.sleep(2)
+    response = client.responses.retrieve(response.id)
+
+# Streaming with resume capability
+stream = client.responses.create(
+    model="gpt-4.1",
+    input="Tell me a story",
+    stream=True
+)
+
+for event in stream:
+    if event.type == 'response.output_text.delta':
+        print(event.delta, end='')
+```
+
+#### Image Generation
+```python
+# Generate images in conversation
+response = client.responses.create(
+    model="gpt-4.1",
+    input="Create an image of a sunset over mountains",
+    tools=[{"type": "image_generation"}],
+    default_headers={"x-ms-oai-image-generation-deployment": "gpt-image-1"}
+)
+
+# Streaming partial images
+stream = client.responses.create(
+    model="gpt-4.1",
+    input="Draw a landscape",
+    stream=True,
+    tools=[{"type": "image_generation", "partial_images": 2}]
+)
+
+for event in stream:
+    if event.type == "response.image_generation_call.partial_image":
+        image_data = base64.b64decode(event.partial_image_b64)
+        with open(f"partial_{event.partial_image_index}.png", "wb") as f:
+            f.write(image_data)
+```
+
+#### File Input Support
+```python
+# PDF analysis via file ID
+response = client.responses.create(
+    model="gpt-4.1",
+    input=[{
+        "role": "user",
+        "content": [
+            {"type": "input_file", "file_id": "file-abc123"},
+            {"type": "input_text", "text": "Summarize this document"}
+        ]
+    }]
+)
+
+# Base64 file input
+with open("document.pdf", "rb") as f:
+    base64_data = base64.b64encode(f.read()).decode()
+
+response = client.responses.create(
+    model="gpt-4.1",
+    input=[{
+        "role": "user",
+        "content": [
+            {
+                "type": "input_file",
+                "filename": "document.pdf",
+                "file_data": f"data:application/pdf;base64,{base64_data}"
+            },
+            {"type": "input_text", "text": "Analyze this document"}
+        ]
+    }]
+)
+```
+
+#### Model Context Protocol (MCP)
+```python
+# Connect to external tools via MCP
+response = client.responses.create(
+    model="gpt-4.1",
+    tools=[{
+        "type": "mcp",
+        "server_label": "github",
+        "server_url": "https://github-mcp-server.com",
+        "headers": {"Authorization": "Bearer YOUR_TOKEN"},
+        "require_approval": "never"
+    }],
+    input="Analyze this GitHub repository"
+)
+
+# Handle approval requests
+if response.output and response.output[0].type == "mcp_approval_request":
+    approval_response = client.responses.create(
+        model="gpt-4.1",
+        previous_response_id=response.id,
+        input=[{
+            "type": "mcp_approval_response",
+            "approve": True,
+            "approval_request_id": response.output[0].id
+        }]
+    )
+```
+
+### Migration from Chat Completions
+
+#### API Endpoint Changes
+| Feature | Chat Completions | Responses API |
+|---------|------------------|---------------|
+| Endpoint | `/v1/chat/completions` | `/v1/responses` |
+| Context | Manual messages array | Automatic or chaining |
+| Tools | Basic function calling | Built-in + function calling |
+| Streaming | Basic chunks | Enhanced with sequence numbers |
+| Background | Not supported | Full async support |
+| Files | Separate upload/reference | Direct file input |
+
+#### Code Migration Examples
+```python
+# OLD: Chat Completions (❌ Don't use)
+response = openai.chat.completions.create(
+    model="gpt-4",
+    messages=[{"role": "user", "content": "Hello"}]
+)
+content = response.choices[0].message.content
+
+# NEW: Responses API (✅ Use this)
+response = client.responses.create(
+    model="gpt-4.1",
+    input="Hello"
+)
+content = response.output_text
+
+# OLD: Manual conversation management
+messages = [
+    {"role": "system", "content": "You are helpful"},
+    {"role": "user", "content": "Hi"},
+    {"role": "assistant", "content": "Hello!"},
+    {"role": "user", "content": "How are you?"}
+]
+
+# NEW: Automatic context or chaining
+response1 = client.responses.create(model="gpt-4.1", input="Hi")
+response2 = client.responses.create(
+    model="gpt-4.1",
+    previous_response_id=response1.id,
+    input="How are you?"
+)
+```
+
+---
+
+## Anthropic Implementation
+
+### Available Models
+
+#### Claude 4 Series (Latest - May 2025)
+- `claude-opus-4-20250514` - Most capable (ASL-3 safety level)
+- `claude-sonnet-4-20250514` - Balanced (ASL-2 safety level)
+
+#### Claude 3.7 Series (Hybrid Reasoning)
+- `claude-3-7-sonnet-20250219` - First hybrid reasoning model
+
+#### Claude 3.5 Series (Current Production)
+- `claude-3-5-sonnet-20241022` - **Recommended for production**
+- `claude-3-5-haiku-20241022` - Fast model
+
+### Basic Messages API Usage
+
+```python
+import requests
+
+# Standard API call
+response = requests.post(
+    "https://api.anthropic.com/v1/messages",
+    headers={
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
+        "content-type": "application/json"
+    },
+    json={
+        "model": "claude-3-5-sonnet-20241022",
+        "max_tokens": 1024,
+        "messages": [
+            {"role": "user", "content": "Explain quantum computing"}
+        ]
+    }
+)
+content = response.json()["content"][0]["text"]
+```
+
+### Extended Thinking (Claude 4+)
+
+```python
+# Enable extended thinking for complex reasoning
+response = requests.post(
+    "https://api.anthropic.com/v1/messages",
+    headers={
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
+        "content-type": "application/json"
+    },
+    json={
+        "model": "claude-sonnet-4-20250514",
+        "max_tokens": 16000,
+        "thinking": {
+            "type": "enabled",
+            "budget_tokens": 10000  # 40-60% of max_tokens
+        },
+        "messages": [
+            {"role": "user", "content": "Complex reasoning task here"}
+        ]
+    }
+)
+
+# Response includes thinking process
+thinking = response.json()["content"][0]["thinking"]
+answer = response.json()["content"][1]["text"]
+```
+
+### Structured Outputs (Tool Use Method)
+
+```python
+# Define structured response tool
+json_tool = {
+    "name": "structured_response",
+    "description": "Provide structured analysis",
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "analysis": {"type": "string"},
+            "recommendations": {"type": "array", "items": {"type": "string"}},
+            "confidence": {"type": "number", "minimum": 0, "maximum": 1}
+        },
+        "required": ["analysis", "recommendations", "confidence"]
+    }
+}
+
+response = requests.post(
+    "https://api.anthropic.com/v1/messages",
+    headers={
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01"
+    },
+    json={
+        "model": "claude-3-5-sonnet-20241022",
+        "max_tokens": 1024,
+        "tools": [json_tool],
+        "tool_choice": {"type": "tool", "name": "structured_response"},
+        "messages": [
+            {"role": "user", "content": "Analyze this business scenario"}
+        ]
+    }
+)
+```
+
+### Refusal Handling
+
+```python
+def handle_anthropic_response(response):
+    """Handle Anthropic API responses with refusal detection."""
+    content = response.json()["content"][0]["text"]
+    
+    # Check for common refusal patterns
+    refusal_indicators = [
+        "I can't assist with",
+        "I'm not able to",
+        "I don't feel comfortable",
+        "That request could be harmful"
+    ]
+    
+    is_refusal = any(indicator in content for indicator in refusal_indicators)
+    
+    if is_refusal:
+        return {"type": "refusal", "message": content}
+    else:
+        return {"type": "success", "content": content}
+```
+
+---
+
+## Code Standards
+
+### API Call Pattern
+```python
+# Standard pattern for all API calls
+def make_api_call(
+    provider: str,
+    model: str,
+    prompt: str,
+    system_prompt: str = None,
+    **kwargs
+) -> Dict[str, Any]:
+    """
+    Standard API call pattern with proper error handling.
+    
+    Args:
+        provider: 'openai' or 'anthropic'
+        model: Model name to use
+        prompt: User input/question
+        system_prompt: System instructions (optional)
+        **kwargs: Additional provider-specific parameters
+    
+    Returns:
+        Parsed response content
+    """
+    if provider == "openai":
+        return _call_openai_responses_api(
+            model=model,
+            input=prompt,
+            instructions=system_prompt,
+            **kwargs
+        )
+    elif provider == "anthropic":
+        return _call_anthropic_messages_api(
+            model=model,
+            prompt=prompt,
+            system=system_prompt,
+            **kwargs
+        )
+    else:
+        raise ValueError(f"Unsupported provider: {provider}")
+```
+
+### Error Handling Requirements
+```python
+# Required error handling for all API calls
+try:
+    response = make_api_call(...)
+except ProviderError as e:
+    logger.error(f"Provider error: {e}")
+    # Implement retry logic or fallback
+except ContentRefusalError as e:
+    logger.warning(f"Content refused: {e}")
+    # Handle refusal gracefully
+except Exception as e:
+    logger.error(f"Unexpected error: {e}")
+    # Generic error handling
+```
+
+### Testing Requirements
+```python
+# All API calls must be properly mocked in tests
+@pytest.fixture
+def mock_openai_response():
+    """Mock OpenAI Responses API response."""
+    return {
+        "output_text": "Test response",
+        "usage": {
+            "prompt_tokens": 10,
+            "completion_tokens": 20,
+            "total_tokens": 30
+        }
+    }
+
+def test_api_call(mock_openai_response, monkeypatch):
+    """Test API call with proper mocking."""
+    monkeypatch.setattr(requests, 'post', lambda *args, **kwargs: mock_openai_response)
+    result = make_api_call("openai", "gpt-4.1", "test prompt")
+    assert result["content"] == "Test response"
+```
+
+---
+
+## Project Structure
+
+### Core Files
+- `mythos/utils/llm_utils.py` - Main LLM interface (uses Responses API)
+- `mythos/config/settings.py` - Model configuration  
+- `mythos/services/writer.py` - Story generation services
+
+### Configuration Flow
+1. Environment variables loaded from shell
+2. Model configurations defined in `settings.py`
+3. LLM utilities handle API calls with proper error handling
+4. Services use LLM utilities for business logic
+
+---
+
+## Development Guidelines
+
+### Adding New Models
+1. Verify model exists in official documentation
+2. Test with actual API calls in development
+3. Update `mythos/config/settings.py` with new model
+4. Add tests with proper mocking
+5. Update this documentation
+
+### API Changes
+1. Always use latest API versions
+2. Check official documentation for breaking changes  
+3. Update response parsing logic accordingly
+4. Maintain backward compatibility where possible
+5. Update all affected tests
+
+### Best Practices Summary
+- **Always use OpenAI Responses API** - never Chat Completions
+- **Use `strict: true`** for structured outputs
+- **Handle refusals gracefully** - check for refusal field
+- **Use reasoning models** for complex analytical tasks
+- **Chain responses** for multi-turn conversations
+- **Leverage built-in tools** instead of manual implementations
+- **Use background mode** for long-running tasks (o-series models)
+- **Migrate to Responses API** for new projects and enhanced features
+- **Use MCP for external tool integration** instead of custom implementations
+
+### Notes
+- This project is publicly visible on GitHub
+- Focus on clarity, readability, and good developer experience
+- All APIs must be production-ready and well-tested
+- Avoid bloat and feature creep 

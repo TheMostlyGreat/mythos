@@ -154,7 +154,7 @@ def generate_chapter_list(prompt: str, **kwargs) -> str:
 
 def generate_story_concept(prompt: str, **kwargs) -> str:
     """
-    Generate story concept using MEDIUM tier model.
+    Generate story concept using MEDIUM tier model with structured outputs.
 
     Parameters
     ----------
@@ -165,12 +165,14 @@ def generate_story_concept(prompt: str, **kwargs) -> str:
     Returns
     -------
     str
-        The generated story concept.
+        The generated story concept as JSON string.
     """
     return call_llm(
         prompt=prompt,
         system_prompt=PLANNING_SYSTEM_PROMPT,
         tier="medium",
+        json_output=True,
+        json_schema=CONCEPT_TITLE_SCHEMA,
         **kwargs
     )
 

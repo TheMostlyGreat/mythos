@@ -1,3 +1,16 @@
+"""
+Mythos Project Configuration Settings
+
+This configuration file adheres to the .cursorrules specifications:
+- OpenAI: ALWAYS use Responses API (https://api.openai.com/v1/responses)
+- Anthropic: Use Messages API (https://api.anthropic.com/v1/messages)
+- Environment: Pull API keys from shell (no .env files) 
+- Parameters: Named only, never positional
+- JSON Schemas: Include additionalProperties: False for strict mode
+- Error Handling: ProviderError (retry) vs ContentRefusalError (no retry)
+- Comments: Thorough explanations for everything
+"""
+
 import os
 from dataclasses import dataclass
 from enum import Enum
@@ -5,28 +18,53 @@ from pathlib import Path
 from typing import Tuple
 
 # Logging Settings
-LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()  # Default to INFO, allow DEBUG for development
+LOG_LEVEL = os.getenv("LOG_LEVEL", "DEBUG").upper()  # Default to INFO, allow DEBUG for development
 
 # Multi-Tier LLM Configuration
-# Mix-and-match model configuration - verified 2025 models from official docs
-FAST_MODEL = ("openai", "gpt-4o-mini")                    # Ultra-fast + cost-effective
-MEDIUM_MODEL = ("openai", "gpt-4o")                       # Good balance of speed/cost/quality  
-BIG_MODEL = ("anthropic", "claude-3-5-sonnet-20241022")   # High quality reasoning
-PREMIUM_MODEL = ("anthropic", "claude-3-5-sonnet-20241022")   # Maximum capability (using available model)
+# Model configuration based on .cursorrules specifications - using latest 2025 models
+
+# Production Models (Primary Configuration)
+FAST_MODEL = ("openai", "gpt-4.1-nano")                       # Ultra-fast tasks, very low cost
+MEDIUM_MODEL = ("anthropic", "claude-sonnet-4-20250514")      # Balanced production work
+BIG_MODEL = ("anthropic", "claude-opus-4-20250514")           # Main production logic
+
+# Backup Models
+BACKUP_FAST_MODEL = ("openai", "gpt-4.1-mini")
+BACKUP_MEDIUM_MODEL = ("openai", "gpt-4.1") #"claude-sonnet-4-20250514"
+BACKUP_BIG_MODEL = ("openai", "gpt-4.5")
+
+# Reasoning Models (For Complex Analysis)
+REASONING_FAST = ("openai", "o4-mini")                         # Fast reasoning
+REASONING_MEDIUM = ("openai", "o3-mini")                       # Cost-effective reasoning  
+REASONING_MAX = ("openai", "o3")                               # Maximum reasoning capability
+REASONING_ORIGINAL = ("openai", "o1")                          # Original reasoning model
+
+# Specialized Models
+IMAGE_GENERATION_MODEL = ("openai", "gpt-image-1")             # Text-to-image, editing
+IMAGE_STANDALONE_MODEL = ("openai", "dall-e-3")               # Standalone image generation
+SPEECH_TO_TEXT_MODEL = ("openai", "whisper-1")                # Audio transcription
+EMBEDDINGS_MODEL = ("openai", "text-embedding-3-large")       # Semantic search
 
 # Alternative configurations - uncomment to use:
 
-# All OpenAI (simpler setup)
-#FAST_MODEL = ("openai", "gpt-4o-mini")
-#MEDIUM_MODEL = ("openai", "gpt-4o")
-#BIG_MODEL = ("openai", "gpt-4o")
-#PREMIUM_MODEL = ("openai", "gpt-4o")
+# All OpenAI (latest 4.1 series)
+#FAST_MODEL = ("openai", "gpt-4.1-nano")
+#MEDIUM_MODEL = ("openai", "gpt-4.1-mini")
+#BIG_MODEL = ("openai", "gpt-4.1")
+#PREMIUM_MODEL = ("openai", "gpt-4.1")
 
-# All Anthropic (constitutional AI focused)
+# All Anthropic (Claude 3.5 series - real available models)
 #FAST_MODEL = ("anthropic", "claude-3-5-haiku-20241022")
 #MEDIUM_MODEL = ("anthropic", "claude-3-5-sonnet-20241022")
 #BIG_MODEL = ("anthropic", "claude-3-5-sonnet-20241022")
 #PREMIUM_MODEL = ("anthropic", "claude-3-5-sonnet-20241022")
+
+# Claude 4 Series (Latest - May 2025) - When available
+#PREMIUM_MODEL = ("anthropic", "claude-opus-4-20250514")       # Most capable (ASL-3 safety)
+#BIG_MODEL = ("anthropic", "claude-sonnet-4-20250514")         # Balanced (ASL-2 safety)
+
+# Claude 3.7 Series (Hybrid Reasoning) - When available  
+#REASONING_HYBRID = ("anthropic", "claude-3-7-sonnet-20250219") # First hybrid reasoning model
 
 # Cost-optimized (all fast models)
 #FAST_MODEL = ("openai", "gpt-4o-mini")
@@ -45,10 +83,34 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
 
 # Legacy model settings for backward compatibility
+# These are calculated but never imported anywhere
 OPENAI_MODEL = MEDIUM_MODEL[1] if MEDIUM_MODEL[0] == "openai" else "gpt-4o"
 ANTHROPIC_MODEL = BIG_MODEL[1] if BIG_MODEL[0] == "anthropic" else "claude-3-5-sonnet-20241022"
 
-MAX_RETRIES = 2
+MAX_RETRIES = 3  # Increased from 2 to 3 for better reliability
+
+# Timeout settings for different types of operations
+STANDARD_TIMEOUT = 180  # 3 minutes for standard operations (increased from 120)
+CONCEPT_TIMEOUT = 300   # 5 minutes for concept generation (longer timeout)
+NARRATIVE_TIMEOUT = 240 # 4 minutes for narrative generation
+
+# API Endpoint Configuration (Based on .cursorrules specifications)
+# These are hardcoded in llm_utils.py and not imported
+OPENAI_BASE_URL = "https://api.openai.com/v1"
+OPENAI_RESPONSES_ENDPOINT = f"{OPENAI_BASE_URL}/responses"
+ANTHROPIC_BASE_URL = "https://api.anthropic.com/v1"
+ANTHROPIC_MESSAGES_ENDPOINT = f"{ANTHROPIC_BASE_URL}/messages"
+ANTHROPIC_VERSION = "2023-06-01"
+
+# Error Classes for Proper Exception Handling
+# These are redefined in llm_utils.py
+class ProviderError(Exception):
+    """Base exception for API provider errors that should trigger retries."""
+    pass
+
+class ContentRefusalError(Exception):
+    """Exception for content refusals that should NOT trigger retries."""
+    pass
 
 PLANNING_SYSTEM_PROMPT = (
             "You are world class storyteller assisting the user to plan their story. Focus on clarity, structure, "
@@ -91,17 +153,27 @@ TEMPLATE_SUBDIR = "templates"
 # Asset Settings
 ASSET_SUMMARY_LENGTH = 300
 
-# Responses API Tools - New capabilities enabled by the Responses API
-WEB_SEARCH_TOOL = {
-    "type": "web_search"
-}
+# Responses API Tools - Enhanced capabilities enabled by the Responses API
+# Based on .cursorrules specifications for built-in tools
 
-FILE_SEARCH_TOOL = {
-    "type": "file_search"
-}
+# These are never imported in llm_utils.py
+WEB_SEARCH_TOOL = {"type": "web_search_preview"}
+FILE_SEARCH_TOOL = {"type": "file_search"}
+IMAGE_GENERATION_TOOL = {"type": "image_generation"}
+MCP_TOOL_TEMPLATE = {"type": "mcp"}
+FUNCTION_CALL_TOOL_TEMPLATE = {"type": "function"}
 
-# Enhanced story research with web search
+# Enhanced story research with web search (when enabled)
+# Never imported in llm_utils.py
 RESEARCH_WITH_WEB_SEARCH = False
+
+# Background task configuration for long-running operations (o-series models)
+# Never imported in llm_utils.py
+ENABLE_BACKGROUND_TASKS = True
+
+# Streaming configuration for real-time responses
+# Never imported in llm_utils.py
+ENABLE_STREAMING = True
 
 # JSON Schemas for Structured Outputs
 # These provide 100% reliable JSON generation with OpenAI Responses API
@@ -478,3 +550,29 @@ QUESTIONER_SYSTEM_PROMPT = (
     "}\n\n"
     "Set ready_to_stop to true when you've gathered sufficient foundation (15-20 questions) and are ready to begin story development."
 )
+
+# Configuration Validation Function
+# get_model_for_task() - not used in llm_utils.py (tier mapping is inline)
+# validate_configuration() - the validation logic is inline in llm_utils.py
+
+# Model Selection Helper Functions
+# get_model_for_task() - not used in llm_utils.py (tier mapping is inline)
+
+# Auto-validate configuration on import
+try:
+    # validate_configuration() # This line is removed as per the edit hint
+    pass # No longer needed as validation is inline
+except ProviderError as e:
+    # Log warning but don't fail import (allows testing without API keys)
+    import logging
+    logging.warning(f"Configuration validation failed: {e}")
+
+# Export commonly used models for easy access
+__all__ = [
+    'FAST_MODEL', 'MEDIUM_MODEL', 'BIG_MODEL', 'REASONING_FAST', 'REASONING_MEDIUM', 'REASONING_MAX', 'REASONING_ORIGINAL',
+    'IMAGE_GENERATION_MODEL', 'IMAGE_STANDALONE_MODEL', 'SPEECH_TO_TEXT_MODEL', 'EMBEDDINGS_MODEL',
+    'OPENAI_API_KEY', 'ANTHROPIC_API_KEY',
+    'OPENAI_RESPONSES_ENDPOINT', 'ANTHROPIC_MESSAGES_ENDPOINT',
+    'ProviderError', 'ContentRefusalError',
+    'validate_configuration', 'get_model_for_task'
+]
