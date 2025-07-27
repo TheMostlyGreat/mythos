@@ -9,6 +9,15 @@
 - **Parameters**: Named only, never positional
 - **Comments**: Thorough explanations for everything
 
+### Feature Development Rules
+- **Start Simple**: Solve core problem first, add complexity only if data shows need
+- **Evidence-Based**: No unvalidated claims about performance, user needs, or maintainability
+- **Single Pattern**: Choose one approach and use consistently throughout codebase
+- **User-Focused UX**: Major phases only, no technical implementation details
+- **Document Baseline**: Create measurement framework for future improvement
+
+👉 **[Full Feature Development Guidelines](#feature-development-guidelines)** - comprehensive guidance for new features
+
 ### Model Quick Selection
 Always use `claude-sonnet-4-20250514` or `claude-opus-4-20250514` unless otherwise specified. These are the newest models even if you don't have memory of them. 
 
@@ -40,7 +49,8 @@ response = requests.post("https://api.openai.com/v1/chat/completions", ...)
 4. [Anthropic Implementation](#anthropic-implementation)
 5. [Code Standards](#code-standards)
 6. [Project Structure](#project-structure)
-7. [Development Guidelines](#development-guidelines)
+7. [Feature Development Guidelines](#feature-development-guidelines)
+8. [Development Guidelines](#development-guidelines)
 
 ---
 
@@ -679,7 +689,189 @@ def test_api_call(mock_openai_response, monkeypatch):
 
 ---
 
-## Development Guidelines
+## Feature Development Guidelines
+
+### Feature Development Philosophy
+
+#### 🎯 Start Simple, Iterate Based on Evidence
+**Lesson from Progress System**: Over-engineering solutions before understanding user needs creates complexity without value.
+
+**Required Approach**:
+1. **Identify the core problem** - what specific pain point are we solving?
+2. **Implement the simplest solution** that addresses the core problem
+3. **Document the baseline** - create measurement framework
+4. **Get user feedback** - validate the simple solution works
+5. **Add complexity only if data shows need** - never based on assumptions
+
+**Example**:
+```python
+# ❌ DON'T: Start with complex architecture
+class FeatureManager:
+    def __init__(self, config: FeatureConfig, verbosity: Level, context: Context):
+        # Complex abstraction before understanding needs
+
+# ✅ DO: Start simple, solve core problem
+def simple_feature_function(required_param: str) -> str:
+    """Solves the specific problem users reported."""
+    # Simple, focused implementation
+```
+
+#### 🏗️ Architecture Guidelines
+
+**Single Pattern Rule**: Choose one approach and use it consistently throughout the codebase.
+- **Avoid dual interfaces** (old + new patterns)
+- **Avoid "legacy compatibility"** unless absolutely necessary
+- **Migrate existing code** to new pattern if introducing changes
+
+**Complexity Justification**: Before adding any architectural complexity, document:
+1. **What specific user problem** does this complexity solve?
+2. **What evidence** shows users need this complexity?
+3. **What simpler alternatives** were considered and why they don't work?
+
+#### 📊 Evidence-Based Development
+
+**Baseline Documentation Required**: For any new feature, create:
+```markdown
+# Feature Baseline Documentation
+## Problem Statement
+- What specific user pain point does this address?
+- How do users currently handle this?
+
+## Simple Solution
+- What's the minimal implementation that solves the core problem?
+- What does the user experience look like?
+
+## Success Metrics
+- How will we measure if this feature is successful?
+- What user feedback will we collect?
+
+## Future Improvement Framework
+- What questions will we ask users?
+- How will we A/B test improvements?
+```
+
+**No Unvalidated Claims**: 
+- ❌ "This improves performance" (without measurement)
+- ❌ "Users will prefer this" (without user research)
+- ❌ "This is more maintainable" (without evidence)
+- ✅ "This solves the reported issue of X"
+- ✅ "Users specifically requested Y functionality"
+
+### Feature Integration Guidelines
+
+#### 🔌 UI/UX Integration
+**Progress System Learning**: Users prefer clean, simple feedback over technical details.
+
+**UI Principles**:
+- **Major phases only** - no granular technical implementation details
+- **Professional appearance** - consistent formatting and visual hierarchy  
+- **Meaningful information** - only show what users actually care about
+- **Graceful fallbacks** - system works even if feature fails
+
+**Example**:
+```python
+# ❌ AVOID: Technical implementation details
+print("🔄 Initializing FeatureConfigManager with verbosity=DETAILED")
+print("🔄 Validating configuration schema v2.1")
+print("🔄 Loading feature modules: [auth, data, cache]")
+
+# ✅ PREFER: User-focused information  
+print("🔄 Setting up your workspace...")
+```
+
+#### 🧪 Testing Strategy
+**Comprehensive but Simple**: Focus on real user workflows, not complex architectural edge cases.
+
+**Required Tests**:
+1. **Happy path integration test** - complete user workflow
+2. **Error recovery test** - what happens when things fail
+3. **Backwards compatibility test** - existing functionality unaffected
+4. **Performance regression test** - new feature doesn't slow existing operations
+
+**Avoid Over-Testing**:
+- Complex mocking of architectural abstractions
+- Testing internal implementation details
+- Verbosity level combinations without user validation
+
+#### 🚀 Deployment Strategy
+**Incremental Rollout**:
+1. **Feature flag/configuration** - allow disabling if issues arise
+2. **Backwards compatibility** - existing users unaffected
+3. **Documentation** - clear usage examples and troubleshooting
+4. **Monitoring** - track actual usage and user satisfaction
+
+### Anti-Patterns to Avoid
+
+#### ❌ Over-Engineering Patterns
+Based on progress system lessons:
+
+**Context Manager Overuse**:
+```python
+# ❌ AVOID: Complex session management for simple operations
+with feature_session(config, verbosity, context) as session:
+    session.do_simple_thing()
+
+# ✅ PREFER: Simple function calls
+simple_function(required_param)
+```
+
+**Premature Abstraction**:
+```python
+# ❌ AVOID: Complex inheritance hierarchies
+class BaseFeature(ABC):
+    @abstractmethod
+    def configure(self, level: FeatureLevel): pass
+
+class AdvancedFeature(BaseFeature):
+    def configure(self, level: FeatureLevel): pass
+
+# ✅ PREFER: Simple, focused functions
+def feature_function(required_input: str) -> str:
+    """Does exactly what it says."""
+```
+
+**Configuration Explosion**:
+```python
+# ❌ AVOID: Too many configuration options
+@dataclass
+class FeatureConfig:
+    verbosity: Level
+    output_format: Format  
+    timing_display: bool
+    color_scheme: ColorScheme
+    accessibility_mode: bool
+    # ... 15 more options
+
+# ✅ PREFER: Sensible defaults, minimal configuration
+def feature_function(input: str, verbose: bool = False) -> str:
+```
+
+#### ❌ Assumption-Driven Development
+**Don't Assume User Needs**:
+- ❌ "Users probably want fine-grained control"
+- ❌ "Power users will need advanced options"
+- ❌ "This will improve performance" (without measurement)
+
+**Do Validate with Users**:
+- ✅ "User reported specific problem X"
+- ✅ "Survey shows 80% of users want Y"
+- ✅ "A/B test shows version Z performs better"
+
+### Success Criteria for New Features
+
+#### ✅ Feature Ready for Merge When:
+1. **Solves specific user problem** - clearly documented
+2. **Simple implementation** - no unnecessary complexity
+3. **Comprehensive tests** - real workflows covered
+4. **Baseline documented** - framework for future measurement
+5. **No regressions** - existing functionality unaffected
+6. **User-focused UX** - clean, professional interface
+7. **Single pattern** - consistent with codebase architecture
+
+#### 📝 Required Documentation:
+- **User-facing**: How to use the feature, examples, troubleshooting
+- **Developer-facing**: Architecture decisions, testing approach, future roadmap
+- **Baseline**: Current implementation, success metrics, improvement framework
 
 ### Adding New Models
 1. Verify model exists in official documentation
