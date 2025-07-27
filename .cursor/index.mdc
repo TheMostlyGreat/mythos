@@ -1,0 +1,59 @@
+---
+description: Mythos project development guidelines, API usage patterns, and architectural principles for AI story generation
+globs: 
+alwaysApply: true
+---
+
+# Mythos Project - AI Assistant Rules
+
+## 🎯 Core Rules
+- **Check Latest Docs**: Always consult official API documentation and release notes before implementation
+- **OpenAI**: ALWAYS use Responses API (`/v1/responses`) - never Chat Completions
+  - Use `text` parameter (not `response_format`)
+  - JSON schemas require `additionalProperties: false` for strict mode
+  - Access response via `output_text` attribute
+- **Anthropic**: Use Messages API (`/v1/messages`)
+- **Environment**: Pull API keys from shell (no .env files)
+- **Parameters**: Named only, never positional
+- **Comments**: Thorough explanations for everything
+
+## 📋 Feature Development
+- **Start Simple**: Solve core problem first, add complexity only if data shows need
+- **Evidence-Based**: No unvalidated claims about performance/user needs
+- **Single Pattern**: Choose one approach, use consistently throughout codebase
+- **User-Focused UX**: Major phases only, no technical implementation details
+- **Document Baseline**: Create measurement framework for future improvement
+
+## 🏗️ Architecture
+- **Avoid over-engineering**: Context managers, complex inheritance, configuration explosion
+- **Prefer simple functions** over complex class hierarchies
+- **Handle errors explicitly** - never silently ignore
+- **Use existing patterns** - build on proven ProgressTracker, StoryManager architecture
+
+## 🧪 Testing
+- Focus on real user workflows, not architectural edge cases
+- Required: happy path, error recovery, backwards compatibility, performance regression
+- Avoid complex mocking without user validation
+
+## 📦 Tech Stack
+- **Models**: `claude-sonnet-4-20250514` or `claude-opus-4-20250514` (newest available)
+- **LLM Utils**: Always use Responses API with correct structure
+- **Progress**: Simple ProgressTracker pattern consistently
+- **Storage**: Pydantic models, file-based story storage
+- **Testing**: pytest with proper mocking
+
+## 🚫 Anti-Patterns
+- Dual interfaces (old + new patterns)
+- Unvalidated performance/UX claims
+- Complex verbosity levels without user research
+- Technical progress details exposed to users
+- Assumption-driven feature development
+
+## ✅ Ready to Merge When
+1. Solves specific user problem (documented)
+2. Simple implementation (no unnecessary complexity)
+3. Comprehensive tests (real workflows)
+4. Baseline documented (measurement framework)
+5. No regressions (existing functionality works)
+6. User-focused UX (clean, professional)
+7. Single pattern (consistent with codebase)
