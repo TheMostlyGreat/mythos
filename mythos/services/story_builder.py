@@ -614,9 +614,6 @@ class StoryBuilder:
         asset_type = getattr(AssetTypes, asset_type_enum.name)
         prompt = self._assemble_planning_prompt(story, asset_type)
         
-        # Show progress indicator with specific asset type
-        print_progress_step(asset_type.title, f"Creating detailed {asset_type.title.lower()}")
-        
         # Use Structured Outputs for specific asset types that need reliable JSON
         if asset_type_enum == AssetTypeNames.CHARACTERS:
             asset_text = generate_character_list(prompt=prompt)
@@ -628,8 +625,6 @@ class StoryBuilder:
         else:
             # Use regular planning text for other asset types
             asset_text = generate_planning_text(prompt=prompt)
-            
-        complete_progress_step(asset_type.title)
             
         summary = summarize_text(text=asset_text, summary_length=asset_type.summary_length)
         
@@ -1315,7 +1310,6 @@ class StoryBuilder:
             f"{template_text}\n"
         )
 
-        print_progress_step(f"Chapter {chapter_num} Outline", f"Creating detailed outline for Chapter {chapter_num}")
         chapter_asset.details = generate_planning_text(prompt=chapter_prompt)
         chapter_asset.summary = summarize_text(
             text=chapter_asset.details,
@@ -1324,7 +1318,6 @@ class StoryBuilder:
 
         self._create_asset_with_metadata(story, chapter_asset)
         self.story_manager.update_story(story)
-        complete_progress_step(f"Chapter {chapter_num} Outline")
         self.logger.debug(f"Chapter {chapter_num} outline generated and saved.")
         
         return chapter_asset
