@@ -32,17 +32,25 @@ class StoryBuildException(Exception):
 
 class StoryBuilder:
     """
-    Handles the business logic for building a story from a user prompt using the Snowflake method.
-    
-    The process includes generating the concept, related assets, and chapters by leveraging
-    various managers and writer services.
+    Constructs story objects through iterative refinement.
+
+    The StoryBuilder class manages the process of transforming a user's initial 
+    story concept into a complete story with all supporting assets and chapter content.
+    It provides methods for:
+    - Creating concept and story assets
+    - Generating chapter lists and outlines
+    - Writing full narrative content
+    - Creating EPUB files for distribution
+
+    Attributes:
+        logger: Logger for tracking operations
+        story_manager: Manages story data persistence
+        asset_manager: Handles story asset creation and updates
     """
 
     def __init__(self):
-        """
-        Initializes the StoryBuilder with necessary managers.
-        """
-        self.logger = get_logger(self.__class__.__name__)
+        """Initialize StoryBuilder with necessary managers."""
+        self.logger = get_logger(__name__)
         self.story_manager = StoryManager()
         self.asset_manager = StoryAssetManager()
 
@@ -116,6 +124,7 @@ class StoryBuilder:
             story = Story(user_prompt=user_prompt)
             
             # Generate concept asset and extract title
+            print_thinking("Creating your story concept...")
             concept_asset = self._generate_concept_asset(story)
             new_title = self._extract_title_from_concept()
             
@@ -133,6 +142,7 @@ class StoryBuilder:
             ):
                 return story
 
+            print_thinking("Generating story planning assets...")
             self._generate_related_assets(story)
             
             # Set baseline for change detection after asset generation
@@ -144,25 +154,51 @@ class StoryBuilder:
                 self.logger.info(f"Stopping after asset generation as requested: '{story.title}'")
                 return story
 
-            # Ask before continuing to story generation (chapters + content)
+            # Step 3: Ask if user wants to continue to chapter outline generation
             if not confirm_next_step(
-                current_step="Planning assets complete",
-                next_step="Generate story content (outlines and chapters)",
+                current_step="Story assets created",
+                next_step="Generate chapter outlines",
                 story_title=story.title
             ):
                 return story
 
-            # Generate story content (outlines and chapters)
-            story = self._generate_story_content(story)
-
-            self.story_manager.update_story(story)
-            self.logger.info(f"Successfully built story: '{story.title}'")
+            print_thinking("Creating chapter outlines...")
+            # Generate chapter list and outlines
+            self.generate_chapter_assets(story)
             
+            # Step 4: Ask if user wants to continue to full narrative generation
+            if not confirm_next_step(
+                current_step="Chapter outlines created",
+                next_step="Write full chapter narratives",
+                story_title=story.title
+            ):
+                return story
+
+            print_thinking("Writing full chapter narratives...")
+            # Generate full chapter content
+            self._generate_chapter_narratives(story)
+
+            # Set baseline again after narrative generation
+            self.story_manager.update_asset_baseline(story)
+
+            # Step 5: Ask if user wants to continue to EPUB creation
+            if not confirm_next_step(
+                current_step="Chapter narratives completed",
+                next_step="Create EPUB file",
+                story_title=story.title
+            ):
+                return story
+
+            print_thinking("Creating EPUB file...")
+            # Generate EPUB
+            self._create_epub(story)
+
+            self.logger.info(f"Story building completed successfully: '{story.title}'")
             return story
 
         except Exception as e:
-            self.logger.error(f"Failed to build story: {e}")
-            raise StoryBuildException(f"Story building failed: {e}") from e
+            self.logger.error(f"Story building failed: {e}")
+            raise StoryBuildException(f"Failed to build story: {e}")
 
     def build_story_assets(self, user_prompt: str) -> Story:
         """

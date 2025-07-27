@@ -110,9 +110,6 @@ class StoryQuestioner:
     def _generate_conversation_response(self) -> str:
         """Generate natural conversational response from AI."""
         
-        # Show thinking indicator before LLM call
-        print("\n🤔 Thinking of the next question...")
-        
         # Build the full conversation context
         messages = self.conversation.copy()
         

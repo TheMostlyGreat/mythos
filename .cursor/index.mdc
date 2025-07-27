@@ -30,6 +30,14 @@ alwaysApply: true
 - **Handle errors explicitly** - never silently ignore
 - **Use existing patterns** - build on proven ProgressTracker, StoryManager architecture
 
+## 🎭 User Experience
+- **Thinking Indicators**: Use `print_thinking("Descriptive message...")` before LLM operations
+  - Provides immediate feedback during 10-30 second LLM delays
+  - Different from progress tracking (shows API call delays vs structured progress)
+  - Examples: "Creating your story concept...", "Writing chapter narratives..."
+- **Progress Tracking**: Use ProgressTracker for structured multi-step operations
+- **Confirmations**: Use `confirm_next_step()` between major story building phases
+
 ## 🧪 Testing
 - Focus on real user workflows, not architectural edge cases
 - Required: happy path, error recovery, backwards compatibility, performance regression
@@ -44,6 +52,8 @@ alwaysApply: true
   - `pydantic-settings==2.10.1` (configuration)
 - **Development**:
   - `pytest==8.4.1` (testing framework)
+- **Models**: `claude-sonnet-4-20250514` or `claude-opus-4-20250514` (newest available)
+- **LLM Utils**: Always use Responses API with correct structure or OpenAI, and the Messages API for Anthropic. 
 - **Content Generation**:
   - `EbookLib==0.19` (EPUB creation)
   - `markdownify==1.1.0` (HTML to Markdown)
@@ -56,6 +66,7 @@ alwaysApply: true
 - Complex verbosity levels without user research
 - Technical progress details exposed to users
 - Assumption-driven feature development
+- Silent LLM operations without user feedback
 
 ## ✅ Ready to Merge When
 1. Solves specific user problem (documented)

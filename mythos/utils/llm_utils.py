@@ -3,15 +3,20 @@ import time
 import json
 import requests
 import logging
+from pathlib import Path
 from typing import Dict, Any, Optional, List, Literal, Union, Tuple
 from mythos.config.settings import (
     OPENAI_API_KEY, ANTHROPIC_API_KEY,
+    OPENAI_BASE_URL, ANTHROPIC_BASE_URL,
     FAST_MODEL, MEDIUM_MODEL, BIG_MODEL,
     PLANNING_SYSTEM_PROMPT, MAX_RETRIES, STANDARD_TIMEOUT,
-    CONCEPT_TIMEOUT
+    CONCEPT_TIMEOUT, LLM_CONFIG
 )
 from mythos.utils.logger import get_logger
 from mythos.utils.token_counter import TokenCounter
+
+# Import UI utilities for user feedback
+from mythos.utils.ui_utils import print_thinking
 
 logger = get_logger(__name__)
 token_counter = TokenCounter()
@@ -71,6 +76,9 @@ def call_llm(
         ContentRefusalError: Content was refused due to safety policies
         ValueError: Invalid tier or parameter values
     """
+    # Show thinking indicator immediately when LLM call starts
+    print_thinking("AI is processing...")
+    
     # Map tier names to configured model providers and names
     tier_models = {
         "fast": FAST_MODEL,
