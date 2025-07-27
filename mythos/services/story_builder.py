@@ -115,18 +115,12 @@ class StoryBuilder:
         try:
             story = Story(user_prompt=user_prompt)
             
-            # Start progress tracking
-            from mythos.utils.progress_tracker import start_story_progress
-            tracker = start_story_progress()
-            
             # Generate concept asset and extract title
             concept_asset = self._generate_concept_asset(story)
             new_title = self._extract_title_from_concept()
             
             self.logger.debug(f"Concept created. Extracted story title: '{new_title}'")
-
             self.story_manager.set_story_title(story, new_title)
-            tracker.story_title = new_title  # Update tracker with real title
             
             self._create_asset_with_metadata(story, concept_asset)
             complete_progress_step("Story Concept", f"Created concept for '{new_title}'")
@@ -135,11 +129,9 @@ class StoryBuilder:
             # Ask if user wants to continue to assets generation
             if not confirm_next_step(
                 current_step="Story concept created",
-                next_step="Generate planning assets (research, settings, plot, characters, etc.)",
+                next_step="Generate planning assets (characters, settings, plot, etc.)",
                 story_title=story.title
             ):
-                # Save story and return early
-                self.story_manager.update_story(story)
                 return story
 
             self._generate_related_assets(story)
@@ -150,40 +142,22 @@ class StoryBuilder:
             # Step 2 Complete: Assets generated
             # Stop here if requested (for user review of assets)
             if stop_after_assets:
-                self.logger.info(f"Story assets generated for: '{story.title}'. Stopping for user review.")
+                self.logger.info(f"Stopping after asset generation as requested: '{story.title}'")
                 return story
-                
-            # Ask if user wants to continue to chapter outlines
+
+            # Ask before continuing to story generation (chapters + content)
             if not confirm_next_step(
-                current_step="Planning assets generated",
-                next_step="Create chapter outlines",
+                current_step="Planning assets complete",
+                next_step="Generate story content (outlines and chapters)",
                 story_title=story.title
             ):
-                # Save story and return early
-                self.story_manager.update_story(story)
                 return story
-            
-            # Generate chapter structure and content
-            self._generate_story_content(story)
-            
-            # Check if user confirmed finalization (by checking story state)
-            state, _ = self.story_manager.get_story_state(story)
-            if state == "finalization_needed":
-                # User confirmed they want finalization - proceed with draft and EPUB creation
-                print_progress_step("Final Draft", "Creating final manuscript and EPUB file")
-                self.logger.info(f"Finalizing story: '{story.title}'")
-                story.draft = self._create_manuscript_draft(story)
-                create_epub(story)
-                complete_progress_step("Final Draft", "Story completed and EPUB created")
-                self.logger.info(f"Successfully built and finalized story: '{story.title}'")
-            else:
-                # User stopped before finalization or story is in a different state
-                self.logger.info(f"Story building paused at current state: {state}")
-            
-            # Show progress summary
-            from mythos.utils.progress_tracker import get_progress_tracker
-            tracker = get_progress_tracker()
-            tracker.show_progress_summary()
+
+            # Generate story content (outlines and chapters)
+            story = self._generate_story_content(story)
+
+            self.story_manager.update_story(story)
+            self.logger.info(f"Successfully built story: '{story.title}'")
             
             return story
 
@@ -329,11 +303,6 @@ class StoryBuilder:
             self.story_manager.update_asset_baseline(story)
             self.logger.info(f"Successfully resumed story: '{story.title}'")
             
-            # Show progress summary
-            from mythos.utils.progress_tracker import get_progress_tracker
-            tracker = get_progress_tracker()
-            tracker.show_progress_summary()
-            
             return story
             
         except Exception as e:
@@ -367,11 +336,9 @@ class StoryBuilder:
         for asset_type in asset_sequence:
             if asset_type.value not in story.assets:
                 self.logger.info(f"Generating missing asset: {asset_type.value}")
-                print_progress_step(f"Asset: {asset_type.value.title()}", f"Generating missing {asset_type.value.replace('_', ' ').lower()}")
                 asset = self._create_single_asset(story, asset_type)
                 self._create_asset_with_metadata(story, asset)
                 self.story_manager.update_story(story)
-                complete_progress_step(f"Asset: {asset_type.value.title()}")
                 
         # Check if deep dive research is needed
         if self.analyze_research_depth_needs(story):
@@ -876,16 +843,13 @@ class StoryBuilder:
             # Generate deep dive research for each identified topic
             for topic in research_topics:
                 try:
-                    print_progress_step(f"Research: {topic.title()}", f"Researching {topic} with web search")
                     deep_dive_asset = self.create_deep_dive_research(story, topic)
                     self._create_asset_with_metadata(story, deep_dive_asset)
                     self.logger.info(f"Generated deep dive research: '{topic}'")
-                    complete_progress_step(f"Research: {topic.title()}")
                     
                 except Exception as e:
                     self.logger.error(f"Failed to generate deep dive for '{topic}': {e}")
                     # Continue with other topics even if one fails
-                    continue
             
             # Save story with new research assets
             self.story_manager.update_story(story)
@@ -987,11 +951,9 @@ class StoryBuilder:
         # Generate deep dive settings for each identified component
         for component in setting_components:
             try:
-                print_progress_step(f"Settings: {component.title()}", f"Creating detailed {component} settings")
                 deep_dive_asset = self.create_deep_dive_settings(story, component)
                 self._create_asset_with_metadata(story, deep_dive_asset)
                 self.logger.info(f"Generated deep dive settings: '{component}'")
-                complete_progress_step(f"Settings: {component.title()}")
                 
             except Exception as e:
                 self.logger.error(f"Failed to generate deep dive settings for '{component}': {e}")
