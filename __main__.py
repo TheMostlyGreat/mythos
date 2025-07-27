@@ -274,6 +274,23 @@ def continue_existing_story():
         
         print(f"✅ Successfully loaded: {story.title}")
         
+        # Check for external asset changes (only if baseline exists)
+        cache_file = story.story_dir / ".mythos" / "changes.json"
+        if cache_file.exists() and story_manager.has_asset_changes(story):
+            changed_files = story_manager.get_changed_asset_files(story)
+            print(f"\n📝 Asset files have been modified externally:")
+            for file_path in changed_files[:5]:  # Show first 5 files
+                print(f"    • {file_path}")
+            if len(changed_files) > 5:
+                print(f"    • ... and {len(changed_files) - 5} more files")
+            print("✅ Your changes have been preserved and will be used.")
+            
+            # Update baseline to acknowledge the changes
+            story_manager.update_asset_baseline(story)
+        elif not cache_file.exists():
+            # First time loading this story with change detection - establish baseline
+            story_manager.update_asset_baseline(story)
+        
         # Get current story state and show progress
         state, description = story_manager.get_story_state(story)
         progress_summary = story_manager.get_story_progress_summary(story)

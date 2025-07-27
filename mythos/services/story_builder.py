@@ -137,6 +137,9 @@ class StoryBuilder:
 
             self._generate_related_assets(story)
             
+            # Set baseline for change detection after asset generation
+            self.story_manager.update_asset_baseline(story)
+            
             # Step 2 Complete: Assets generated
             # Stop here if requested (for user review of assets)
             if stop_after_assets:
@@ -1303,6 +1306,9 @@ class StoryBuilder:
         """Generates chapter structure and content."""
         self.generate_chapter_assets(story)
         
+        # Set baseline after chapter outline generation
+        self.story_manager.update_asset_baseline(story)
+        
         # Step 3 Complete: Chapter outlines generated
         # Ask if user wants to continue to writing chapters
         if not confirm_next_step(
@@ -1315,6 +1321,9 @@ class StoryBuilder:
             return story
         
         self.write_chapters(story)
+        
+        # Set baseline after chapter writing
+        self.story_manager.update_asset_baseline(story)
         
         # Step 4 Complete: Chapters written
         # Ask if user wants to continue to finalization

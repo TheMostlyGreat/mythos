@@ -1,9 +1,10 @@
 import json
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Dict, List
 from mythos.story import Story
 from mythos.story_asset import StoryAsset, AssetMetadata
 from mythos.utils.logger import get_logger
+from mythos.utils.file_change_tracker import FileChangeTracker
 from mythos.config import settings
 from mythos.utils.data_utils import (
     serialize_to_json,
@@ -23,6 +24,7 @@ class StoryManager:
         Initializes the StoryManager with the directory to store story files.
         """
         self.logger = get_logger(self.__class__.__name__)
+        self.change_tracker = FileChangeTracker()
 
     # def create_story(self, story: Story) -> Story:
     #     """
@@ -403,3 +405,50 @@ class StoryManager:
         }
         
         return progress_map.get(state, "❓ Unknown state")
+
+    def check_asset_changes(self, story: Story) -> Dict[str, bool]:
+        """
+        Check which story asset markdown files have changed since last baseline.
+        
+        Args:
+            story: The story to check for asset changes
+            
+        Returns:
+            Dictionary mapping relative file paths to change status (True = changed)
+        """
+        return self.change_tracker.check_for_changes(story.story_dir)
+    
+    def get_changed_asset_files(self, story: Story) -> List[str]:
+        """
+        Get list of story asset files that have changed since last baseline.
+        
+        Args:
+            story: The story to check for changes
+            
+        Returns:
+            List of relative file paths that have changed
+        """
+        return self.change_tracker.get_changed_files(story.story_dir)
+    
+    def has_asset_changes(self, story: Story) -> bool:
+        """
+        Check if any story asset files have changed since last baseline.
+        
+        Args:
+            story: The story to check for changes
+            
+        Returns:
+            True if any files have changed, False otherwise
+        """
+        return self.change_tracker.has_any_changes(story.story_dir)
+    
+    def update_asset_baseline(self, story: Story) -> None:
+        """
+        Update the baseline timestamps for all current story asset files.
+        Call this after generating or modifying assets to establish new baseline.
+        
+        Args:
+            story: The story to update baseline for
+        """
+        self.change_tracker.update_baseline(story.story_dir)
+        self.logger.info(f"Updated asset change baseline for story: {story.title}")
