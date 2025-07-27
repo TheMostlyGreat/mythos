@@ -107,13 +107,47 @@ class TestEnhancedUIUtils:
         complete_progress_step("Fallback Step", "Fallback completed")
         
     def test_extraction_chapter_number(self):
-        """Test chapter number extraction."""
+        """Test the _extract_chapter_number helper function."""
         from mythos.services.story_builder import StoryBuilder
         
         builder = StoryBuilder()
         
+        # Test various chapter title formats
         assert builder._extract_chapter_number("chapter_1") == 1
         assert builder._extract_chapter_number("Chapter 5") == 5
         assert builder._extract_chapter_number("chapter_10") == 10
-        assert builder._extract_chapter_number("Some Title 3") == 3
-        assert builder._extract_chapter_number("No Number") == 1  # fallback 
+        assert builder._extract_chapter_number("Chapter 2: The Beginning") == 2
+        assert builder._extract_chapter_number("no_number_here") == 1  # Default fallback
+        
+    def test_session_cleanup_and_reset(self):
+        """Test that session cleanup and reset functionality works correctly."""
+        from mythos.utils.progress_tracker import (
+            start_story_progress, 
+            end_current_session, 
+            get_progress_tracker,
+            reset_progress_tracker
+        )
+        
+        # Start a session
+        tracker1 = start_story_progress("Test Story 1")
+        tracker1.start_step("Step 1", "Testing step")
+        assert tracker1.session_start_time is not None
+        assert tracker1.story_title == "Test Story 1"
+        
+        # End session should reset state
+        end_current_session()
+        
+        # Get new tracker should be fresh instance
+        tracker2 = get_progress_tracker()
+        assert tracker2.session_start_time is None
+        assert tracker2.story_title == ""
+        assert tracker2.step_count == 0
+        
+        # Manual reset should also work
+        tracker3 = start_story_progress("Test Story 2")
+        tracker3.start_step("Another step", "More testing")
+        reset_progress_tracker()
+        
+        tracker4 = get_progress_tracker()
+        assert tracker4.session_start_time is None
+        assert tracker4.story_title == "" 

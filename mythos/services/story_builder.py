@@ -269,7 +269,9 @@ class StoryBuilder:
                     return story
                     
                 self.logger.info("Continuing asset generation...")
+                print_progress_step("Resume Assets", "Continuing generation of missing planning assets")
                 self._resume_asset_generation(story)
+                complete_progress_step("Resume Assets", "Missing planning assets completed")
                 
             elif state == "chapters_not_outlined":
                 # Ask before generating chapter outlines
@@ -281,7 +283,9 @@ class StoryBuilder:
                     return story
                     
                 self.logger.info("Generating chapter outlines...")
+                print_progress_step("Chapter Outlines", "Generating chapter structure and outlines")
                 self.generate_chapter_assets(story)
+                complete_progress_step("Chapter Outlines", "All chapter outlines completed")
                 
             elif state in ["chapters_not_written", "chapters_partial"]:
                 # Ask before writing chapters
@@ -294,7 +298,9 @@ class StoryBuilder:
                     return story
                     
                 self.logger.info("Writing manuscript chapters...")
+                print_progress_step("Chapter Writing", "Writing remaining manuscript chapters")
                 self._resume_chapter_writing(story)
+                complete_progress_step("Chapter Writing", "All chapters completed")
                 
             elif state == "finalization_needed":
                 # Ask before finalizing
@@ -306,8 +312,10 @@ class StoryBuilder:
                     return story
                     
                 self.logger.info("Finalizing story...")
+                print_progress_step("Final Draft", "Creating final manuscript and EPUB file")
                 story.draft = self._create_manuscript_draft(story)
                 create_epub(story)
+                complete_progress_step("Final Draft", "Story completed and EPUB created")
                 
             elif state == "complete":
                 self.logger.info("Story is already complete!")
@@ -316,9 +324,15 @@ class StoryBuilder:
             else:
                 raise StoryBuildException(f"Unknown story state: {state}")
                 
-            # Always save progress
+            # Always save progress and update baseline
             self.story_manager.update_story(story)
+            self.story_manager.update_asset_baseline(story)
             self.logger.info(f"Successfully resumed story: '{story.title}'")
+            
+            # Show progress summary
+            from mythos.utils.progress_tracker import get_progress_tracker
+            tracker = get_progress_tracker()
+            tracker.show_progress_summary()
             
             return story
             
@@ -353,9 +367,23 @@ class StoryBuilder:
         for asset_type in asset_sequence:
             if asset_type.value not in story.assets:
                 self.logger.info(f"Generating missing asset: {asset_type.value}")
+                print_progress_step(f"Asset: {asset_type.value.title()}", f"Generating missing {asset_type.value.replace('_', ' ').lower()}")
                 asset = self._create_single_asset(story, asset_type)
                 self._create_asset_with_metadata(story, asset)
                 self.story_manager.update_story(story)
+                complete_progress_step(f"Asset: {asset_type.value.title()}")
+                
+        # Check if deep dive research is needed
+        if self.analyze_research_depth_needs(story):
+            print_progress_step("Deep Dive Research", "Generating detailed research for complex topics")
+            self.generate_deep_dive_research(story)
+            complete_progress_step("Deep Dive Research", "Deep dive research completed")
+            
+        # Check if deep dive settings are needed  
+        if self.analyze_settings_depth_needs(story):
+            print_progress_step("Deep Dive Settings", "Generating detailed world-building settings")
+            self.generate_deep_dive_settings(story)
+            complete_progress_step("Deep Dive Settings", "Deep dive settings completed")
 
     def _resume_chapter_writing(self, story: Story) -> None:
         """
@@ -805,7 +833,6 @@ class StoryBuilder:
         try:
             from mythos.services.writer import generate_web_enhanced_research, summarize_text
             
-            print_progress_step("Web Research", f"Researching {topic} with web search")
             # Generate deep dive research with web search
             research_text = generate_web_enhanced_research(prompt=research_prompt)
             summary = summarize_text(text=research_text, summary_length=AssetTypes.RESEARCH.summary_length)
@@ -849,9 +876,11 @@ class StoryBuilder:
             # Generate deep dive research for each identified topic
             for topic in research_topics:
                 try:
+                    print_progress_step(f"Research: {topic.title()}", f"Researching {topic} with web search")
                     deep_dive_asset = self.create_deep_dive_research(story, topic)
                     self._create_asset_with_metadata(story, deep_dive_asset)
                     self.logger.info(f"Generated deep dive research: '{topic}'")
+                    complete_progress_step(f"Research: {topic.title()}")
                     
                 except Exception as e:
                     self.logger.error(f"Failed to generate deep dive for '{topic}': {e}")
@@ -958,9 +987,11 @@ class StoryBuilder:
         # Generate deep dive settings for each identified component
         for component in setting_components:
             try:
+                print_progress_step(f"Settings: {component.title()}", f"Creating detailed {component} settings")
                 deep_dive_asset = self.create_deep_dive_settings(story, component)
                 self._create_asset_with_metadata(story, deep_dive_asset)
                 self.logger.info(f"Generated deep dive settings: '{component}'")
+                complete_progress_step(f"Settings: {component.title()}")
                 
             except Exception as e:
                 self.logger.error(f"Failed to generate deep dive settings for '{component}': {e}")
@@ -1037,7 +1068,6 @@ class StoryBuilder:
         Output comprehensive, well-organized markdown that provides detailed world-building for compelling storytelling.
         """
         
-        print_progress_step("Deep Dive Settings", f"Creating detailed settings for {component}")
         # Generate the deep dive settings content
         settings_content = generate_planning_text(prompt=settings_prompt)
         

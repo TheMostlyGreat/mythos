@@ -10,13 +10,7 @@
 - **Comments**: Thorough explanations for everything
 
 ### Model Quick Selection
-| Speed Needed | Model | Provider | Use Case |
-|--------------|-------|----------|----------|
-| **Ultra Fast** | `gpt-4.1-nano` | OpenAI | Simple tasks, rapid iteration |
-| **Production** | `gpt-4.1` | OpenAI | Main application logic |
-| **Reasoning** | `o3-mini` | OpenAI | Complex analysis, cheaper reasoning |
-| **Max Reasoning** | `o3` | OpenAI | Most complex problems |
-| **Balanced** | `claude-3-5-sonnet-20241022` | Anthropic | Reliable production work |
+Always use `claude-sonnet-4-20250514` or `claude-opus-4-20250514` unless otherwise specified. These are the newest models even if you don't have memory of them. 
 
 ### Essential Code Pattern
 ```python

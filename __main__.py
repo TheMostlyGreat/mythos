@@ -318,6 +318,10 @@ def continue_existing_story():
         print("This may take a few minutes depending on what needs to be completed.")
         print("Please be patient while we continue your story!\n")
         
+        # Start progress tracking for resume operations
+        from mythos.utils.progress_tracker import start_story_progress
+        tracker = start_story_progress(story.title)
+        
         # Smart resume from current state
         story = story_builder.smart_resume_story(story)
         
@@ -338,11 +342,20 @@ def continue_existing_story():
             
         print("\nThank you for using Mythos! Happy writing! 🌟\n")
         
+        # Clean up progress session
+        from mythos.utils.progress_tracker import end_current_session
+        end_current_session()
+        
         return True
         
     except Exception as e:
         print_error(f"\n❌ Error while continuing story: {e}")
         print_error("Please check the story files and try again.")
+        
+        # Clean up progress session on error
+        from mythos.utils.progress_tracker import end_current_session
+        end_current_session()
+        
         return False
 
 
@@ -395,11 +408,20 @@ def create_new_story():
             
         print("\nThank you for using Mythos! Happy writing! 🌟\n")
         
+        # Clean up progress session
+        from mythos.utils.progress_tracker import end_current_session
+        end_current_session()
+        
         return True
         
     except Exception as e:
         print_error(f"\n❌ Error during story generation: {e}")
         print_error("Please check your configuration and try again.")
+        
+        # Clean up progress session on error
+        from mythos.utils.progress_tracker import end_current_session
+        end_current_session()
+        
         return False
 
 

@@ -155,6 +155,12 @@ def get_progress_tracker() -> ProgressTracker:
     return _global_tracker
 
 
+def reset_progress_tracker():
+    """Reset the global progress tracker - useful for testing and session cleanup."""
+    global _global_tracker
+    _global_tracker = None
+
+
 def start_story_progress(story_title: str = ""):
     """Convenience function to start story generation progress tracking."""
     tracker = get_progress_tracker()
@@ -168,4 +174,12 @@ def start_chapter_progress(story_title: str = ""):
     tracker = get_progress_tracker()
     tracker.story_title = story_title
     tracker.start_session("Chapter Writing")
-    return tracker 
+    return tracker
+
+
+def end_current_session():
+    """End the current progress session and reset tracker state."""
+    tracker = get_progress_tracker()
+    if tracker.session_start_time is not None:
+        tracker.show_progress_summary()
+    reset_progress_tracker() 
