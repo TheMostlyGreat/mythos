@@ -2,6 +2,9 @@
 
 ## 🎯 Core Rules
 - **OpenAI**: ALWAYS use Responses API (`/v1/responses`) - never Chat Completions
+  - Use `text` parameter (not `response_format`)
+  - JSON schemas require `additionalProperties: false` for strict mode
+  - Access response via `output_text` attribute
 - **Anthropic**: Use Messages API (`/v1/messages`)
 - **Environment**: Pull API keys from shell (no .env files)
 - **Parameters**: Named only, never positional
