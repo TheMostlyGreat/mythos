@@ -123,7 +123,6 @@ class StoryBuilder:
             self.story_manager.set_story_title(story, new_title)
             
             self._create_asset_with_metadata(story, concept_asset)
-            complete_progress_step("Story Concept", f"Created concept for '{new_title}'")
 
             # Step 1 Complete: Concept generated
             # Ask if user wants to continue to assets generation
@@ -243,9 +242,7 @@ class StoryBuilder:
                     return story
                     
                 self.logger.info("Continuing asset generation...")
-                print_progress_step("Resume Assets", "Continuing generation of missing planning assets")
                 self._resume_asset_generation(story)
-                complete_progress_step("Resume Assets", "Missing planning assets completed")
                 
             elif state == "chapters_not_outlined":
                 # Ask before generating chapter outlines
@@ -257,9 +254,7 @@ class StoryBuilder:
                     return story
                     
                 self.logger.info("Generating chapter outlines...")
-                print_progress_step("Chapter Outlines", "Generating chapter structure and outlines")
                 self.generate_chapter_assets(story)
-                complete_progress_step("Chapter Outlines", "All chapter outlines completed")
                 
             elif state in ["chapters_not_written", "chapters_partial"]:
                 # Ask before writing chapters
@@ -272,9 +267,7 @@ class StoryBuilder:
                     return story
                     
                 self.logger.info("Writing manuscript chapters...")
-                print_progress_step("Chapter Writing", "Writing remaining manuscript chapters")
                 self._resume_chapter_writing(story)
-                complete_progress_step("Chapter Writing", "All chapters completed")
                 
             elif state == "finalization_needed":
                 # Ask before finalizing
@@ -286,10 +279,8 @@ class StoryBuilder:
                     return story
                     
                 self.logger.info("Finalizing story...")
-                print_progress_step("Final Draft", "Creating final manuscript and EPUB file")
                 story.draft = self._create_manuscript_draft(story)
                 create_epub(story)
-                complete_progress_step("Final Draft", "Story completed and EPUB created")
                 
             elif state == "complete":
                 self.logger.info("Story is already complete!")
@@ -342,15 +333,11 @@ class StoryBuilder:
                 
         # Check if deep dive research is needed
         if self.analyze_research_depth_needs(story):
-            print_progress_step("Deep Dive Research", "Generating detailed research for complex topics")
             self.generate_deep_dive_research(story)
-            complete_progress_step("Deep Dive Research", "Deep dive research completed")
             
         # Check if deep dive settings are needed  
         if self.analyze_settings_depth_needs(story):
-            print_progress_step("Deep Dive Settings", "Generating detailed world-building settings")
             self.generate_deep_dive_settings(story)
-            complete_progress_step("Deep Dive Settings", "Deep dive settings completed")
 
     def _resume_chapter_writing(self, story: Story) -> None:
         """
@@ -508,8 +495,6 @@ class StoryBuilder:
             StoryAsset: The generated concept asset.
         """
         prompt = self._assemble_planning_prompt(story, AssetTypes.CONCEPT)
-        
-        print_progress_step("Story Concept", "Analyzing your story idea and creating the concept")
         
         try:
             # Get structured JSON with title + markdown content

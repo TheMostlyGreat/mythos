@@ -26,27 +26,21 @@ def print_thinking(message: str = "Thinking..."):
     print(f"\n🤔 {message}")
 
 
-def print_progress_step(step_name: str, description: str = "", min_level = None):
+def print_progress_step(step_name: str, description: str = ""):
     """
-    Enhanced progress indicator that works with the new ProgressTracker.
+    Enhanced progress indicator that can work with or without ProgressTracker.
 
     Args:
         step_name: Name of the step being performed
         description: Optional description of what's happening
-        min_level: Minimum verbosity level (ProgressLevel enum)
     """
     try:
-        from mythos.utils.progress_tracker import get_progress_tracker, ProgressLevel
-        
-        # Set default level if not specified
-        if min_level is None:
-            min_level = ProgressLevel.NORMAL
-            
+        from mythos.utils.progress_tracker import get_progress_tracker
         tracker = get_progress_tracker()
 
         # If we have an active session, use progress tracking
         if tracker and tracker.session_start_time is not None:
-            tracker.start_step(step_name, description, min_level)
+            tracker.start_step(step_name, description)
         else:
             # Fallback to enhanced print_thinking style
             if description:
@@ -59,32 +53,25 @@ def print_progress_step(step_name: str, description: str = "", min_level = None)
         print_thinking(step_name)
 
 
-def complete_progress_step(step_name: str, result_summary: str = "", min_level = None):
+def complete_progress_step(step_name: str, result_summary: str = ""):
     """
     Mark a progress step as complete.
 
     Args:
         step_name: Name of completed step
         result_summary: Optional summary of what was accomplished
-        min_level: Minimum verbosity level (ProgressLevel enum)
     """
     try:
-        from mythos.utils.progress_tracker import get_progress_tracker, ProgressLevel
-        
-        # Set default level if not specified
-        if min_level is None:
-            min_level = ProgressLevel.NORMAL
-            
+        from mythos.utils.progress_tracker import get_progress_tracker
         tracker = get_progress_tracker()
 
         # If we have an active session, use progress tracking
         if tracker and tracker.session_start_time is not None:
-            tracker.complete_step(step_name, result_summary, min_level)
+            tracker.complete_step(step_name, result_summary)
         else:
             # Fallback to simple completion message
             if result_summary:
-                print(f"✅ {step_name} completed")
-                print(f"   {result_summary}")
+                print(f"✅ {step_name} completed - {result_summary}")
             else:
                 print(f"✅ {step_name} completed")
     except Exception:

@@ -318,11 +318,12 @@ def continue_existing_story():
         print("This may take a few minutes depending on what needs to be completed.")
         print("Please be patient while we continue your story!\n")
         
-        # Use the new context manager for progress tracking
-        from mythos.utils.progress_tracker import progress_session, ProgressLevel
-        with progress_session(story.title, "Story Continuation", ProgressLevel.NORMAL) as tracker:
-            # Smart resume from current state
-            story = story_builder.smart_resume_story(story)
+        # Start progress tracking for resume operations
+        from mythos.utils.progress_tracker import start_story_progress
+        tracker = start_story_progress(story.title)
+        
+        # Smart resume from current state
+        story = story_builder.smart_resume_story(story)
 
         total_tokens = get_total_token_usage()
 
@@ -341,11 +342,19 @@ def continue_existing_story():
             
         print("\nThank you for using Mythos! Happy writing! 🌟\n")
         
+        # Clean up progress session
+        from mythos.utils.progress_tracker import end_current_session
+        end_current_session()
+        
         return True
         
     except Exception as e:
         print_error(f"\n❌ Error while continuing story: {e}")
         print_error("Please check the story files and try again.")
+        
+        # Clean up progress session on error
+        from mythos.utils.progress_tracker import end_current_session
+        end_current_session()
         
         return False
 
@@ -370,17 +379,18 @@ def create_new_story():
     print("You can choose to stop at any stage and resume later!")
     
     try:
-        from mythos.utils.progress_tracker import progress_session, ProgressLevel
+        from mythos.utils.progress_tracker import start_story_progress
         
         story_builder = StoryBuilder()
         
-        # Use the new context manager for progress tracking
-        with progress_session("", "Story Creation", ProgressLevel.NORMAL) as tracker:
-            # Use the refined concept for story building
-            story = story_builder.build_story(refined_concept)
-            
-            # Update tracker with actual story title once we have it
-            tracker.story_title = story.title
+        # Start progress tracking
+        tracker = start_story_progress("")
+        
+        # Use the refined concept for story building
+        story = story_builder.build_story(refined_concept)
+        
+        # Update tracker with actual story title once we have it
+        tracker.story_title = story.title
 
         total_tokens = get_total_token_usage()
 
@@ -404,11 +414,19 @@ def create_new_story():
             
         print("\nThank you for using Mythos! Happy writing! 🌟\n")
         
+        # Clean up progress session
+        from mythos.utils.progress_tracker import end_current_session
+        end_current_session()
+        
         return True
         
     except Exception as e:
         print_error(f"\n❌ Error during story generation: {e}")
         print_error("Please check your configuration and try again.")
+        
+        # Clean up progress session on error
+        from mythos.utils.progress_tracker import end_current_session
+        end_current_session()
         
         return False
 
