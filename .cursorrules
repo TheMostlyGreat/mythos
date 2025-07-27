@@ -1,6 +1,7 @@
 # Mythos Project - AI Assistant Rules
 
 ## 🎯 Core Rules
+- **Check Latest Docs**: Always consult official API documentation and release notes before implementation
 - **OpenAI**: ALWAYS use Responses API (`/v1/responses`) - never Chat Completions
   - Use `text` parameter (not `response_format`)
   - JSON schemas require `additionalProperties: false` for strict mode
@@ -49,4 +50,7 @@
 4. Baseline documented (measurement framework)
 5. No regressions (existing functionality works)
 6. User-focused UX (clean, professional)
-7. Single pattern (consistent with codebase) 
+7. Single pattern (consistent with codebase)
+
+## 📝 Note: Legacy Format
+This .cursorrules file is in legacy format. Consider migrating to .cursor/index.mdc for better Cursor integration. 
