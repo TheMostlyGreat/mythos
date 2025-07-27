@@ -365,9 +365,9 @@ def create_new_story():
     print("We'll guide you through each step of the process.")
     print("You can choose to stop at any stage and resume later!")
     
-    print_thinking("Creating your story concept...")
-    
     try:
+        from mythos.utils.progress_tracker import start_story_progress
+        
         story_builder = StoryBuilder()
         
         # Use the refined concept for story building

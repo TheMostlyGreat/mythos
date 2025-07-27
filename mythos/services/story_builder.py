@@ -23,7 +23,7 @@ import re
 from mythos.utils.llm_utils import call_llm, call_OpenAI_API, create_messages, ContentRefusalError
 
 # Import UI utilities from shared utils
-from mythos.utils.ui_utils import print_thinking, confirm_next_step
+from mythos.utils.ui_utils import print_thinking, print_progress_step, complete_progress_step, confirm_next_step
 
 class StoryBuildException(Exception):
     """Raised when story building process fails."""
@@ -114,6 +114,11 @@ class StoryBuilder:
         
         try:
             story = Story(user_prompt=user_prompt)
+            
+            # Start progress tracking
+            from mythos.utils.progress_tracker import start_story_progress
+            tracker = start_story_progress()
+            
             # Generate concept asset and extract title
             concept_asset = self._generate_concept_asset(story)
             new_title = self._extract_title_from_concept()
@@ -121,8 +126,10 @@ class StoryBuilder:
             self.logger.debug(f"Concept created. Extracted story title: '{new_title}'")
 
             self.story_manager.set_story_title(story, new_title)
+            tracker.story_title = new_title  # Update tracker with real title
             
             self._create_asset_with_metadata(story, concept_asset)
+            complete_progress_step("Story Concept", f"Created concept for '{new_title}'")
 
             # Step 1 Complete: Concept generated
             # Ask if user wants to continue to assets generation
@@ -163,13 +170,20 @@ class StoryBuilder:
             state, _ = self.story_manager.get_story_state(story)
             if state == "finalization_needed":
                 # User confirmed they want finalization - proceed with draft and EPUB creation
+                print_progress_step("Final Draft", "Creating final manuscript and EPUB file")
                 self.logger.info(f"Finalizing story: '{story.title}'")
                 story.draft = self._create_manuscript_draft(story)
                 create_epub(story)
+                complete_progress_step("Final Draft", "Story completed and EPUB created")
                 self.logger.info(f"Successfully built and finalized story: '{story.title}'")
             else:
                 # User stopped before finalization or story is in a different state
                 self.logger.info(f"Story building paused at current state: {state}")
+            
+            # Show progress summary
+            from mythos.utils.progress_tracker import get_progress_tracker
+            tracker = get_progress_tracker()
+            tracker.show_progress_summary()
             
             return story
 
@@ -450,7 +464,15 @@ class StoryBuilder:
                     chapter_title=chapter_title
                 )
 
-                print_thinking(f"Writing full narrative for {chapter_title}...")
+                # Extract chapter number for progress display
+                chapter_num = self._extract_chapter_number(chapter_title)
+                total_chapters = len(chapters_to_write)
+                
+                # Show chapter-specific progress
+                from mythos.utils.progress_tracker import get_progress_tracker
+                tracker = get_progress_tracker()
+                tracker.show_chapter_progress(chapter_num, total_chapters, chapter_title)
+                
                 chapter_text = generate_narrative_text(prompt=chapter_prompt)
                 
                 if not chapter_text or chapter_text.startswith("Error:"):
@@ -492,7 +514,7 @@ class StoryBuilder:
         """
         prompt = self._assemble_planning_prompt(story, AssetTypes.CONCEPT)
         
-        print_thinking("Analyzing your story idea and creating the concept...")
+        print_progress_step("Story Concept", "Analyzing your story idea and creating the concept")
         
         try:
             # Get structured JSON with title + markdown content
@@ -597,8 +619,8 @@ class StoryBuilder:
         asset_type = getattr(AssetTypes, asset_type_enum.name)
         prompt = self._assemble_planning_prompt(story, asset_type)
         
-        # Show thinking indicator with specific asset type
-        print_thinking(f"Creating {asset_type.title.lower()}...")
+        # Show progress indicator with specific asset type
+        print_progress_step(asset_type.title, f"Creating detailed {asset_type.title.lower()}")
         
         # Use Structured Outputs for specific asset types that need reliable JSON
         if asset_type_enum == AssetTypeNames.CHARACTERS:
@@ -611,6 +633,8 @@ class StoryBuilder:
         else:
             # Use regular planning text for other asset types
             asset_text = generate_planning_text(prompt=prompt)
+            
+        complete_progress_step(asset_type.title)
             
         summary = summarize_text(text=asset_text, summary_length=asset_type.summary_length)
         
@@ -781,7 +805,7 @@ class StoryBuilder:
         try:
             from mythos.services.writer import generate_web_enhanced_research, summarize_text
             
-            print_thinking(f"Researching {topic} with web search...")
+            print_progress_step("Web Research", f"Researching {topic} with web search")
             # Generate deep dive research with web search
             research_text = generate_web_enhanced_research(prompt=research_prompt)
             summary = summarize_text(text=research_text, summary_length=AssetTypes.RESEARCH.summary_length)
@@ -1013,7 +1037,7 @@ class StoryBuilder:
         Output comprehensive, well-organized markdown that provides detailed world-building for compelling storytelling.
         """
         
-        print_thinking(f"Creating detailed settings for {component}...")
+        print_progress_step("Deep Dive Settings", f"Creating detailed settings for {component}")
         # Generate the deep dive settings content
         settings_content = generate_planning_text(prompt=settings_prompt)
         
@@ -1217,7 +1241,17 @@ class StoryBuilder:
                     chapter_title=chapter_title
                 )
 
-                print_thinking(f"Writing full narrative for {chapter_title}...")
+                # Extract chapter number for progress display  
+                chapter_num = self._extract_chapter_number(chapter_title)
+                
+                # Show chapter-specific progress
+                from mythos.utils.progress_tracker import get_progress_tracker
+                tracker = get_progress_tracker()
+                
+                # Get total from sorted chapters
+                total_chapters = len(sorted_chapters)
+                tracker.show_chapter_progress(chapter_num, total_chapters, chapter_title)
+                
                 chapter_text = generate_narrative_text(prompt=chapter_prompt)
                 
                 # Handle Claude 4 refusal responses
@@ -1289,7 +1323,7 @@ class StoryBuilder:
             f"{template_text}\n"
         )
 
-        print_thinking(f"Creating outline for Chapter {chapter_num}...")
+        print_progress_step(f"Chapter {chapter_num} Outline", f"Creating detailed outline for Chapter {chapter_num}")
         chapter_asset.details = generate_planning_text(prompt=chapter_prompt)
         chapter_asset.summary = summarize_text(
             text=chapter_asset.details,
@@ -1298,6 +1332,7 @@ class StoryBuilder:
 
         self._create_asset_with_metadata(story, chapter_asset)
         self.story_manager.update_story(story)
+        complete_progress_step(f"Chapter {chapter_num} Outline")
         self.logger.debug(f"Chapter {chapter_num} outline generated and saved.")
         
         return chapter_asset
@@ -1338,6 +1373,21 @@ class StoryBuilder:
             
         return story
 
+    def _extract_chapter_number(self, chapter_title: str) -> int:
+        """
+        Extract chapter number from chapter title.
+        
+        Args:
+            chapter_title: Title like "chapter_1" or "Chapter 1"
+            
+        Returns:
+            Chapter number as integer, defaulting to 1 if not found
+        """
+        import re
+        # Try to extract number from various formats
+        match = re.search(r'(\d+)', chapter_title)
+        return int(match.group(1)) if match else 1
+    
     def _build_chapter_prompt(self, synopsis: str, chapter_details: dict, writing_style: str, story_so_far: str, chapter_title: str) -> str:
         """
         Builds a prompt for generating chapter narrative content.

@@ -26,6 +26,56 @@ def print_thinking(message: str = "Thinking..."):
     print(f"\n🤔 {message}")
 
 
+def print_progress_step(step_name: str, description: str = ""):
+    """
+    Enhanced progress indicator that can work with or without ProgressTracker.
+    
+    Args:
+        step_name: Name of the step being performed
+        description: Optional description of what's happening
+    """
+    try:
+        from mythos.utils.progress_tracker import get_progress_tracker
+        tracker = get_progress_tracker()
+        
+        # If we have an active session, use progress tracking
+        if tracker.session_start_time is not None:
+            tracker.start_step(step_name, description)
+        else:
+            # Fallback to enhanced print_thinking style
+            if description:
+                print(f"\n🔄 {step_name}")
+                print(f"   {description}")
+            else:
+                print(f"\n🔄 {step_name}...")
+    except Exception:
+        # Ultimate fallback to simple print_thinking
+        print_thinking(step_name)
+
+
+def complete_progress_step(step_name: str, result_summary: str = ""):
+    """
+    Mark a progress step as complete.
+    
+    Args:
+        step_name: Name of completed step
+        result_summary: Optional summary of what was accomplished
+    """
+    try:
+        from mythos.utils.progress_tracker import get_progress_tracker
+        tracker = get_progress_tracker()
+        
+        # If we have an active session, use progress tracking
+        if tracker.session_start_time is not None:
+            tracker.complete_step(step_name, result_summary)
+        else:
+            # Fallback to simple completion message
+            print(f"✅ {step_name} completed")
+    except Exception:
+        # Ultimate fallback - just print completion
+        print(f"✅ {step_name} completed")
+
+
 def confirm_next_step(current_step: str, next_step: str, story_title: str = "") -> bool:
     """
     Ask user if they want to proceed to the next step in story creation.
