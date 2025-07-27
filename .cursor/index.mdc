@@ -36,11 +36,19 @@ alwaysApply: true
 - Avoid complex mocking without user validation
 
 ## 📦 Tech Stack
-- **Models**: `claude-sonnet-4-20250514` or `claude-opus-4-20250514` (newest available)
-- **LLM Utils**: Always use Responses API with correct structure
+- **Python**: 3.12.2
+- **Core Dependencies**:
+  - `openai==1.95.0` (Responses API required)
+  - `anthropic==0.57.1` (Messages API)
+  - `pydantic==2.11.7` (data models, validation)
+  - `pydantic-settings==2.10.1` (configuration)
+- **Development**:
+  - `pytest==8.4.1` (testing framework)
+- **Content Generation**:
+  - `EbookLib==0.19` (EPUB creation)
+  - `markdownify==1.1.0` (HTML to Markdown)
 - **Progress**: Simple ProgressTracker pattern consistently
 - **Storage**: Pydantic models, file-based story storage
-- **Testing**: pytest with proper mocking
 
 ## 🚫 Anti-Patterns
 - Dual interfaces (old + new patterns)
