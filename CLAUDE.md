@@ -1,0 +1,4 @@
+@./.safeword/SAFEWORD.md
+
+---
+
