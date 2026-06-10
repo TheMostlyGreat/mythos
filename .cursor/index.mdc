@@ -8,10 +8,11 @@ alwaysApply: true
 
 ## 🎯 Core Rules
 - **Check Latest Docs**: Always consult official API documentation and release notes before implementation
-- **OpenAI**: ALWAYS use Responses API (`/v1/responses`) - never Chat Completions
-  - Use `text` parameter (not `response_format`)
+- **OpenAI**: Use Chat Completions API (`/v1/chat/completions`)
+  - Use `response_format` parameter for JSON output
   - JSON schemas require `additionalProperties: false` for strict mode
-  - Access response via `output_text` attribute
+  - Access response via `choices[0].message.content`
+  - Use `messages` array with `role` and `content`
 - **Anthropic**: Use Messages API (`/v1/messages`)
 - **Environment**: Pull API keys from shell (no .env files)
 - **Parameters**: Named only, never positional
@@ -46,14 +47,16 @@ alwaysApply: true
 ## 📦 Tech Stack
 - **Python**: 3.12.2
 - **Core Dependencies**:
-  - `openai==1.95.0` (Responses API required)
-  - `anthropic==0.57.1` (Messages API)
-  - `pydantic==2.11.7` (data models, validation)
-  - `pydantic-settings==2.10.1` (configuration)
+  - `openai>=1.97.0` (Chat Completions API)
+  - `anthropic>=0.58.0` (Messages API)
+  - `pydantic>=2.11.7` (data models, validation)
+  - `pydantic-settings>=2.10.1` (configuration)
 - **Development**:
-  - `pytest==8.4.1` (testing framework)
-- **Models**: `claude-sonnet-4-20250514` or `claude-opus-4-20250514` (newest available)
-- **LLM Utils**: Always use Responses API with correct structure or OpenAI, and the Messages API for Anthropic. 
+  - `pytest>=8.4.1` (testing framework)
+- **Verified Models** (as of October 2025):
+  - OpenAI: `gpt-4o`, `gpt-4o-mini`, `gpt-4-turbo`
+  - Anthropic: `claude-sonnet-4-5`, `claude-opus-4-1-20250805`, `claude-3-5-sonnet-20241022`
+- **LLM Utils**: Use Chat Completions API (`/v1/chat/completions`) for OpenAI, Messages API (`/v1/messages`) for Anthropic 
 - **Content Generation**:
   - `EbookLib==0.19` (EPUB creation)
   - `markdownify==1.1.0` (HTML to Markdown)
