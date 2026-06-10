@@ -17,11 +17,31 @@ The rebuild is driven by two documents, which are the source of truth:
 
 Work happens on the `ts-rebuild` branch. The flow is **JTBD + BDD first, then implement in TypeScript** — pick a job, work its acceptance criteria and scenarios, build to satisfy them. Treat the Python sections below as a prototype reference (how the concept worked), not as a spec to port line-for-line. When the prototype and the JTBD/BDD disagree, **the JTBD/BDD win.**
 
+### Stack (decided)
+
+Mythos is a **mobile-first consumer web app**, not a CLI. The layout is a **Bun-workspaces monorepo** with a surface-agnostic engine that every UI consumes:
+
+- `packages/core` — the generation engine (JTBD jobs, LLM calls, schemas, the story bible). **No UI.** Tests and scenarios run against this.
+- `apps/web` — the end-user app (Next.js, App Router). **First build target.**
+- `apps/mcp` — MCP server exposing the engine programmatically. **Later.**
+
+| Concern                   | Choice                                                                                                    |
+| ------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Runtime + package manager | **Bun** (workspaces)                                                                                      |
+| Web framework             | **Next.js 15** (App Router), mobile-first responsive                                                      |
+| LLM layer                 | **Vercel AI SDK 5** behind one `core` interface; raw `@anthropic-ai/sdk` as a prompt-caching escape hatch |
+| Schema / validation       | **Zod 4** — drives structured LLM outputs via `toJSONSchema`                                              |
+| Tests                     | **Vitest + vitest-cucumber** for BDD scenarios (`BEHAVIOR-SPEC.md`); **Playwright** for web E2E           |
+| Lint / format             | **ESLint** (+ Prettier)                                                                                   |
+| MCP (later)               | **`@modelcontextprotocol/sdk`**                                                                           |
+
+The **Claude Agent SDK is deliberately not the spine** — it is Claude-only and built for autonomous tool-using loops, whereas Mythos is a multi-provider, human-in-the-loop generation pipeline. Reserve it for any future autonomous sub-feature (e.g. fork detection, research deep-dives). **Model IDs come from current Anthropic/OpenAI docs, never the prototype's stale list.**
+
 ## Project Overview
 
 Mythos is an AI-powered story builder that transforms a writer's concept into a complete narrative with rich world-building, character development, and narrative structure, using a multi-tier LLM system with OpenAI and Anthropic models.
 
-> The architecture, commands, and APIs documented below describe the **Python prototype**. They are accurate for that codebase and useful as a behavioral reference for the rebuild — but the TypeScript stack, project layout, and tooling are open decisions to be made as the rebuild proceeds, not constraints inherited from the prototype.
+> The architecture, commands, and APIs documented below describe the **Python prototype**. They are accurate for that codebase and useful as a behavioral reference for the rebuild — but the TypeScript stack and layout are now decided (see _Stack (decided)_ above); the prototype's structure is a behavioral reference, not a constraint to inherit.
 
 ## Essential Commands
 
