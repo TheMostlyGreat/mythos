@@ -1,4 +1,4 @@
-from mythos.services.writer import generate_narrative_text, generate_asset_text
+from mythos.services.writer import generate_narrative_text, generate_planning_text
 
 def test_generate_narrative_text_integration():
     """
@@ -34,25 +34,25 @@ def test_generate_narrative_text_integration():
 
 def test_generate_asset_text_integration():
     """
-    Integration test for generate_asset_text function.
-    
-    This test verifies that the generate_asset_text function successfully
-    generates asset text by making a real API call to the OpenAI API.
-    
+    Integration test for generate_planning_text function.
+
+    This test verifies that the generate_planning_text function successfully
+    generates planning text by making a real API call to the OpenAI API.
+
     Parameters
     ----------
     None
-    
+
     Assertions
     ----------
     - The returned text is a non-empty string.
     - The returned text follows the expected structure based on the prompt.
     """
-    # Define a sample prompt for generating asset text
+    # Define a sample prompt for generating planning text
     prompt = "Give me a sentence that uses the words 'dragon' and 'quest'."
-    
-    # Call the generate_asset_text function with the sample prompt
-    asset_text = generate_asset_text(prompt)
+
+    # Call the generate_planning_text function with the sample prompt
+    asset_text = generate_planning_text(prompt)
     
     # Assert that the function returns a string
     assert isinstance(asset_text, str), "The asset text should be a string."

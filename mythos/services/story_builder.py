@@ -103,7 +103,7 @@ class StoryBuilder:
             relative_file_path=asset.relative_file_path
         )
 
-    def build_story(self, user_prompt: str, iterations: int = 1, stop_after_assets: bool = False) -> Story:
+    def build_story(self, user_prompt: str, iterations: int = 1, stop_after_assets: bool = False, non_interactive: bool = False) -> Story:
         """
         Constructs a complete story from a user prompt using iterative refinement.
 
@@ -111,6 +111,7 @@ class StoryBuilder:
             user_prompt (str): The initial prompt provided by the user.
             iterations (int): Number of iterations to refine the story.
             stop_after_assets (bool): If True, stops after generating story assets without creating chapters.
+            non_interactive (bool): If True, skips user confirmations and runs full pipeline automatically.
 
         Returns:
             Story: The story object (complete or with assets only, depending on stop_after_assets).
@@ -135,7 +136,7 @@ class StoryBuilder:
 
             # Step 1 Complete: Concept generated
             # Ask if user wants to continue to assets generation
-            if not confirm_next_step(
+            if not non_interactive and not confirm_next_step(
                 current_step="Story concept created",
                 next_step="Generate planning assets (characters, settings, plot, etc.)",
                 story_title=story.title
@@ -155,7 +156,7 @@ class StoryBuilder:
                 return story
 
             # Step 3: Ask if user wants to continue to chapter outline generation
-            if not confirm_next_step(
+            if not non_interactive and not confirm_next_step(
                 current_step="Story assets created",
                 next_step="Generate chapter outlines",
                 story_title=story.title
@@ -165,9 +166,9 @@ class StoryBuilder:
             print_thinking("Creating chapter outlines...")
             # Generate chapter list and outlines
             self.generate_chapter_assets(story)
-            
+
             # Step 4: Ask if user wants to continue to full narrative generation
-            if not confirm_next_step(
+            if not non_interactive and not confirm_next_step(
                 current_step="Chapter outlines created",
                 next_step="Write full chapter narratives",
                 story_title=story.title
@@ -176,13 +177,13 @@ class StoryBuilder:
 
             print_thinking("Writing full chapter narratives...")
             # Generate full chapter content
-            self._generate_chapter_narratives(story)
+            self.write_chapters(story)
 
             # Set baseline again after narrative generation
             self.story_manager.update_asset_baseline(story)
 
             # Step 5: Ask if user wants to continue to EPUB creation
-            if not confirm_next_step(
+            if not non_interactive and not confirm_next_step(
                 current_step="Chapter narratives completed",
                 next_step="Create EPUB file",
                 story_title=story.title

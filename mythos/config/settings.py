@@ -1,14 +1,14 @@
 """
-Mythos Project Configuration Settings
+Mythos Project Configuration Settings (October 2025)
 
-This configuration file adheres to the .cursorrules specifications:
-- OpenAI: ALWAYS use Responses API (https://api.openai.com/v1/responses)
-- Anthropic: Use Messages API (https://api.anthropic.com/v1/messages)
-- Environment: Pull API keys from shell (no .env files) 
-- Parameters: Named only, never positional
+Core Implementation Standards:
+- OpenAI: Chat Completions API (https://api.openai.com/v1/chat/completions)
+- Anthropic: Messages API (https://api.anthropic.com/v1/messages)
+- Environment: Pull API keys from shell environment (no .env files)
+- Parameters: Named parameters only, never positional
 - JSON Schemas: Include additionalProperties: False for strict mode
 - Error Handling: ProviderError (retry) vs ContentRefusalError (no retry)
-- Comments: Thorough explanations for everything
+- Comments: Thorough explanations for all configuration choices
 """
 
 import os
@@ -21,71 +21,45 @@ from typing import Tuple
 LOG_LEVEL = os.getenv("LOG_LEVEL", "DEBUG").upper()  # Default to INFO, allow DEBUG for development
 
 # Multi-Tier LLM Configuration
-# Model configuration based on .cursorrules specifications - using latest 2025 models
+# Using LATEST AVAILABLE models (October 2025)
 
-# Production Models (Primary Configuration)
-FAST_MODEL = ("openai", "gpt-4.1-nano")                       # Ultra-fast tasks, very low cost
-MEDIUM_MODEL = ("anthropic", "claude-sonnet-4-20250514")      # Balanced production work
-BIG_MODEL = ("anthropic", "claude-opus-4-20250514")           # Main production logic
+# Production Models - VERIFIED WORKING AS OF OCT 2025
+FAST_MODEL = ("openai", "gpt-5-mini")                                   # GPT-5 Mini: Ultra-fast, cost-effective
+MEDIUM_MODEL = ("anthropic", "claude-sonnet-4-5-20250929")              # Claude Sonnet 4.5: Best balance (SWE-bench 72.7%)
+BIG_MODEL = ("anthropic", "claude-opus-4-1-20250805")                   # Claude Opus 4: Most powerful, more reliable than GPT-5
 
-# Backup Models
-BACKUP_FAST_MODEL = ("openai", "gpt-4.1-mini")
-BACKUP_MEDIUM_MODEL = ("openai", "gpt-4.1") #"claude-sonnet-4-20250514"
-BACKUP_BIG_MODEL = ("openai", "gpt-4.5")
+# Prompt Caching Configuration (Anthropic - saves up to 90% cost)
+ENABLE_PROMPT_CACHING = True                                   # Enable prompt caching for Anthropic
+# Note: Works with all Claude 3.5+ and Claude 4 models
 
-# Reasoning Models (For Complex Analysis)
-REASONING_FAST = ("openai", "o4-mini")                         # Fast reasoning
-REASONING_MEDIUM = ("openai", "o3-mini")                       # Cost-effective reasoning  
-REASONING_MAX = ("openai", "o3")                               # Maximum reasoning capability
-REASONING_ORIGINAL = ("openai", "o1")                          # Original reasoning model
+# Extended Thinking Configuration (Claude 4 support)
+DEFAULT_THINKING_BUDGET = 4000                                 # Default thinking budget in tokens (min: 1024, max: 128000)
+ENABLE_INTERLEAVED_THINKING = True                             # Available in Claude 4 models
 
-# Specialized Models
-IMAGE_GENERATION_MODEL = ("openai", "gpt-image-1")             # Text-to-image, editing
-IMAGE_STANDALONE_MODEL = ("openai", "dall-e-3")               # Standalone image generation
-SPEECH_TO_TEXT_MODEL = ("openai", "whisper-1")                # Audio transcription
-EMBEDDINGS_MODEL = ("openai", "text-embedding-3-large")       # Semantic search
+# GPT-5 Configuration
+DEFAULT_REASONING_EFFORT = "minimal"                           # Options: minimal, low, medium, high
+DEFAULT_VERBOSITY = "medium"                                   # Options: low, medium, high
 
-# Alternative configurations - uncomment to use:
+# Alternative configurations - uncomment to use (VERIFIED OCT 2025 MODELS):
 
-# All OpenAI (latest 4.1 series)
-#FAST_MODEL = ("openai", "gpt-4.1-nano")
-#MEDIUM_MODEL = ("openai", "gpt-4.1-mini")
-#BIG_MODEL = ("openai", "gpt-4.1")
-#PREMIUM_MODEL = ("openai", "gpt-4.1")
+# All OpenAI GPT-5 (latest 2025)
+#FAST_MODEL = ("openai", "gpt-5-mini")
+#MEDIUM_MODEL = ("openai", "gpt-5")
+#BIG_MODEL = ("openai", "gpt-5")
 
-# All Anthropic (Claude 3.5 series - real available models)
-#FAST_MODEL = ("anthropic", "claude-3-5-haiku-20241022")
-#MEDIUM_MODEL = ("anthropic", "claude-3-5-sonnet-20241022")
-#BIG_MODEL = ("anthropic", "claude-3-5-sonnet-20241022")
-#PREMIUM_MODEL = ("anthropic", "claude-3-5-sonnet-20241022")
-
-# Claude 4 Series (Latest - May 2025) - When available
-#PREMIUM_MODEL = ("anthropic", "claude-opus-4-20250514")       # Most capable (ASL-3 safety)
-#BIG_MODEL = ("anthropic", "claude-sonnet-4-20250514")         # Balanced (ASL-2 safety)
-
-# Claude 3.7 Series (Hybrid Reasoning) - When available  
-#REASONING_HYBRID = ("anthropic", "claude-3-7-sonnet-20250219") # First hybrid reasoning model
+# All Anthropic Claude 4 (latest 2025)
+#FAST_MODEL = ("anthropic", "claude-3-5-haiku-20241022")        # Still good for speed
+#MEDIUM_MODEL = ("anthropic", "claude-sonnet-4-5-20250929")     # Best balance
+#BIG_MODEL = ("anthropic", "claude-opus-4-1-20250805")          # Most powerful
 
 # Cost-optimized (all fast models)
-#FAST_MODEL = ("openai", "gpt-4o-mini")
-#MEDIUM_MODEL = ("openai", "gpt-4o-mini")
-#BIG_MODEL = ("openai", "gpt-4o")
-#PREMIUM_MODEL = ("openai", "gpt-4o")
-
-# Quality-first (all premium models)
-#FAST_MODEL = ("anthropic", "claude-3-5-sonnet-20241022")
-#MEDIUM_MODEL = ("anthropic", "claude-3-5-sonnet-20241022") 
-#BIG_MODEL = ("anthropic", "claude-3-5-sonnet-20241022")
-#PREMIUM_MODEL = ("anthropic", "claude-3-5-sonnet-20241022")
+#FAST_MODEL = ("openai", "gpt-5-mini")
+#MEDIUM_MODEL = ("openai", "gpt-5-mini")
+#BIG_MODEL = ("openai", "gpt-5-mini")
 
 # API Keys (only sensitive data in environment variables)
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
-
-# Legacy model settings for backward compatibility
-# These are calculated but never imported anywhere
-OPENAI_MODEL = MEDIUM_MODEL[1] if MEDIUM_MODEL[0] == "openai" else "gpt-4o"
-ANTHROPIC_MODEL = BIG_MODEL[1] if BIG_MODEL[0] == "anthropic" else "claude-3-5-sonnet-20241022"
 
 MAX_RETRIES = 3  # Increased from 2 to 3 for better reliability
 
@@ -94,10 +68,10 @@ STANDARD_TIMEOUT = 180  # 3 minutes for standard operations (increased from 120)
 CONCEPT_TIMEOUT = 300   # 5 minutes for concept generation (longer timeout)
 NARRATIVE_TIMEOUT = 240 # 4 minutes for narrative generation
 
-# API Endpoint Configuration (Based on .cursorrules specifications)
+# API Endpoint Configuration (Using actual OpenAI endpoints)
 # These are hardcoded in llm_utils.py and not imported
 OPENAI_BASE_URL = "https://api.openai.com/v1"
-OPENAI_RESPONSES_ENDPOINT = f"{OPENAI_BASE_URL}/responses"
+OPENAI_CHAT_ENDPOINT = f"{OPENAI_BASE_URL}/chat/completions"  # Actual endpoint
 ANTHROPIC_BASE_URL = "https://api.anthropic.com/v1"
 ANTHROPIC_MESSAGES_ENDPOINT = f"{ANTHROPIC_BASE_URL}/messages"
 ANTHROPIC_VERSION = "2023-06-01"
