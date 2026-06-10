@@ -1,0 +1,26 @@
+{
+  "name": "@mythos/web",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@ai-sdk/react": "^3.0.202",
+    "@mythos/core": "workspace:*",
+    "ai": "^6.0.200",
+    "next": "^16.2.9",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.3",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "eslint-config-next": "^16.2.9"
+  }
+}

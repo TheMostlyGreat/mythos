@@ -1,0 +1,20 @@
+{
+  "name": "@mythos/core",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc -b"
+  },
+  "dependencies": {
+    "@ai-sdk/anthropic": "^3.0.82",
+    "@ai-sdk/openai": "^3.0.69",
+    "@anthropic-ai/sdk": "^0.104.1",
+    "ai": "^6.0.200",
+    "zod": "^4.4.3"
+  }
+}

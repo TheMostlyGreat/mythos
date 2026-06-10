@@ -35,3 +35,10 @@ mythos/.old/
 .safeword-project/quality-state*.json
 .safeword-project/failure-counts.json
 .safeword-project/re-entry.md
+
+# Node / TypeScript toolchain (TS rebuild)
+node_modules/
+.next/
+dist/
+*.tsbuildinfo
+apps/web/next-env.d.ts
