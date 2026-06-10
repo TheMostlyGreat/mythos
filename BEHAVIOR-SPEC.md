@@ -1,5 +1,10 @@
 # Mythos — Behavior Specification (JTBD + BDD)
 
+> **Companion doc:** [`JTBD.md`](JTBD.md) is the mirror of this file — the
+> forward-looking **vision** (where Mythos is headed). This document is the
+> **current location** (what the code does today); that one is the
+> **destination**. Both share the single **Writer** persona.
+
 This document reverse-engineers Mythos's product behavior from the current
 codebase into the project's own intake format: **Personas → Jobs To Be Done →
 Acceptance Criteria → BDD scenarios**, with each scenario carrying its full
@@ -28,7 +33,7 @@ Slug for all jobs: `mythos`.
 
 ## Personas
 
-`.safeword-project/personas.md` is currently empty (template only). The code
+`.safeword-project/personas.md` defines the single **Writer** persona. The code
 serves exactly one real user.
 
 ### Writer (WR)
