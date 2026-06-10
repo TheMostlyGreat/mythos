@@ -4,6 +4,17 @@ A forward-looking description of this project through the lens of every job it h
 
 ---
 
+## Who this is for
+
+Mythos is a **creative tool, not a content platform** — it optimizes for the person _making_ a story, not an audience browsing a catalog of others' stories. Two personas, defined in `.safeword-project/personas.md`:
+
+- **The Author (primary).** A person with a story in them but without a novelist's craft, time, or discipline for the blank page. They want to make the _meaningful_ decisions and have the drudgery removed; the payoff is an output they feel deep ownership over. Everything optimizes for them first. The Author also _reads_ their finished work in a lean-back mode (see _Fork density is a user-controlled dial_, below), so "Reader" is a mode of the Author, not a separate persona.
+- **The Integrator (secondary).** A developer who invokes Mythos's generation engine programmatically through the MCP server — a game-master generating lore, an app embedding story creation — wanting the engine without the conversational UI.
+
+A **Reader** who consumes _other_ authors' finished stories is explicitly **deferred**: that persona appears only if Mythos earns its way into being a platform. Until then, the only reader is the Author enjoying their own work.
+
+---
+
 ## Design Principles
 
 These principles govern _how_ the jobs below are delivered. They exist because the research on creative-tool attachment and AI fiction quality points somewhere counterintuitive.
@@ -34,6 +45,15 @@ Grounded in choice-architecture research (Chernev 2015 choice-overload moderator
 - **The user can always request a fork** ("let me steer here") on top of the ones the engine surfaces.
 
 > **Open build risk:** tiered cadence requires the engine to _detect_ where a genuine "interesting decision" lives in the plot, rather than hardcoding "fork at chapter 3." That detection is the non-trivial part; the user-requested fork is the fallback.
+
+### Fork density is a user-controlled dial
+
+The cadence above is the _default_. But fork density is a **dial the user controls**, and that single mechanism is how one engine serves both a lean-forward author and a lean-back reader — without a second product, a second mode, or a second persona.
+
+- **Forks up → author mode (lean-forward).** Decisions surface at every tier; the user is the visible co-creator making the ~8–15 meaningful choices that earn ownership.
+- **Forks near zero → reading mode (lean-back).** The engine writes through the bible in near-continuous flow and the user mostly _receives_ the story — the "beach novel" posture, same engine, divergence turned down.
+
+Crucially, dialing density down never costs agency: the expressive decisions remain **available on demand** (the user can always request a fork), so lean-back mode _defers_ authorship rather than removing it. This is the concrete resolution of "Reader is a mode of the Author" — reading is authoring with the dial at zero.
 
 ---
 
