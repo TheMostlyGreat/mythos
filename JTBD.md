@@ -8,12 +8,12 @@ Each job is stated in canonical job-story form — **[Persona] — When [situati
 
 ## Who this is for
 
-Mythos is a **creative tool, not a content platform** — it optimizes for the person _making_ a story, not an audience browsing a catalog of others' stories. Two personas, defined in `.safeword-project/personas.md`:
+Mythos is a **creative tool, not a content platform** — it optimizes for the person _making_ a story, not an audience browsing others' stories. Two personas, defined in `.safeword-project/personas.md`:
 
-- **The Author (primary).** A person with a story in them but without a novelist's craft, time, or discipline for the blank page. They want to make the _meaningful_ decisions and have the drudgery removed; the payoff is an output they feel deep ownership over. Everything optimizes for them first. The Author also _reads_ their finished work in a lean-back mode (see _Fork density is a user-controlled dial_, below), so "Reader" is a mode of the Author, not a separate persona.
-- **The Integrator (secondary).** A developer who invokes Mythos's generation engine programmatically through the MCP server — a game-master generating lore, an app embedding story creation — wanting the engine without the conversational UI.
+- **Author (primary).** Has a story in them but not a novelist's craft, time, or tolerance for the blank page. Wants to make the _meaningful_ decisions and have the drudgery removed; the payoff is an output they feel deep ownership over. Everything optimizes for them first.
+- **Integrator (secondary).** A developer who drives Mythos's generation engine programmatically over the MCP server — a game-master generating lore, an app embedding story creation — wanting the engine without the conversational UI.
 
-A **Reader** who consumes _other_ authors' finished stories is explicitly **deferred**: that persona appears only if Mythos earns its way into being a platform. Until then, the only reader is the Author enjoying their own work.
+**Reader is deferred, not a third persona.** Someone consuming _other_ authors' stories appears only if Mythos earns its way into being a platform. Until then the only reader is the Author in lean-back mode (see _Fork density is a user-controlled dial_) — reading their own finished work with forks dialed down.
 
 ---
 
@@ -23,9 +23,9 @@ These principles govern _how_ the jobs below are delivered. They exist because t
 
 ### Mechanically effortless, expressively yours
 
-The core tension in this product: "effortless" and "deep emotional attachment" pull in opposite directions. Attachment to a created thing comes from being its **causal, visible co-creator** — not its commissioner (the IKEA effect; psychological-ownership research shows automating the _expressive_ act destroys ownership and agency). A one-click "type a sentence, get a novel" product would simultaneously produce homogenized AI slop _and_ kill the user's attachment, because they did nothing they can point to and call their own.
+"Effortless" and "deep emotional attachment" pull in opposite directions. Attachment comes from being a thing's **causal, visible co-creator**, not its commissioner — the IKEA effect, and psychological-ownership research showing that automating the _expressive_ act destroys ownership and agency. A one-click "type a sentence, get a novel" product would produce homogenized AI slop _and_ kill attachment at once, because the user did nothing they can point to as their own.
 
-So **"effortless" means mechanically effortless, never expressively effortless.** Strip out the drudgery — blank-page paralysis, continuity bookkeeping, formatting, "what comes next" mechanics. Keep, and actively stage, the expressive decisions, because those decisions _are_ the entertainment and _are_ the source of attachment. The unit of the product is **the meaningful decision, made delightful** — not the prompt, not the chat.
+So **"effortless" means mechanically effortless, never expressively effortless.** Strip the drudgery — blank-page paralysis, continuity bookkeeping, formatting, "what comes next" mechanics. Keep and actively stage the expressive decisions, because those decisions _are_ the entertainment and _are_ the source of attachment. The unit of the product is **the meaningful decision, made delightful** — not the prompt, not the chat.
 
 ### The core loop: choose → redirect → edit
 
