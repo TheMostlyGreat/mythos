@@ -3,6 +3,7 @@
 ## Title: An engaging and memorable title for the novel.
 
 ## Concept and Themes:
+
 - Core Idea: A one-sentence summary of the novel’s main idea or concept.
 
 - Inspiration
@@ -18,9 +19,10 @@
 - Length: The length of the story in pages. Unless otherwise specified, the story should be between 20 and 50 pages.
 
 ## Details
-- Characters: 
-    - Main Characters: 
-    - Supporting Characters:
+
+- Characters:
+  - Main Characters:
+  - Supporting Characters:
 
 - Setting
 

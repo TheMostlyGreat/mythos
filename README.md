@@ -7,56 +7,63 @@ An intelligent storytelling assistant that uses multi-tier AI models to create c
 Mythos uses a sophisticated multi-tier LLM system that automatically selects the best AI model for each task:
 
 - **FAST Tier**: Quick tasks like summarization and simple analysis
-- **MEDIUM Tier**: Balanced tasks like planning, research, and asset creation  
+- **MEDIUM Tier**: Balanced tasks like planning, research, and asset creation
 - **BIG Tier**: Complex creative work like narrative writing and deep reasoning
 
-### Current Configuration
+### Current Configuration (October 2025)
 
 ```python
-FAST_MODEL = ("openai", "gpt-4o-mini")                    # Ultra-fast + cost-effective
-MEDIUM_MODEL = ("openai", "gpt-4o")                       # Good balance of speed/cost/quality  
-BIG_MODEL = ("anthropic", "claude-3-5-sonnet-20241022")   # High quality reasoning
-PREMIUM_MODEL = ("anthropic", "claude-3-5-sonnet-20241022") # Maximum capability
+FAST_MODEL = ("openai", "gpt-5-mini")                    # GPT-5 Mini: Ultra-fast + cost-effective
+MEDIUM_MODEL = ("anthropic", "claude-sonnet-4")          # Claude Sonnet 4: Best balance (72.7% SWE-bench)
+BIG_MODEL = ("openai", "gpt-5")                          # GPT-5: 400K context, reasoning controls
 ```
+
+**What's New in 2025**:
+
+- ✅ **GPT-5** (Aug 2025) - 400,000 token context (3x larger than GPT-4o), reasoning_effort & verbosity controls
+- ✅ **Claude 4** (May 2025) - Sonnet 4 (72.7% SWE-bench), Opus 4 (most powerful)
+- ✅ **Extended Thinking** - Native API support with configurable budgets (1K-128K tokens)
+- ✅ **Prompt Caching** (Anthropic) - Up to 90% cost savings on repeated prompts
+- ✅ **Interleaved Thinking** - Thinking between tool calls (Claude 4)
 
 ### Mix-and-Match Flexibility
 
 You can easily customize which models to use for each tier by editing `mythos/config/settings.py`:
 
 ```python
-# All OpenAI (simpler setup)
-FAST_MODEL = ("openai", "gpt-4o-mini")
-MEDIUM_MODEL = ("openai", "gpt-4o")
-BIG_MODEL = ("openai", "gpt-4o")
-PREMIUM_MODEL = ("openai", "gpt-4o")
+# All OpenAI GPT-5 (latest 2025)
+FAST_MODEL = ("openai", "gpt-5-mini")
+MEDIUM_MODEL = ("openai", "gpt-5")
+BIG_MODEL = ("openai", "gpt-5")
 
-# All Anthropic (constitutional AI focused)
-FAST_MODEL = ("anthropic", "claude-3-5-haiku-20241022")
-MEDIUM_MODEL = ("anthropic", "claude-3-5-sonnet-20241022")
-BIG_MODEL = ("anthropic", "claude-3-5-sonnet-20241022")
-PREMIUM_MODEL = ("anthropic", "claude-3-5-sonnet-20241022")
+# All Anthropic Claude 4 (latest 2025)
+FAST_MODEL = ("anthropic", "claude-3-5-haiku-20241022")  # Still good for speed
+MEDIUM_MODEL = ("anthropic", "claude-sonnet-4")           # Best balance
+BIG_MODEL = ("anthropic", "claude-opus-4")                # Most powerful
 
 # Cost-optimized (all fast models)
-FAST_MODEL = ("openai", "gpt-4o-mini")
-MEDIUM_MODEL = ("openai", "gpt-4o-mini")
-BIG_MODEL = ("openai", "gpt-4o")
-PREMIUM_MODEL = ("openai", "gpt-4o")
+FAST_MODEL = ("openai", "gpt-5-mini")
+MEDIUM_MODEL = ("openai", "gpt-5-mini")
+BIG_MODEL = ("openai", "gpt-5-mini")
 ```
 
 ## Installation
 
 1. Clone this repository:
+
 ```bash
 git clone https://github.com/yourusername/mythos.git
 cd mythos
 ```
 
 2. Install dependencies:
+
 ```bash
 pip install -r requirements.txt
 ```
 
 3. Set up environment variables:
+
 ```bash
 export OPENAI_API_KEY="your_openai_api_key_here"
 export ANTHROPIC_API_KEY="your_anthropic_api_key_here"
@@ -65,11 +72,13 @@ export ANTHROPIC_API_KEY="your_anthropic_api_key_here"
 ## Usage
 
 ### Command Line Interface
+
 ```bash
 python -m mythos create "A story about a time-traveling detective"
 ```
 
 ### Python API
+
 ```python
 from mythos.services.story_builder import StoryBuilder
 from mythos.utils.llm_utils import call_llm
@@ -108,6 +117,7 @@ The system is built with a modular architecture:
 ## Testing
 
 Run the test suite:
+
 ```bash
 python -m pytest tests/ -v
 ```

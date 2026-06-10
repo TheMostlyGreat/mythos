@@ -57,6 +57,7 @@
 - Notes on how timeline events impact other story elements
 
 ---
+
 # EXAMPLE: Timeline: Harry Potter and the Philosopher's Stone
 
 ## Chronological Timeline
@@ -136,7 +137,7 @@
 ## Timeline Visualization
 
 - Linear timeline following the school year
-- Color-coding: 
+- Color-coding:
   - Red for main plot events
   - Blue for character development
   - Green for world-building elements

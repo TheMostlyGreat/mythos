@@ -3,14 +3,16 @@
 ## 📊 Current State Analysis
 
 ### Strengths
+
 - Clear welcome message and examples
-- Good emoji usage for visual appeal  
+- Good emoji usage for visual appeal
 - Interactive story questioner works well
 - Basic progress indicators with `print_thinking()`
 - Consistent error handling with colored output
 - Good separation of concerns in UI utilities
 
 ### Areas for Improvement
+
 - Inconsistent input validation patterns across functions
 - Basic progress feedback during long operations (just "🤔 Thinking...")
 - Limited error recovery options - mostly just retry or exit
@@ -25,10 +27,12 @@
 
 ### Phase 1: Foundation Improvements (Quick Wins)
 
-#### 1.1 Enhanced Progress Indicators 
+#### 1.1 Enhanced Progress Indicators
+
 **Priority: HIGH | Effort: LOW**
 
 Replace basic "🤔 Thinking..." with:
+
 - Real-time progress bars for multi-step operations
 - Step-by-step status updates (e.g., "1/9 - Generating concept...")
 - Estimated time remaining for long operations
@@ -36,25 +40,29 @@ Replace basic "🤔 Thinking..." with:
 - Progress persistence across interruptions
 
 **Implementation:**
+
 - Create `ProgressTracker` class in `ui_utils.py`
 - Add step counting to `StoryBuilder` operations
 - Integrate with existing `print_thinking()` calls
 
 #### 1.2 Better Error Handling & Recovery
+
 **Priority: HIGH | Effort: MEDIUM**
 
 - Clear error messages with actionable suggestions
-- Automatic retry mechanisms with user confirmation  
+- Automatic retry mechanisms with user confirmation
 - Graceful degradation when API calls fail
 - Save progress before potential failure points
 - Smart recovery from partial failures
 
 **Implementation:**
+
 - Enhance error messages in `ui_utils.py`
 - Add retry logic to API calls in `llm_utils.py`
 - Create checkpoint system in `StoryBuilder`
 
 #### 1.3 Enhanced Input Validation
+
 **Priority: MEDIUM | Effort: LOW**
 
 - Real-time input validation with helpful hints
@@ -64,6 +72,7 @@ Replace basic "🤔 Thinking..." with:
 - Consistent validation patterns across all inputs
 
 **Implementation:**
+
 - Create `InputValidator` class
 - Standardize input functions in `__main__.py`
 - Add input sanitization and suggestions
@@ -71,6 +80,7 @@ Replace basic "🤔 Thinking..." with:
 ### Phase 2: User Experience Improvements
 
 #### 2.1 Interactive Story Preview & Review
+
 **Priority: HIGH | Effort: MEDIUM**
 
 - Preview generated assets before proceeding to next step
@@ -80,11 +90,13 @@ Replace basic "🤔 Thinking..." with:
 - Side-by-side comparison of versions
 
 **Implementation:**
+
 - Create `StoryPreview` class
 - Add preview mode to story creation workflow
 - Integrate with existing asset display functions
 
 #### 2.2 Improved Navigation & Menus
+
 **Priority: MEDIUM | Effort: MEDIUM**
 
 - Consistent menu patterns throughout application
@@ -94,11 +106,13 @@ Replace basic "🤔 Thinking..." with:
 - Context-aware menu options
 
 **Implementation:**
+
 - Create `MenuSystem` class with consistent patterns
 - Add navigation state tracking
 - Implement breadcrumb system
 
 #### 2.3 Better Output Formatting
+
 **Priority: MEDIUM | Effort: LOW**
 
 - Hierarchical information display
@@ -108,6 +122,7 @@ Replace basic "🤔 Thinking..." with:
 - Responsive layout for different terminal widths
 
 **Implementation:**
+
 - Enhance existing color system in `ui_utils.py`
 - Create formatting utilities for complex data
 - Add terminal width detection
@@ -115,6 +130,7 @@ Replace basic "🤔 Thinking..." with:
 ### Phase 3: Advanced Features
 
 #### 3.1 Graceful Interruption Handling
+
 **Priority: MEDIUM | Effort: HIGH**
 
 - Smart save points during generation
@@ -124,11 +140,13 @@ Replace basic "🤔 Thinking..." with:
 - Background processing continuation
 
 **Implementation:**
+
 - Implement checkpoint system
 - Enhance interrupt handlers in `__main__.py`
 - Add resume state management
 
 #### 3.2 Contextual Help System
+
 **Priority: LOW | Effort: MEDIUM**
 
 - Inline help for each step
@@ -138,6 +156,7 @@ Replace basic "🤔 Thinking..." with:
 - Interactive tutorials
 
 **Implementation:**
+
 - Create `HelpSystem` class
 - Add context-aware help content
 - Integrate help into menu systems
@@ -150,16 +169,16 @@ Replace basic "🤔 Thinking..." with:
 # mythos/utils/ui_enhanced.py
 class ProgressTracker:
     """Enhanced progress tracking with visual feedback"""
-    
+
 class InputValidator:
     """Standardized input validation and sanitization"""
-    
+
 class MenuSystem:
     """Consistent menu patterns and navigation"""
-    
+
 class StoryPreview:
     """Interactive preview and editing of story assets"""
-    
+
 class HelpSystem:
     """Context-aware help and guidance"""
 ```
@@ -177,12 +196,13 @@ def confirm_with_preview(item: Any, action: str) -> bool
 ### Visual Mockups (Text-based)
 
 #### Enhanced Progress Display
+
 ```
 🚀 Creating Your Story: "Detective with Memory Vision"
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 6/9 (67%)
 
 ✅ Story concept created          (2m 15s)
-✅ Research completed            (1m 45s)  
+✅ Research completed            (1m 45s)
 ✅ Settings defined              (0m 30s)
 ✅ Plot structured               (3m 20s)
 ✅ Characters developed          (2m 10s)
@@ -195,6 +215,7 @@ def confirm_with_preview(item: Any, action: str) -> bool
 ```
 
 #### Enhanced Menu System
+
 ```
 ┌─ MYTHOS: Current Story Progress ─────────────────┐
 │ 📖 "Detective with Memory Vision"                │
@@ -215,6 +236,7 @@ def confirm_with_preview(item: Any, action: str) -> bool
 ```
 
 #### Asset Preview Format
+
 ```
 ┌─ Story Asset: Character Development ─────────────┐
 │ Status: ✅ Complete | Generated: 2m 30s ago      │
@@ -236,24 +258,28 @@ def confirm_with_preview(item: Any, action: str) -> bool
 ## 🛠️ Implementation Roadmap
 
 ### Week 1: Foundation
+
 - [ ] Create new UI enhancement classes
 - [ ] Implement enhanced progress tracking
 - [ ] Improve error handling and recovery
 - [ ] Add input validation improvements
 
-### Week 2: User Experience  
+### Week 2: User Experience
+
 - [ ] Build story preview system
 - [ ] Enhance menu navigation
 - [ ] Improve output formatting
 - [ ] Add confirmation dialogs with previews
 
 ### Week 3: Advanced Features
+
 - [ ] Implement graceful interruption handling
 - [ ] Add contextual help system
 - [ ] Create checkpoint/resume functionality
 - [ ] Performance optimizations
 
 ### Week 4: Polish & Testing
+
 - [ ] User experience testing
 - [ ] Bug fixes and refinements
 - [ ] Documentation updates
@@ -277,4 +303,4 @@ def confirm_with_preview(item: Any, action: str) -> bool
 
 ---
 
-**Next Steps**: Start with Phase 1 implementations, focusing on progress indicators and error handling as they provide immediate user value with minimal risk. 
+**Next Steps**: Start with Phase 1 implementations, focusing on progress indicators and error handling as they provide immediate user value with minimal risk.
