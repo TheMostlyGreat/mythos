@@ -6,9 +6,22 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## ⚠️ Current Direction: TypeScript rebuild from scratch
+
+**The active goal is to rebuild Mythos from scratch in TypeScript.** The existing Python code is a **prototype** — a proof of concept that validated the idea and surfaced the real behavior. It is **not** the foundation to extend; it is the reference to learn from and replace.
+
+The rebuild is driven by two documents, which are the source of truth:
+
+- **[`JTBD.md`](JTBD.md)** — the forward-looking product vision (the single **Writer** persona and the jobs to be done). This defines _what to build_.
+- **[`BEHAVIOR-SPEC.md`](BEHAVIOR-SPEC.md)** — the as-built behavior reverse-engineered from the Python prototype, expressed as Jobs → Acceptance Criteria → BDD scenarios. This defines _the behavior the rebuild must preserve or deliberately improve_.
+
+Work happens on the `ts-rebuild` branch. The flow is **JTBD + BDD first, then implement in TypeScript** — pick a job, work its acceptance criteria and scenarios, build to satisfy them. Treat the Python sections below as a prototype reference (how the concept worked), not as a spec to port line-for-line. When the prototype and the JTBD/BDD disagree, **the JTBD/BDD win.**
+
 ## Project Overview
 
-Mythos is an AI-powered story builder that transforms user concepts into complete narratives with rich world-building, character development, and narrative structure. It uses a multi-tier LLM system with OpenAI and Anthropic models.
+Mythos is an AI-powered story builder that transforms a writer's concept into a complete narrative with rich world-building, character development, and narrative structure, using a multi-tier LLM system with OpenAI and Anthropic models.
+
+> The architecture, commands, and APIs documented below describe the **Python prototype**. They are accurate for that codebase and useful as a behavioral reference for the rebuild — but the TypeScript stack, project layout, and tooling are open decisions to be made as the rebuild proceeds, not constraints inherited from the prototype.
 
 ## Essential Commands
 
