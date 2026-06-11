@@ -19,3 +19,15 @@ The raw-idea → concept path, end to end:
 3. That blob becomes `story.user_prompt`. `_assemble_planning_prompt` wraps it with `concept_template.md` and calls `generate_story_concept` — a **medium-tier** (`claude-sonnet-4`) call returning the structured concept `{title, concept_markdown}`.
 
 **So synthesis happens — but in `_generate_concept_asset`, one step later than the "refiner" name suggests, and the structure comes from the template, not the interview.** Two upgrades for the rebuild: (a) the concept model only ever sees answers, never the questions that framed them ("slow-burn" without "slow-burn, forbidden, or triangle?"), so context is lost; (b) the TS questioner should emit a structured brief (Q&A pairs or a synthesized brief), not a bullet dump. Maps to JTBD "Turn a raw idea into a developed story concept" — interview half solid, synthesis half thin.
+
+### Asset & chapter generation pipeline (traced June 2026)
+
+`build_story` (`mythos/services/story_builder.py`) runs five phases, each gated only by a yes/no `confirm_next_step`: concept → planning assets → chapter outline → chapter narratives → EPUB. The Writer's sole agency is "continue?".
+
+- **Planning fan-out** (`_generate_related_assets`) is **sequential, fixed order**: research → settings → plot → themes → characters → timeline → chapter_list → writing_style. Each asset is generated from `{user_prompt + running synopsis + asset template}` (`_assemble_planning_prompt`), and each new summary folds into the **synopsis** before the next runs — so order is load-bearing. That synopsis is the prototype's continuity memory: **the proto-`story bible`** the vision promotes to canon.
+- **Generator dispatch** (`_create_single_asset`): characters and chapter_list use structured-JSON generators, research uses the web-search call, the rest use plain planning text — all medium-tier.
+- **Chapter narratives** (`write_chapters`) is also a **sequential** loop, accumulating `story_so_far` (concatenated chapter summaries) for continuity; each chapter is written from `{synopsis + chapter_details + writing_style + story_so_far}`.
+- **Parallelism** (`ThreadPoolExecutor(max_workers=3)`) is used **only** for order-independent batches — critical perspectives, deep-dive research, deep-dive settings. The continuity-bound loops are deliberately sequential. (Resolves the old "document max_workers=3" todo: it's correct where it sits.)
+- **Non-fatal branches:** deep-dives and critical perspectives are wrapped in `try/except` that warns and continues — failures are silent, and nothing wires their output into chapter writing (the "add back critical perspectives" todo).
+
+For the rebuild: **keep** the synopsis→bible lineage, the asset list, and the sequential-for-continuity / parallel-for-independent split. **Break open** the silent auto-fan-out — the high-leverage assets (plot, themes, character cast) and act-level chapter turns are the natural fork sites, replacing "continue?" gates with authored choices. **Fix** the silent critical-perspective failures, and actually feed their output downstream.
