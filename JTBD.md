@@ -2,9 +2,9 @@
 
 A forward-looking description of this project through the lens of every job it helps users accomplish.
 
-> This document is the **canonical, forward-looking description** of Mythos — the destination the build works toward. The TypeScript web app is the target stack. The existing Python CLI under `mythos/` is a prototype kept for reference only; this vision, not that code, is the source of truth.
+> This document is the **canonical, forward-looking description** of Mythos — the jobs it helps the **Writer** accomplish, stated independently of any implementation. Stack, delivery, and the current rebuild live in `CLAUDE.md`, not here.
 
-Each job is stated in canonical job-story form — **[Persona] — When [situation], I want to [motivation], so I can [outcome]** — followed by the design rationale. The one persona, **Writer**, is defined in `.safeword-project/personas.md`. Jobs labeled _Integrator_ or _Maintainer_ describe deferred roles or the system itself, not personas we build for today.
+Each job is stated in canonical job-story form — **[Persona] — When [situation], I want to [motivation], so I can [outcome]** — followed by the design rationale. The one persona, **Writer**, is defined in `.safeword-project/personas.md`. A few jobs labeled _Integrator (deferred)_ describe a role we don't build for today.
 
 ---
 
@@ -98,7 +98,7 @@ Mythos applies genre-specific writing templates (Fantasy, Crime, Horror, Romance
 
 **Writer** — When I'm deliberately working with allusions, influences, and literary references, I want Mythos to capture them as a dedicated asset, so I can manage the story's literary dialogue intentionally.
 
-Sophisticated writers manage deliberate allusions and influences; Mythos gives them a structured place to track the story's literary dialogue.
+When a writer is deliberately working with allusions and influences, Mythos gives them a structured place to track the story's literary dialogue.
 
 ---
 
@@ -253,33 +253,3 @@ Developers and power users — a game-master generating lore, an app embedding s
 **Integrator (deferred)** — When my organization or team uses Mythos, I want isolated per-tenant data, billing, and access control with collaboration where wanted, so I can trust that our stories and data stay separate and secure.
 
 Mythos is built multi-tenant from the ground up. Each user or organization has isolated data, stories, and settings; billing, access control, and data isolation operate per-tenant; teams can collaborate on stories with appropriate permissions.
-
----
-
-## Platform — Technical Foundation
-
-These jobs are framed from the viewpoint of whoever **builds and operates** Mythos (a maintainer, or the running system acting on the Writer's behalf) — they are architectural requirements that serve the Writer's experience indirectly rather than jobs the Writer performs directly.
-
-### Run on TypeScript end to end
-
-**Maintainer** — When I'm building and extending Mythos, I want the entire stack — server, client, shared types — in TypeScript, so I can rely on end-to-end type safety across API, data models, and UI and keep the codebase accessible to the broadest contributor base.
-
-End-to-end type safety across the API, data models, and UI; one language across the stack.
-
-### Control API costs without sacrificing quality where it matters
-
-**Maintainer** — When different tasks need different amounts of model power, I want Mythos to route each call to the right tier (fast/cheap for analysis, medium for planning, expensive for narrative) and cache repeated system prompts, so I can keep costs down without weakening the writing where it counts.
-
-Prompt caching reduces costs by up to 90% on repeated system prompts; tiered routing spends the expensive model only where quality is felt.
-
-### Prevent wasted work from API failures
-
-**Maintainer** — When a transient API error hits mid-generation, I want retry logic with exponential backoff that separates transient errors (rate limits, timeouts) from permanent ones (content refusals), so I can ensure users never lose progress to a recoverable hiccup.
-
-Transient errors retry; permanent failures surface; users never lose progress to a recoverable API hiccup.
-
-### Enable reasoning-heavy generation
-
-**Maintainer** — When a narrative problem is genuinely hard, I want Mythos to use extended thinking with a configurable token budget before producing output, so I can get well-reasoned results on complex narrative beats.
-
-Extended-thinking support with configurable budgets lets the AI reason deeply on complex narrative problems before producing output.

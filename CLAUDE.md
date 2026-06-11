@@ -10,6 +10,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Mythos is an AI-powered story builder that transforms user concepts into complete narratives with rich world-building, character development, and narrative structure. It uses a multi-tier LLM system with OpenAI and Anthropic models.
 
+> ## ⚠️ Project status: greenfield TypeScript rebuild
+>
+> Mythos is being **rebuilt from scratch in TypeScript** (end-to-end: server, client, shared types). The product vision driving that build is `JTBD.md`; the single persona is in `.safeword-project/personas.md`.
+>
+> **The Python code under `mythos/` and everything documented below is the reference-only prototype** — kept to mine for working behavior, prompts, and pipeline logic, not to extend. Build new work in TypeScript against `JTBD.md`; treat the Python stack notes below as historical reference.
+
 ## Essential Commands
 
 ### Development
