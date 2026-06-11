@@ -2,7 +2,7 @@
 
 A forward-looking description of this project through the lens of every job it helps users accomplish.
 
-> **Companion doc:** [`BEHAVIOR-SPEC.md`](BEHAVIOR-SPEC.md) is the mirror of this file — what Mythos _does today_ (as-built jobs, acceptance criteria, and BDD scenarios reverse-engineered from the code). This document is the **destination**; that one is the **current location**.
+> This document is the **canonical, forward-looking description** of Mythos — the destination the build works toward. The TypeScript web app is the target stack. The existing Python CLI under `mythos/` is a prototype kept for reference only; this vision, not that code, is the source of truth.
 
 Each job is stated in canonical job-story form — **[Persona] — When [situation], I want to [motivation], so I can [outcome]** — followed by the design rationale. The one persona, **Writer**, is defined in `.safeword-project/personas.md`. Jobs labeled _Integrator_ or _Maintainer_ describe deferred roles or the system itself, not personas we build for today.
 
@@ -10,11 +10,7 @@ Each job is stated in canonical job-story form — **[Persona] — When [situati
 
 ## Who this is for
 
-Mythos is a **creative tool, not a content platform** — it optimizes for the person _making_ a story, not an audience browsing others' stories. There is **one persona**, defined in `.safeword-project/personas.md`:
-
-- **Writer.** A fiction author moving from a loose idea toward a structured story and first-draft manuscript. Wants to make the _meaningful_ decisions and have the drudgery — blank-page paralysis, continuity bookkeeping, formatting — removed; the payoff is an output they feel deep ownership over. Everything optimizes for them. The Writer also _reads_ their finished work in a lean-back mode (see _Fork density is a user-controlled dial_), so "Reader" is a mode of the Writer, not a separate persona.
-
-**Deferred — roles in the forward-looking jobs below, but not personas we build for yet.** An **Integrator** (a developer driving the engine programmatically over MCP) and a **Reader** (someone consuming _other_ writers' stories) each become real only if Mythos earns its way there. Until then the only user is the Writer.
+Mythos is a **creative tool, not a content platform** — it optimizes for the person _making_ a story, not an audience browsing others' stories. Personas are defined in [`.safeword-project/personas.md`](.safeword-project/personas.md): the one real user is the **Writer**, with an **Integrator** (programmatic/MCP access) and a **Reader** (consuming _other_ writers' stories) as deferred roles we don't build for yet. Per _Fork density is a user-controlled dial_ below, "Reader" is a mode of the Writer — reading is authoring with the dial at zero — not a separate persona.
 
 ---
 
