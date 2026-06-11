@@ -75,15 +75,15 @@ Mythos conducts a conversational interview to clarify intent, stakes, tone, and 
 
 ### Review and shape the concept before committing to generation
 
-**Writer** — When a concept has been drafted but I'm not yet sure it's right, I want to react to it, ask for variations, and edit the concept document directly in conversation before any expensive generation runs, so I can commit to a direction I actually believe in.
+**Writer** — When a concept has been drafted but I'm not sure it's right, I want Mythos to offer a few genuinely different directions it could take — each with its tradeoff in a line — so I can pick the one I believe in, say it in my own words if none fit, or edit it directly as a last resort, before any expensive generation runs.
 
-The user can ask for variations, redirect the tone, or edit the concept document directly like a doc. Only then does generation proceed.
+This is the first real fork: Mythos surfaces divergent concept directions to choose from (the spine), honors a plain-language redirect when none fit, and treats a direct edit as the final authority. Generation proceeds only once the Writer has committed to a direction.
 
 ### Build a complete world before writing a single chapter
 
-**Writer** — When my concept is set but the world behind it is still thin, I want Mythos to generate interconnected planning assets — concept, research, critical perspectives, settings, plot, themes, characters, timeline, writing style — as living documents I can read and edit, so I can write on top of a fully realized world.
+**Writer** — When my concept is set but the world behind it is still thin, I want Mythos to build the world _with_ me — offering a choice of directions at the decisions that matter (which plot shape, which themes, which cast) and filling the connective tissue in itself — so I can author the world's turning points without hand-crafting every asset.
 
-Each asset is stored as a living document the user can read, edit, and collaborate on with the AI.
+Mythos generates the interconnected planning assets — research, settings, plot, themes, characters, timeline, writing style — but the high-leverage ones aren't handed over finished: at each, it surfaces a small set of divergent directions to **choose** from, generating the low-leverage detail to fit the choice. Every asset stays a living document the Writer can **redirect** in words or **edit** directly — but choosing comes first; editing is the fallback, not the main gesture.
 
 ### Understand the world deeply, not just broadly
 
@@ -95,7 +95,7 @@ Generic world-building isn't enough; Mythos targets the spots that need deeper i
 
 **Writer** — When I want my story to actually mean something — to land with weight rather than just happen — I want Mythos to build that depth in from the start, so I can have a story that says something without knowing how to engineer that myself.
 
-The machinery: Mythos reads the story through established critical lenses (feminist, Marxist, postcolonial, and others) to surface theme and subtext, then bakes that depth into generation. The craft runs underneath; the Writer never has to name a theory — they just get a story with something to say.
+The machinery: Mythos reads the story through established critical lenses (feminist, Marxist, postcolonial, and others) to surface theme and subtext, then bakes that depth into generation. The craft runs underneath; the Writer never has to name a theory — they just get a story with something to say. The bar is the lens visibly shaping the prose — the themes surfacing in scenes — not a critical-analysis document sitting on the side that the chapters never read.
 
 ### Use genre-appropriate craft guidance
 
@@ -127,9 +127,9 @@ The opening scene establishes voice and tone for everything that follows and bec
 
 ### Build the manuscript incrementally, chapter by chapter
 
-**Writer** — When I don't want to commit to a whole manuscript sight-unseen, I want Mythos to generate one chapter at a time and surface each for my reaction, so I can continue or redirect before more is written.
+**Writer** — When I don't want to commit to a whole manuscript sight-unseen, I want Mythos to write one chapter at a time and end each by showing where it could go next, so I can choose the direction, redirect in my own words, or simply continue — before more is written.
 
-Users see a chapter, react to it, and decide whether to continue or redirect — not commit to generating the entire manuscript blindly.
+Each chapter surfaces the next turn as a **choice** — a few divergent directions the story could take — so "what happens next" is the Writer's call, not a silent default. Continuing without choosing is always one of the options; this is the per-chapter fork, not a yes/no "generate more?" gate.
 
 ### See and steer the story scene by scene
 
@@ -147,7 +147,7 @@ The model maintains continuity, voice, and thematic consistency across the full 
 
 **Writer** — When generated text is close but not exactly what I want, I want to open any asset or chapter and edit it directly — not just regenerate — and have Mythos treat my edit as authoritative in all downstream generation, so I can keep ultimate authorship.
 
-Edits are respected and preserved; the AI treats user edits as authoritative when continuing generation.
+Edit is the deepest of the three control channels — the authority the Writer reaches for when choosing a direction and redirecting in words still didn't land it. Edits are respected and preserved; whatever the Writer types becomes canon the engine obeys in all downstream generation.
 
 ### Steer the story in conversation at any stage
 
@@ -194,6 +194,8 @@ This is the strongest quality lever in the research (fine-tuning on an author's 
 **Writer** — When a long book risks drifting, contradicting itself, or losing voice over 80k words, I want Mythos to treat the story bible as persistent canon it reads on every generation — and to flag conflicts and offer a one-click retroactive fix when I edit it — so I can trust the whole book to stay consistent with itself.
 
 This is the differentiator. The story bible isn't just an _output_ of the planning phase — it's the **persistent continuity engine** the writing phase reads from on every generation. Entities, world-rules, character voices, and established facts are injected as fixed canon. When the user edits the bible, the canon updates and all downstream generation respects the change; when an edit contradicts already-written chapters, Mythos flags it and offers a one-click retroactive fix ("chapter 2 still uses the old name — update?"). The bible is the user-editable source of truth the engine obeys, not a document it merely consulted once.
+
+Crucially, canon is **structured, queryable facts** — named entities, rules, and their current values — not a running prose summary. A summary blurs exactly the specifics (names, dates, established details) that drift over a long book, and you cannot flag a contradiction against a blur; the bible has to hold what is _true_ so the engine can check new prose against it.
 
 ### Pause and resume without losing progress
 
