@@ -54,6 +54,10 @@ The cadence above is the _default_. But fork density is a **dial the user contro
 
 Crucially, dialing density down never costs agency: the expressive decisions remain **available on demand** (the user can always request a fork), so lean-back mode _defers_ authorship rather than removing it. This is the concrete resolution of "Reader is a mode of the Writer" — reading is authoring with the dial at zero.
 
+### Sophistication is a property of the output, not the Writer
+
+Literary sophistication — thematic depth, intertextual echo, a real tension arc, prose that doesn't read as slop — is an attribute of the **story Mythos produces**, never a trait the Writer has to bring. The Writer is a layperson with no formal craft; they hire Mythos precisely to supply the sophistication they couldn't engineer themselves. So every craft job is voiced as the Writer's plain desire ("I want my story to actually mean something"), and the machinery that delivers it (critical lenses, allusion-tracking, affect planning) lives in the rationale, never in the want. The Writer directs; Mythos is the crew. The gap between what the Writer can do alone and the quality of the output isn't a contradiction — it's the whole value proposition.
+
 ---
 
 ## Creation — Ideation & Concept
@@ -82,11 +86,11 @@ Each asset is stored as a living document the user can read, edit, and collabora
 
 Generic world-building isn't enough; Mythos targets the spots that need deeper investigation rather than padding everything uniformly.
 
-### Explore the story through multiple critical lenses
+### Give the story something real to say
 
-**Writer** — When I want intellectual and thematic depth baked in from the start, I want Mythos to generate literary analysis through feminist, Marxist, postcolonial, and other critical-theory lenses, so I can write with thematic intention rather than adding it in revision.
+**Writer** — When I want my story to actually mean something — to land with weight rather than just happen — I want Mythos to build that depth in from the start, so I can have a story that says something without knowing how to engineer that myself.
 
-For writers who want intellectual depth and thematic intentionality baked into the story, not bolted on later.
+The machinery: Mythos reads the story through established critical lenses (feminist, Marxist, postcolonial, and others) to surface theme and subtext, then bakes that depth into generation. The craft runs underneath; the Writer never has to name a theory — they just get a story with something to say.
 
 ### Use genre-appropriate craft guidance
 
@@ -94,11 +98,11 @@ For writers who want intellectual depth and thematic intentionality baked into t
 
 Mythos applies genre-specific writing templates (Fantasy, Crime, Horror, Romance, Sci-Fi, Literary Fiction, Mystery/Thriller, Historical Fiction, etc.) that inform how each genre's craft is handled.
 
-### Track literary references and intertextual influences
+### Echo the books and influences I love
 
-**Writer** — When I'm deliberately working with allusions, influences, and literary references, I want Mythos to capture them as a dedicated asset, so I can manage the story's literary dialogue intentionally.
+**Writer** — When my idea is inspired by stories I love — "like Le Guin meets a heist movie" — I want Mythos to treat those touchstones as something it writes toward, so I can have my story echo what inspired it without studying how allusion works.
 
-When a writer is deliberately working with allusions and influences, Mythos gives them a structured place to track the story's literary dialogue.
+The machinery: the influences the Writer names are captured as a dedicated asset and fed into generation as a living touchstone. The Writer says what they love; Mythos manages the literary dialogue — allusion, homage, intertextual echo — underneath.
 
 ---
 
