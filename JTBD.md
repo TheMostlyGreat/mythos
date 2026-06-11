@@ -10,7 +10,7 @@ Each job is stated in canonical job-story form — **[Persona] — When [situati
 
 ## Who this is for
 
-Mythos is a **creative tool, not a content platform** — it optimizes for the person _making_ a story, not an audience browsing others' stories. Personas are defined in [`.safeword-project/personas.md`](.safeword-project/personas.md): the one real user is the **Writer**, with an **Integrator** (programmatic/MCP access) and a **Reader** (consuming _other_ writers' stories) as deferred roles we don't build for yet. Per _Fork density is a user-controlled dial_ below, "Reader" is a mode of the Writer — reading is authoring with the dial at zero — not a separate persona.
+Mythos is a **creative tool, not a content platform** — it optimizes for the person _making_ a story, not an audience browsing others' stories. Personas are defined in [`.safeword-project/personas.md`](.safeword-project/personas.md): the one real user is the **Writer**, with an **Integrator** (programmatic/MCP access) and a **Reader** (consuming _other_ writers' stories) as deferred roles we don't build for yet. Per _The story finds its own cadence_ below, "Reader" is a mode of the Writer — reading is authoring with forks turned down — not a separate persona.
 
 ---
 
@@ -45,14 +45,13 @@ Grounded in choice-architecture research (Chernev 2015 choice-overload moderator
 
 > **Open build risk:** tiered cadence requires the engine to _detect_ where a genuine "interesting decision" lives in the plot, rather than hardcoding "fork at chapter 3." That detection is the non-trivial part; the user-requested fork is the fallback.
 
-### Fork density is a user-controlled dial
+### The story finds its own cadence
 
-The cadence above is the _default_. But fork density is a **dial the user controls**, and that single mechanism is how one engine serves both a lean-forward author and a lean-back reader — without a second product, a second mode, or a second persona.
+The cadence above is a _default_, not a fixed clock — and crucially **not a setting the user manages.** Asking the Writer to pick a "mode" or work a density slider is a thing to learn and a thing to get wrong; one engine serves both a lean-forward author and a lean-back reader without ever surfacing that choice as a control.
 
-- **Forks up → author mode (lean-forward).** Decisions surface at every tier; the user is the visible co-creator making the ~8–15 meaningful choices that earn ownership.
-- **Forks near zero → reading mode (lean-back).** The engine writes through the bible in near-continuous flow and the user mostly _receives_ the story — the "beach novel" posture, same engine, divergence turned down.
+Instead, **the control and the sensor are the same gesture.** Every fork carries a frictionless "let the story carry on," and every stretch of flow can be interrupted with "let me steer here." When the Writer deliberates over a fork and picks, that's a lean-forward signal; when they wave forks through or reach for "just continue," that's lean-back. The engine reads that behavior and slowly modulates how often it surfaces forks against the default curve — pushing when the Writer is engaged, breathing when they're receiving. No mood-reading, no menu; the Writer's own choices _are_ the dial.
 
-Crucially, dialing density down never costs agency: the expressive decisions remain **available on demand** (the user can always request a fork), so lean-back mode _defers_ authorship rather than removing it. This is the concrete resolution of "Reader is a mode of the Writer" — reading is authoring with the dial at zero.
+Two rules keep this from going wrong, both straight from the research on self-adjusting interfaces: adaptation moves **slowly and predictably** (no thrash from one stray click), and every adaptation is **elective** — a fork is always skippable and a fork is always summonable, so the Writer can override the engine's read at any moment without losing agency. "Reader is a mode of the Writer" resolves here: lean-back and lean-forward aren't modes anyone selects — they're emergent positions on a curve the story discovers from how the Writer plays it.
 
 ### Sophistication is a property of the output, not the Writer
 
