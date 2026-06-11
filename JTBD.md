@@ -126,6 +126,12 @@ The opening scene establishes voice and tone for everything that follows and bec
 
 Users see a chapter, react to it, and decide whether to continue or redirect — not commit to generating the entire manuscript blindly.
 
+### See and steer the story scene by scene
+
+**Writer** — When a whole chapter is too big a unit to react to, I want to see my story as scenes inside each chapter — each one its own beat I can read, edit, or redirect on its own — so I can shape the story at the grain where it actually turns, not in 4,000-word blocks.
+
+The machinery: the manuscript is a tree — story → chapters → scenes — where each scene is a first-class node carrying its own POV, setting, characters present, purpose, and tension level, plus its own prose. That structure is what lets the engine place forks where a story genuinely turns (scene boundaries, not an arbitrary chapter clock), regenerate one scene without disturbing the rest, and track continuity at the grain where it actually breaks.
+
 ### Get a full draft manuscript written
 
 **Writer** — When my planning is done and I want to see the book exist, I want Mythos to write complete, full-length narrative chapters from the planning assets while holding continuity, voice, and theme, so I can have a real draft rather than fragments.
