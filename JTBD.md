@@ -199,9 +199,9 @@ Crucially, canon is **structured, queryable facts** — named entities, rules, a
 
 ### Pause and resume without losing progress
 
-**Writer** — When I have to stop partway and come back later, I want Mythos to save state at every phase and resume from the exact point of incompleteness, so I can work across many sessions without losing progress.
+**Writer** — When I have to stop partway and come back later, I want Mythos to save state at every phase and resume from the exact point of incompleteness — including dropping me back at a fork I was offered but hadn't answered — so I can work across many sessions without losing progress or a pending decision.
 
-Mythos detects what's done and picks up exactly where work stopped.
+Mythos detects what's done and picks up exactly where work stopped. "Where work stopped" includes an open choice, not just an unfinished artifact: a fork the Writer was mid-deciding is itself a resumable point, restored with its options intact — so a decision in flight is never silently resolved by the engine while the Writer is away.
 
 ### Generate story length and scope appropriate to the idea
 
