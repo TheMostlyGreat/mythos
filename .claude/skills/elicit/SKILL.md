@@ -1,7 +1,7 @@
 ---
 name: elicit
 description: "Extract tacit knowledge through non-obvious microquestions — things only the user knows that can't be found in code, docs, or research. Use when you're about to guess at intent, context, or constraints during SAFEWORD's understanding flow. Also use when user says 'ask me', 'what do you need to know', or when another skill (bdd, brainstorm, debug) needs user context before proceeding. Do NOT use for questions answerable by reading the codebase or searching the web."
-allowed-tools: "*"
+allowed-tools: '*'
 ---
 
 # Elicit: Tacit Knowledge Extraction

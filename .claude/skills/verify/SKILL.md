@@ -3,7 +3,7 @@ name: verify
 description: Verify ticket completion criteria — use when finishing a ticket,
   before marking work done, or checking acceptance criteria. Runs tests, build,
   lint, scenarios, and dependency drift checks.
-allowed-tools: "*"
+allowed-tools: '*'
 ---
 
 # Verify

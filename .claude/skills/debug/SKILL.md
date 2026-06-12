@@ -3,7 +3,7 @@ name: debug
 description: Root cause debugging before fixes. Use when investigating bugs,
   diagnosing test failures, troubleshooting unexpected behavior, or when previous
   fix attempts failed. Enforces investigate-first discipline.
-allowed-tools: "*"
+allowed-tools: '*'
 ---
 
 # Systematic Debugger
@@ -165,9 +165,9 @@ Confirmed by adding pool logging - saw connections increment without decrement o
 Before fixing, write test that fails due to the bug:
 
 ```javascript
-it("handles empty input without crashing", () => {
+it('handles empty input without crashing', () => {
   // This test should FAIL before fix, PASS after
-  expect(() => processData("")).not.toThrow();
+  expect(() => processData('')).not.toThrow();
 });
 ```
 

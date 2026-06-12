@@ -1,7 +1,7 @@
 ---
 name: figure-it-out
 description: Explore and debate options with fresh documentation and research before committing. Use when facing a real decision with multiple plausible approaches — library/framework choice, architecture call, API or schema design, algorithm selection, or any communication / strategy call where being wrong has cost. Enumerates relevant research domains, looks up current docs and evidence-based methods, weighs options on correctness and elegance, resists bloat. Do NOT use for divergent ideation (brainstorm), extracting user intent (elicit), or reviewing already-written code (quality-review).
-allowed-tools: "*"
+allowed-tools: '*'
 ---
 
 # Figure It Out: Evidence-Backed Option Weighing

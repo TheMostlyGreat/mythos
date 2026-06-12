@@ -1,0 +1,12 @@
+{
+  "devDependencies": {
+    "@cucumber/cucumber": "^13.0.0",
+    "@types/node": "^25.9.3",
+    "dependency-cruiser": "^17.4.3",
+    "eslint": "^9.39.4",
+    "knip": "^6.16.1",
+    "prettier": "^3.8.4",
+    "safeword": "^0.43.0",
+    "tsx": "^4.22.4"
+  }
+}

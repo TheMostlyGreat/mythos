@@ -3,7 +3,7 @@ name: quality-review
 description: Deep code review with web research. Use when double-checking code
   against latest docs, verifying dependency versions, or reviewing security
   concerns. Complements automatic quality hook with ecosystem verification.
-allowed-tools: "*"
+allowed-tools: '*'
 ---
 
 # Quality Reviewing

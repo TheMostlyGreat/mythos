@@ -5,7 +5,7 @@ description: Improve code structure without changing behavior. Use when
   duplication, renaming for clarity, or addressing code smells. Enforces one
   change → test → commit cycle. NOT for style/formatting (use /lint), features,
   or bug fixes.
-allowed-tools: "*"
+allowed-tools: '*'
 ---
 
 # Refactoring
@@ -68,10 +68,10 @@ Capture current behavior before refactoring:
 
 ```typescript
 // Characterization test - captures ACTUAL behavior
-it("processOrder returns current behavior", () => {
+it('processOrder returns current behavior', () => {
   const result = processOrder({ items: [], user: null });
   // Whatever it returns NOW is the expected value
-  expect(result).toEqual({ status: "empty", total: 0 });
+  expect(result).toEqual({ status: 'empty', total: 0 });
 });
 ```
 

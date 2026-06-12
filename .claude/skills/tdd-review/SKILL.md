@@ -1,7 +1,7 @@
 ---
 name: tdd-review
 description: Use when completing a TDD step and wanting a quality check. Reviews test quality after RED, implementation correctness after GREEN, and scenario completeness after REFACTOR.
-allowed-tools: "*"
+allowed-tools: '*'
 ---
 
 # TDD Review

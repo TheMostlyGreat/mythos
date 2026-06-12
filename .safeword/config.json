@@ -1,5 +1,6 @@
 {
   "installedPacks": [
-    "python"
+    "python",
+    "typescript"
   ]
 }

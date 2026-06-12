@@ -4,7 +4,7 @@ description: Use when finishing spec.md before writing test-definitions.md, or
   when the review gate asks for a spec review — self-reviews the just-authored
   spec inline and earns its Tier 1 review stamp. Your own inline pass; do not
   spawn a sub-agent.
-allowed-tools: "*"
+allowed-tools: '*'
 ---
 
 # Self-Review

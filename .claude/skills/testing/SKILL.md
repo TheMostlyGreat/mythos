@@ -5,7 +5,7 @@ description: How to write good tests. Use when writing tests, improving test
   RED phase, tdd-review at GREEN gate, refactor at PROTECT phase, and debug.
   Core test quality knowledge across all workflows.
 user-invocable: false
-allowed-tools: "*"
+allowed-tools: '*'
 ---
 
 # Writing Good Tests
@@ -60,10 +60,10 @@ Non-negotiable at every test level. Violating these produces tests that pass but
 ```typescript
 // WRONG — tests internal state
 expect(component.state.count).toBe(1);
-expect(mockFn).toHaveBeenCalledWith("internal-detail");
+expect(mockFn).toHaveBeenCalledWith('internal-detail');
 
 // RIGHT — tests observable behavior
-expect(screen.getByText("Count: 1")).toBeVisible();
+expect(screen.getByText('Count: 1')).toBeVisible();
 expect(result).toEqual({ total: 42 });
 ```
 
@@ -85,7 +85,7 @@ expect(result).toBeTruthy();
 expect(result).toBeDefined();
 
 // RIGHT — asserts specific behavior
-expect(processData(input)).toEqual({ status: "ok", count: 3 });
+expect(processData(input)).toEqual({ status: 'ok', count: 3 });
 expect(result.errors).toHaveLength(0);
 ```
 
@@ -139,13 +139,13 @@ Test the contract (inputs → outputs), not the internals.
 
 ```typescript
 // Behavioral: asserts on output
-it("applies 20% discount for VIP users", () => {
-  expect(calculateDiscount(100, { tier: "VIP" })).toBe(80);
+it('applies 20% discount for VIP users', () => {
+  expect(calculateDiscount(100, { tier: 'VIP' })).toBe(80);
 });
 
 // Non-behavioral: asserts on internal call
-it("calls applyRate with 0.2", () => {
-  calculateDiscount(100, { tier: "VIP" });
+it('calls applyRate with 0.2', () => {
+  calculateDiscount(100, { tier: 'VIP' });
   expect(applyRate).toHaveBeenCalledWith(0.2);
 });
 ```
@@ -171,13 +171,13 @@ Test what the user can see and do. E2E tests are naturally behavioral — lean i
 
 ```typescript
 // Behavioral: user-visible outcome
-test("user creates account and sees dashboard", async ({ page }) => {
-  await page.goto("/signup");
-  await page.fill('[name="email"]', "test@example.com");
-  await page.fill('[name="password"]', "secure123");
+test('user creates account and sees dashboard', async ({ page }) => {
+  await page.goto('/signup');
+  await page.fill('[name="email"]', 'test@example.com');
+  await page.fill('[name="password"]', 'secure123');
   await page.click('button:has-text("Sign Up")');
-  await expect(page).toHaveURL("/dashboard");
-  await expect(page.getByText("Welcome")).toBeVisible();
+  await expect(page).toHaveURL('/dashboard');
+  await expect(page.getByText('Welcome')).toBeVisible();
 });
 ```
 
@@ -236,11 +236,11 @@ Write one test → run it → verify it fails (or passes for characterization) �
 
 ```typescript
 function buildUser(overrides = {}) {
-  return { id: "test-1", name: "Test User", role: "member", ...overrides };
+  return { id: 'test-1', name: 'Test User', role: 'member', ...overrides };
 }
 
-it("applies VIP discount", () => {
-  const user = buildUser({ role: "vip" });
+it('applies VIP discount', () => {
+  const user = buildUser({ role: 'vip' });
   expect(calculateDiscount(user)).toBe(0.2);
 });
 ```
@@ -253,7 +253,7 @@ await sleep(3000);
 await page.waitForTimeout(500);
 
 // RIGHT — wait for condition
-await expect.poll(() => getStatus()).toBe("ready");
+await expect.poll(() => getStatus()).toBe('ready');
 await waitFor(() => expect(element).toBeVisible());
 ```
 
@@ -261,12 +261,12 @@ await waitFor(() => expect(element).toBeVisible());
 
 ```typescript
 // WRONG
-it("works correctly");
-it("should handle edge case");
+it('works correctly');
+it('should handle edge case');
 
 // RIGHT — describes the behavior
-it("returns 401 when API key is missing");
-it("preserves user input after validation error");
+it('returns 401 when API key is missing');
+it('preserves user input after validation error');
 ```
 
 ---
