@@ -57,6 +57,8 @@ Two rules keep this from going wrong, both straight from the research on self-ad
 
 The opening interview that turns a raw idea into a concept and the forks that steer the story are **the same gesture at two phases** — a small set of legible choices with a plain-language escape hatch. Treating them as one primitive pays off three ways. The intake is the Writer's **tutorial** for the fork loop: they learn "pick an option, say it your own way, or pass" before anything is at stake, so forks feel familiar instead of novel. It's also the **cold-start read** for the cadence above — whether the Writer picks offered options or types their own, deliberates or waves questions through, is the first lean-forward/lean-back signal. And its discipline of asking only **setup** questions — never plot turns, endings, or surprises — is exactly what _reserves_ the interesting decisions to become forks: intake fixes the frame (genre, tone, character, world, scope as canon), forks own the turns. The test for any question is "setup fact or narrative turn?" — facts are asked now, turns are saved for forks.
 
+Because they're one primitive, they draw from **one decision budget — and it's spent on the forks, not the form.** The Writer's appetite for choosing is finite, and ownership is earned at the narrative turns, so intake is kept **minimal and adaptive**: ask only the few highest-leverage setup questions, then go deeper _only if the Writer is clearly engaging_ (picking, elaborating) and otherwise synthesize the rest and get to the story. Intake length is governed by the same revealed-preference signal as fork cadence — an eager Writer gets asked more, a Writer waving questions through gets carried to chapter one fast. A long setup form would burn the choosing appetite the forks depend on; minimal-but-deepening keeps it for where it counts.
+
 > **Open design question:** the highest-energy intake choice (the Writer lights up picking "forbidden romance") is both a setup fact _and_ a signal of where they want agency — a candidate to promote into an early fork rather than bury as canon. Where intake ends and forking begins is a dial, not a wall.
 
 ### Sophistication is a property of the output, not the Writer
@@ -69,9 +71,9 @@ Literary sophistication — thematic depth, intertextual echo, a real tension ar
 
 ### Turn a raw idea into a developed story concept
 
-**Writer** — When I have only a rough premise ("a detective who can see memories") and don't know how to grow it into something I could actually write, I want Mythos to interview me about intent, stakes, tone, and genre and synthesize a complete creative brief, so I can start from a solid foundation instead of a blank page.
+**Writer** — When I have only a rough premise ("a detective who can see memories") and don't know how to grow it into something I could actually write, I want Mythos to ask me just a few sharp questions about intent, stakes, tone, and genre and synthesize a complete creative brief, so I can start from a solid foundation instead of a blank page — without slogging through a long form.
 
-Mythos conducts a conversational interview to clarify intent, stakes, tone, and genre — then synthesizes a full story concept that serves as the creative foundation for everything that follows.
+Mythos asks the few highest-leverage setup questions, deepening only if the Writer is engaging, then synthesizes a full story concept that serves as the creative foundation for everything that follows. The interview is kept short on purpose (see _Intake and forks are one grammar_): the Writer's choosing appetite is reserved for the story's forks.
 
 ### Review and shape the concept before committing to generation
 
