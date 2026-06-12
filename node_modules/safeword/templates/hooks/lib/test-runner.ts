@@ -1,0 +1,117 @@
+/**
+ * Test runner utilities for the stop hook.
+ * Detects and executes the project's test suite directly.
+ */
+
+import { execSync } from 'node:child_process';
+import { existsSync, readFileSync } from 'node:fs';
+import nodePath from 'node:path';
+
+type PackageManager = 'npm' | 'yarn' | 'pnpm' | 'bun';
+
+export interface TestResult {
+  /** Whether tests passed (exit code 0). */
+  passed: boolean;
+  /** Truncated output from the test run. */
+  output: string;
+  /** true if no test command was found — caller should skip, not block. */
+  skipped: boolean;
+}
+
+/** Timeout for test suite execution (60 seconds). */
+const TEST_TIMEOUT_MS = 60_000;
+
+/** Maximum lines of test output to inject into the block reason. */
+const MAX_OUTPUT_LINES = 30;
+
+/** Maximum characters of test output to inject into the block reason. */
+const MAX_OUTPUT_CHARS = 3000;
+
+/**
+ * Detect package manager by lockfile presence (bun > pnpm > yarn > npm).
+ * Mirrors the logic in packages/cli/src/utils/install.ts.
+ */
+function detectPackageManager(cwd: string): PackageManager {
+  if (existsSync(nodePath.join(cwd, 'bun.lockb')) || existsSync(nodePath.join(cwd, 'bun.lock')))
+    return 'bun';
+  if (existsSync(nodePath.join(cwd, 'pnpm-lock.yaml'))) return 'pnpm';
+  if (existsSync(nodePath.join(cwd, 'yarn.lock'))) return 'yarn';
+  if (existsSync(nodePath.join(cwd, 'package-lock.json'))) return 'npm';
+  if (process.versions.bun) return 'bun';
+  return 'npm';
+}
+
+/**
+ * Detect the test command from package.json scripts. Prefers `test:done` (a
+ * gate-tuned fast subset) when present, falling back to `test`. Projects whose
+ * full test suite exceeds TEST_TIMEOUT_MS should define `test:done` as a
+ * meaningful but fast subset — unit tests + drift checks typically work.
+ * Returns null if package.json is absent or has no test script at all.
+ */
+function getTestCommand(cwd: string): string | null {
+  const packageJsonPath = nodePath.join(cwd, 'package.json');
+  try {
+    const content = readFileSync(packageJsonPath, 'utf8');
+    const pkg = JSON.parse(content) as { scripts?: Record<string, string> };
+    const script = pkg.scripts?.['test:done'] ? 'test:done' : pkg.scripts?.test ? 'test' : null;
+    if (!script) return null;
+    const pm = detectPackageManager(cwd);
+    if (pm === 'npm') return script === 'test' ? 'npm test' : `npm run ${script}`;
+    return `${pm} run ${script}`;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Truncate output to the last N lines and at most M characters.
+ * Test failures print the summary at the end — we want the tail.
+ */
+function truncateOutput(output: string): string {
+  const lines = output.trimEnd().split('\n');
+  const tail = lines.slice(-MAX_OUTPUT_LINES).join('\n');
+  if (tail.length <= MAX_OUTPUT_CHARS) return tail;
+  // Character cap: take the last MAX_OUTPUT_CHARS characters
+  return '...(truncated)\n' + tail.slice(-MAX_OUTPUT_CHARS);
+}
+
+/**
+ * Run the project's test suite directly and return the result.
+ *
+ * - Detects test command from package.json scripts.test
+ * - Uses execSync for synchronous, timeout-safe execution (no zombie processes)
+ * - Returns skipped=true if no test command found (caller should not block)
+ */
+export function runTests(cwd: string): TestResult {
+  const command = getTestCommand(cwd);
+  if (!command) return { passed: true, output: '', skipped: true };
+
+  try {
+    const output = execSync(command, {
+      cwd,
+      timeout: TEST_TIMEOUT_MS,
+      stdio: 'pipe',
+      encoding: 'utf8',
+    });
+    return { passed: true, output: truncateOutput(output), skipped: false };
+  } catch (error) {
+    const err = error as NodeJS.ErrnoException & {
+      stdout?: string;
+      stderr?: string;
+      killed?: boolean;
+    };
+    if (err.killed) {
+      return {
+        passed: false,
+        output: `Tests timed out after ${TEST_TIMEOUT_MS / 1000}s — tests may be too slow or the runner hung.`,
+        skipped: false,
+      };
+    }
+    const combined = (err.stdout ?? '') + (err.stderr ?? '');
+    return {
+      passed: false,
+      output: truncateOutput(combined || `Tests exited with non-zero status`),
+      skipped: false,
+    };
+  }
+}

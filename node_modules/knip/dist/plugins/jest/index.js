@@ -1,0 +1,113 @@
+import { _glob, _dirGlob } from '../../util/glob.js';
+import { toDeferResolve, toEntry } from '../../util/input.js';
+import { isInternal, join, normalize, toAbsolute } from '../../util/path.js';
+import { hasDependency } from '../../util/plugin.js';
+import { getReportersDependencies, resolveExtensibleConfig } from './helpers.js';
+const title = 'Jest';
+const enablers = ['jest'];
+const isEnabled = ({ dependencies, manifest }) => hasDependency(dependencies, enablers) || Boolean(manifest.name?.startsWith('jest-presets'));
+const config = ['jest.config.{js,ts,mjs,cjs,mts,cts,json}', 'package.json'];
+const mocks = ['**/__mocks__/**/*.[jt]s?(x)'];
+const entry = ['**/__tests__/**/*.[jt]s?(x)', '**/?(*.)+(spec|test).[jt]s?(x)', ...mocks];
+const rootDirRe = /<rootDir>/;
+const resolveDependencies = async (config, rootDir, options) => {
+    const { configFileDir } = options;
+    if (config?.preset) {
+        const { preset } = config;
+        if (isInternal(preset)) {
+            const presetConfigPath = toAbsolute(preset, configFileDir);
+            const presetConfig = await resolveExtensibleConfig(presetConfigPath);
+            config = Object.assign({}, presetConfig, config);
+        }
+    }
+    const presets = (config.preset ? [config.preset] : []).map(preset => isInternal(preset) ? preset : join(preset, 'jest-preset'));
+    const projects = [];
+    for (const project of config.projects ?? []) {
+        if (typeof project === 'string') {
+            const patterns = [project.replace(rootDirRe, rootDir)];
+            const files = await _glob({ patterns, cwd: options.cwd });
+            const dirs = await _dirGlob({ patterns, cwd: options.cwd });
+            projects.push(...files, ...dirs);
+        }
+        else {
+            const dependencies = await resolveDependencies(project, rootDir, options);
+            for (const dependency of dependencies)
+                projects.push(dependency);
+        }
+    }
+    const runner = config.runner ? [config.runner] : [];
+    const runtime = config.runtime && config.runtime !== 'jest-circus' ? [config.runtime] : [];
+    const environments = config.testEnvironment === 'jsdom'
+        ? ['jest-environment-jsdom']
+        : config.testEnvironment
+            ? [config.testEnvironment]
+            : [];
+    const resolvers = config.resolver ? [config.resolver] : [];
+    const reporters = getReportersDependencies(config, options);
+    const watchPlugins = config.watchPlugins?.map(watchPlugin => (typeof watchPlugin === 'string' ? watchPlugin : watchPlugin[0])) ?? [];
+    const transform = config.transform
+        ? Object.values(config.transform).map(transform => (typeof transform === 'string' ? transform : transform[0]))
+        : [];
+    const moduleNameMapper = (config.moduleNameMapper
+        ? Object.values(config.moduleNameMapper).map(mapper => (typeof mapper === 'string' ? mapper : mapper[0]))
+        : []).filter(value => !/\$[0-9]/.test(value));
+    const testResultsProcessor = config.testResultsProcessor ? [config.testResultsProcessor] : [];
+    const snapshotResolver = config.snapshotResolver ? [config.snapshotResolver] : [];
+    const snapshotSerializers = config.snapshotSerializers ?? [];
+    const testSequencer = config.testSequencer ? [config.testSequencer] : [];
+    const setupFiles = config.setupFiles ?? [];
+    const setupFilesAfterEnv = config.setupFilesAfterEnv ?? [];
+    const globalSetup = config.globalSetup ? [config.globalSetup] : [];
+    const globalTeardown = config.globalTeardown ? [config.globalTeardown] : [];
+    return [
+        ...presets,
+        ...projects,
+        ...runner,
+        ...runtime,
+        ...environments,
+        ...resolvers,
+        ...reporters,
+        ...watchPlugins,
+        ...setupFiles,
+        ...setupFilesAfterEnv,
+        ...transform,
+        ...moduleNameMapper,
+        ...testResultsProcessor,
+        ...snapshotResolver,
+        ...snapshotSerializers,
+        ...testSequencer,
+        ...globalSetup,
+        ...globalTeardown,
+    ].map(id => (typeof id === 'string' ? toDeferResolve(id) : id));
+};
+const resolveConfig = async (localConfig, options) => {
+    const { configFileDir } = options;
+    if (typeof localConfig === 'function')
+        localConfig = await localConfig();
+    const rootDir = localConfig.rootDir ?? configFileDir;
+    const replaceRootDir = (name) => name.replace(rootDirRe, rootDir);
+    const inputs = await resolveDependencies(localConfig, rootDir, options);
+    const entries = localConfig.testMatch
+        ? localConfig.testMatch.map(replaceRootDir).map(id => toEntry(id))
+        : entry.map(id => toEntry(id));
+    if (localConfig.testMatch && !options.config.entry)
+        entries.push(...mocks.map(id => toEntry(id)));
+    const result = inputs.map(dependency => {
+        dependency.specifier = normalize(replaceRootDir(dependency.specifier));
+        return dependency;
+    });
+    return entries.concat(result);
+};
+const args = {
+    config: true,
+};
+const plugin = {
+    title,
+    enablers,
+    isEnabled,
+    config,
+    entry,
+    resolveConfig,
+    args,
+};
+export default plugin;

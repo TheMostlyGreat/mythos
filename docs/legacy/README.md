@@ -31,3 +31,11 @@ The raw-idea → concept path, end to end:
 - **Non-fatal branches:** deep-dives and critical perspectives are wrapped in `try/except` that warns and continues — failures are silent, and nothing wires their output into chapter writing (the "add back critical perspectives" todo).
 
 For the rebuild: **keep** the synopsis→bible lineage, the asset list, and the sequential-for-continuity / parallel-for-independent split. **Break open** the silent auto-fan-out — the high-leverage assets (plot, themes, character cast) and act-level chapter turns are the natural fork sites, replacing "continue?" gates with authored choices. **Fix** the silent critical-perspective failures, and actually feed their output downstream.
+
+### Persistence & resume (traced June 2026)
+
+- **Persistence is dual** (`StoryManager.save_story`): a `{sanitized-title}.story` JSON file holds the `Story` plus asset/manuscript _metadata_; the asset and chapter _content_ lives in `.md` files on disk. The `.story` file is references and metadata, not prose.
+- **State is inferred, not stored** (`get_story_state`): the phase is derived by inspecting which artifacts exist — required planning assets present? chapter outlines? manuscript chapters (count vs. outlines)? final draft/EPUB? — returning `empty` / `assets_incomplete` / `chapters_not_outlined` / `chapters_not_written` / `chapters_partial` / `finalization_needed` / `complete`. There is **no saved "current phase" flag**: the artifacts _are_ the state, so it can't desync from reality.
+- **Resume dispatches on that state** (`smart_resume_story`): each state routes to the matching resume method (assets / outlines / chapters / finalize), gated by a `confirm_next_step`.
+
+This **strongly validates** JTBD "Pause and resume without losing progress" — and the artifact-derived, self-healing design is worth keeping verbatim. Two forward notes for the fork world: (a) "the exact point of incompleteness" should also mean an **unanswered fork**, not just a missing artifact — phase-only resume would silently drop a pending decision; (b) resume granularity is chapter-level today and will need to drop to **scene-level** alongside the scene tree.
