@@ -4,7 +4,7 @@ A forward-looking description of this project through the lens of every job it h
 
 > **Companion doc:** [`BEHAVIOR-SPEC.md`](BEHAVIOR-SPEC.md) is the mirror of this file — what Mythos _does today_ (as-built jobs, acceptance criteria, and BDD scenarios reverse-engineered from the code). This document is the **destination**; that one is the **current location**.
 
-Each job is stated in canonical job-story form — **[Persona] — When [situation], I want to [motivation], so I can [outcome]** — followed by the design rationale. The one persona, **Writer**, is defined in `.safeword-project/personas.md`. Jobs labeled _Integrator_ or _Maintainer_ describe deferred roles or the system itself, not personas we build for today.
+Each job is stated in canonical job-story form — **[Persona] — When [situation], I want to [motivation], so I can [outcome]** — followed by the design rationale. The one persona, **Writer**, is defined in `.safeword-project/personas.md`. Jobs labeled _Maintainer_ describe the system itself, not personas we build for today.
 
 ---
 
@@ -14,7 +14,7 @@ Mythos is a **creative tool, not a content platform** — it optimizes for the p
 
 - **Writer.** A fiction author moving from a loose idea toward a structured story and first-draft manuscript. Wants to make the _meaningful_ decisions and have the drudgery — blank-page paralysis, continuity bookkeeping, formatting — removed; the payoff is an output they feel deep ownership over. Everything optimizes for them. The Writer also _reads_ their finished work in a lean-back mode (see _Fork density is a user-controlled dial_), so "Reader" is a mode of the Writer, not a separate persona.
 
-**Deferred — roles in the forward-looking jobs below, but not personas we build for yet.** An **Integrator** (a developer driving the engine programmatically over MCP) and a **Reader** (someone consuming _other_ writers' stories) each become real only if Mythos earns its way there. Until then the only user is the Writer.
+**Deferred — not a second persona.** A **Reader** who consumes _other_ writers' stories becomes real only if Mythos earns its way into a content platform. Until then the only user is the Writer, whether they use Mythos in the web app, a desktop app, or from a chat surface like ChatGPT or Claude through MCP.
 
 ---
 
@@ -248,13 +248,13 @@ The primary surface is a mobile-first web app accessible in any browser — no i
 
 ### Use Mythos as an MCP server
 
-**Integrator (deferred)** — When I'm building my own product or workflow, I want to invoke Mythos's generation capabilities (a story, chapter, character, or bible) programmatically over an MCP server, so I can embed story creation in Claude, another assistant, or custom tooling.
+**Writer** — When I'm working from ChatGPT, Claude, or another assistant, I want to access my Mythos stories and generation tools through MCP, so I can keep creating and steering my story without leaving the conversation I'm already in.
 
-Developers and power users — a game-master generating lore, an app embedding story generation — get programmatic access to the engine without the conversational creation UI.
+MCP is a Writer access surface, not a developer persona. It lets the same Writer bring Mythos into the assistant they already use: create a concept, inspect or edit the story bible, generate a chapter, request forks, or continue a draft from chat.
 
 ### Use Mythos across multiple accounts and teams (multi-tenant)
 
-**Integrator (deferred)** — When my organization or team uses Mythos, I want isolated per-tenant data, billing, and access control with collaboration where wanted, so I can trust that our stories and data stay separate and secure.
+**Writer** — When my organization or team uses Mythos, I want isolated per-tenant data, billing, and access control with collaboration where wanted, so I can trust that our stories and data stay separate and secure.
 
 Mythos is built multi-tenant from the ground up. Each user or organization has isolated data, stories, and settings; billing, access control, and data isolation operate per-tenant; teams can collaborate on stories with appropriate permissions.
 

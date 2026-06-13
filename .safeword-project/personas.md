@@ -2,6 +2,6 @@
 
 ## Writer
 
-**Role:** A fiction author using Mythos from the command line to move from a loose idea to a structured story and first-draft manuscript.
+**Role:** A fiction author using Mythos to move from a loose idea to a structured story and first-draft manuscript.
 
-**Context:** Works in a terminal (`python -m mythos`) through a text menu, supplying a single free-text prompt describing their idea, influences, and audience. Wants to combat writer's block and the blank page. Comfortable re-running and iterating; expects work to persist to disk between sessions.
+**Context:** Works primarily in the mobile-first web app, with future access from desktop and chat surfaces such as ChatGPT or Claude through MCP. Supplies rough premises, influences, intent, and audience; makes the meaningful creative decisions; and expects Mythos to remove blank-page paralysis, continuity bookkeeping, and drafting mechanics. Wants work to persist across sessions and surfaces so the story remains theirs wherever they continue it.

@@ -23,7 +23,7 @@ Mythos is a **mobile-first consumer web app**, not a CLI. The layout is a **Bun-
 
 - `packages/core` — the generation engine (JTBD jobs, LLM calls, schemas, the story bible). **No UI.** Tests and scenarios run against this.
 - `apps/web` — the end-user app (Next.js, App Router). **First build target.**
-- `apps/mcp` — MCP server exposing the engine programmatically. **Later.**
+- `apps/mcp` — MCP server exposing Mythos to the Writer inside chat surfaces like ChatGPT or Claude. **Later.**
 
 | Concern                   | Choice                                                                                                     |
 | ------------------------- | ---------------------------------------------------------------------------------------------------------- |
