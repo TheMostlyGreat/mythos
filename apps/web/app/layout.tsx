@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description: "Turn an idea into a story you own.",
 };
 
-// Mobile-first: the primary surface is a phone browser.
+// Desktop-first prototype; later surfaces can reuse the core engine.
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
