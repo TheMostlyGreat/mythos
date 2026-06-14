@@ -28,6 +28,14 @@ These principles govern _how_ the jobs below are delivered. They exist because t
 
 So **"effortless" means mechanically effortless, never expressively effortless.** Strip the drudgery — blank-page paralysis, continuity bookkeeping, formatting, "what comes next" mechanics. Keep and actively stage the expressive decisions, because those decisions _are_ the entertainment and _are_ the source of attachment. The unit of the product is **the meaningful decision, made delightful** — not the prompt, not the chat.
 
+### Creation is the entertainment
+
+Mythos must hook the Writer before it asks for patience. Within the first minute, the Writer should see **authored proof**: a vivid reflection of their premise, a small set of sharply different directions, and one visible choice that immediately changes what Mythos shows next. The first minute is not onboarding or explanation; it is the smallest complete taste of co-creation.
+
+From there, Mythos should draw the Writer into their own rabbit hole by progressively increasing personal specificity. Each step should reveal something that feels latent in the Writer's premise — a hidden wound, forbidden desire, moral contradiction, image, voice, or consequence — then ask for one meaningful choice that makes the story more theirs. By the end of the opening scene, the Writer should not merely approve a generated sample; they should recognize a story they helped uncover and want to know what happens next.
+
+This is not a tutorial. Help is contextual and secondary. The Writer learns Mythos by watching their choices matter.
+
 ### The core loop: choose → redirect → edit
 
 Three modes of user control, in a strict hierarchy:
@@ -68,11 +76,11 @@ Crucially, dialing density down never costs agency: the expressive decisions rem
 
 Mythos conducts a conversational interview to clarify intent, stakes, tone, and genre — then synthesizes a full story concept that serves as the creative foundation for everything that follows.
 
-### Review and shape the concept before committing to generation
+### Choose the right story direction before expansion
 
-**Writer** — When a concept has been drafted but I'm not yet sure it's right, I want to react to it, ask for variations, and edit the concept document directly in conversation before any expensive generation runs, so I can commit to a direction I actually believe in.
+**Writer** — When Mythos turns my rough premise into a story concept, I want to compare alternatives, redirect the tone, and edit the concept until it feels like the story I actually want to make, so every later asset and chapter grows from a direction I believe in.
 
-The user can ask for variations, redirect the tone, or edit the concept document directly like a doc. Only then does generation proceed.
+The concept is the first major authorship checkpoint. The Writer can ask for variations, steer the creative direction, or edit the concept directly before Mythos expands it into the broader story world.
 
 ### Build a complete world before writing a single chapter
 
@@ -116,9 +124,9 @@ Writers have a complete roadmap before prose begins.
 
 ### Start with a polished opening scene before committing to chapters
 
-**Writer** — When I haven't locked the voice and tone yet, I want Mythos to generate a dedicated opening scene — a planning pass, then full prose — first, so I can anchor the rest of the manuscript to an opening I'm happy with.
+**Writer** — When I am still deciding whether this story is worth following, I want Mythos to turn my early choices into a gripping opening scene that reflects my taste and raises questions I personally want answered, so I am pulled into my own story before committing to the full manuscript.
 
-The opening scene establishes voice and tone for everything that follows and becomes the anchor for the rest of the manuscript.
+The opening scene is the first retention milestone. It establishes voice and tone, but its deeper job is to prove that creation itself is entertaining: the Writer can see their choices echoed in the prose, feel the story becoming more specific, and leave the scene with a live curiosity gap.
 
 ### Build the manuscript incrementally, chapter by chapter
 
@@ -232,9 +240,9 @@ The entertainment value of Mythos is equally in the creation process and in read
 
 ### Export the story as a publishable eBook
 
-**Writer** — When I want my story off the platform, I want Mythos to package the manuscript into a properly formatted EPUB with table of contents and chapter navigation, so I can open it in Kindle, Apple Books, or Kobo.
+**Writer** — When I want my story off the platform, I want Mythos to package the manuscript into a properly formatted EPUB and make it easy to send to my reading device, so I can open it in Kindle, Apple Books, Kobo, or another reader without fighting file-transfer mechanics.
 
-Once complete, Mythos packages the manuscript into a styled, navigable EPUB ready for the major readers.
+Once complete, Mythos packages the manuscript into a styled, navigable EPUB with table of contents and chapter navigation, then helps deliver it to the Writer's preferred reader. Kindle support should include a low-friction path such as Send to Kindle instructions, email delivery, or a direct handoff if the platform supports it; the Writer should not need to understand EPUB/MOBI/AZW compatibility details to read their story.
 
 ### Share the story with others
 
@@ -264,6 +272,12 @@ MCP is a Writer access surface, not a developer persona. It lets the same Writer
 
 Mythos is built multi-tenant from the ground up. Each user or organization has isolated data, stories, and settings; billing, access control, and data isolation operate per-tenant; teams can collaborate on stories with appropriate permissions.
 
+### Meter token usage for billing
+
+**Maintainer** — When Mythos generates work for a Writer, I want every model call metered by token usage and attributed to the right account, so Mythos can bill sustainably while preserving the Writer's creative flow.
+
+Token accounting is an internal billing primitive, not a user-facing "cost visibility" feature. V1 pricing starts with token-based billing: a free tier capped around early exploration (likely a few opening scenes, not full chapter generation), then a subscription roughly comparable to Netflix with usage overages beyond the included token allowance. Pricing should target roughly a 50% gross margin against model costs while still routing to the best model for each job.
+
 ---
 
 ## Platform — Technical Foundation
@@ -278,9 +292,9 @@ End-to-end type safety across the API, data models, and UI; one language across 
 
 ### Control API costs without sacrificing quality where it matters
 
-**Maintainer** — When different tasks need different amounts of model power, I want Mythos to route each call to the right tier (fast/cheap for analysis, medium for planning, expensive for narrative) and cache repeated system prompts, so I can keep costs down without weakening the writing where it counts.
+**Maintainer** — When different generation tasks reward different model strengths, I want Mythos to route each call to the best model for that job and cache repeated system prompts, so I can keep costs down without weakening the writing where model choice matters.
 
-Prompt caching reduces costs by up to 90% on repeated system prompts; tiered routing spends the expensive model only where quality is felt.
+Routing is based on fit, not just size: lightweight models can handle summaries and quick analysis, planning models can handle structure and asset creation, and stronger creative models can handle narrative writing or complex judgment calls. Prompt caching on Anthropic calls reduces costs by up to 90% on repeated system prompts.
 
 ### Prevent wasted work from API failures
 
@@ -288,8 +302,8 @@ Prompt caching reduces costs by up to 90% on repeated system prompts; tiered rou
 
 Transient errors retry; permanent failures surface; users never lose progress to a recoverable API hiccup.
 
-### Enable reasoning-heavy generation
+### Calibrate reasoning depth for hard creative work
 
-**Maintainer** — When a narrative problem is genuinely hard, I want Mythos to use extended thinking with a configurable token budget before producing output, so I can get well-reasoned results on complex narrative beats.
+**Maintainer** — When a narrative problem requires deeper judgment, I want Mythos to choose the right reasoning mode and effort level for the task, so complex creative decisions get enough deliberation without wasting tokens on simple work.
 
-Extended-thinking support with configurable budgets lets the AI reason deeply on complex narrative problems before producing output.
+Reasoning controls should be model-aware and current with provider APIs. Some models expose fixed thinking-token budgets; newer Anthropic models favor adaptive thinking with effort levels instead. Mythos should treat both as implementation details behind a durable routing policy: use deeper reasoning for plot logic, thematic tradeoffs, continuity repair, and difficult prose choices; keep routine summaries and formatting tasks shallow.
