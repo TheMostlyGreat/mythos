@@ -1,0 +1,7 @@
+[mcp_servers.context7]
+command = "bunx"
+args = ["@upstash/context7-mcp@latest"]
+
+[mcp_servers.playwright]
+command = "bunx"
+args = ["@playwright/mcp@latest"]
