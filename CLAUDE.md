@@ -19,16 +19,18 @@ Work happens on the `ts-rebuild` branch. The flow is **JTBD + BDD first, then im
 
 ### Stack (decided)
 
-Mythos is a **mobile-first consumer web app**, not a CLI. The layout is a **Bun-workspaces monorepo** with a surface-agnostic engine that every UI consumes:
+Mythos v1 is a **desktop-only end-user app**, not a CLI and not a mobile-first web app. The layout is a **Bun-workspaces monorepo** with a surface-agnostic engine that every UI consumes:
 
 - `packages/core` — the generation engine (JTBD jobs, LLM calls, schemas, the story bible). **No UI.** Tests and scenarios run against this.
-- `apps/web` — the end-user app (Next.js, App Router). **First build target.**
+- `apps/desktop` — the end-user desktop app. **First build target.**
+- `apps/web` — browser/mobile surface. **Later; do not build for v1.**
 - `apps/mcp` — MCP server exposing Mythos to the Writer inside chat surfaces like ChatGPT or Claude. **Later.**
 
 | Concern                   | Choice                                                                                                     |
 | ------------------------- | ---------------------------------------------------------------------------------------------------------- |
 | Runtime + package manager | **Bun** (workspaces)                                                                                       |
-| Web framework             | **Next.js 16** (App Router, React 19), mobile-first responsive                                             |
+| Desktop app               | **TBD before implementation** — choose the desktop shell before building v1 UI                             |
+| Web framework             | **Next.js 16** (App Router, React 19), deferred until the browser/mobile surface                           |
 | LLM layer                 | **Vercel AI SDK 6** behind one `core` interface; raw `@anthropic-ai/sdk` as a prompt-caching escape hatch  |
 | Schema / validation       | **Zod 4** — drives structured LLM outputs via `toJSONSchema`                                               |
 | Tests                     | **Vitest + `@amiceli/vitest-cucumber`** for BDD scenarios (`BEHAVIOR-SPEC.md`); **Playwright** for web E2E |
@@ -37,7 +39,7 @@ Mythos is a **mobile-first consumer web app**, not a CLI. The layout is a **Bun-
 
 The **Claude Agent SDK is deliberately not the spine** — it is Claude-only and built for autonomous tool-using loops, whereas Mythos is a multi-provider, human-in-the-loop generation pipeline. Reserve it for any future autonomous sub-feature (e.g. fork detection, research deep-dives). **Model IDs come from current Anthropic/OpenAI docs, never the prototype's stale list.**
 
-The workspace is **scaffolded** (`package.json`, `tsconfig.base.json`, `eslint.config.js`, `vitest.config.ts`, `packages/core`, `apps/web`). Versions pinned to what installed (June 2026): Next 16, React 19, AI SDK 6, Zod 4, TypeScript 6, ESLint 10, Vitest 4 — taken from the lockfile, not guessed. `packages/core/src/index.ts` is intentionally empty; the first job (`mythos.WR1`) gets built there against its BEHAVIOR-SPEC scenario.
+The workspace is **partially scaffolded** (`package.json`, `tsconfig.base.json`, `eslint.config.js`, `vitest.config.ts`, `packages/core`, `apps/web`). Versions pinned to what installed (June 2026): Next 16, React 19, AI SDK 6, Zod 4, TypeScript 6, ESLint 10, Vitest 4 — taken from the lockfile, not guessed. `apps/web` was scaffolded before the v1 desktop-only decision and should be treated as deferred scaffolding, not the first build target. `packages/core/src/index.ts` is intentionally empty; the first job (`mythos.WR1`) gets built there against its BEHAVIOR-SPEC scenario.
 
 ```bash
 bun install         # restore dependencies

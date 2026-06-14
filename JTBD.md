@@ -14,7 +14,7 @@ Mythos is a **creative tool, not a content platform** — it optimizes for the p
 
 - **Writer.** A fiction author moving from a loose idea toward a structured story and first-draft manuscript. Wants to make the _meaningful_ decisions and have the drudgery — blank-page paralysis, continuity bookkeeping, formatting — removed; the payoff is an output they feel deep ownership over. Everything optimizes for them. The Writer also _reads_ their finished work in a lean-back mode (see _Fork density is a user-controlled dial_), so "Reader" is a mode of the Writer, not a separate persona.
 
-**Deferred — not a second persona.** A **Reader** who consumes _other_ writers' stories becomes real only if Mythos earns its way into a content platform. Until then the only user is the Writer, whether they use Mythos in the web app, a desktop app, or from a chat surface like ChatGPT or Claude through MCP.
+**Deferred — not a second persona.** A **Reader** who consumes _other_ writers' stories becomes real only if Mythos earns its way into a content platform. Until then the only user is the Writer. For v1, the Writer uses Mythos as a desktop app; later surfaces may include web, mobile, and chat access through MCP.
 
 ---
 
@@ -240,11 +240,11 @@ Mythos provides shareable links, export formats, and access controls so users ca
 
 ## Platform — Access & Distribution
 
-### Use Mythos anywhere, on any device
+### Use Mythos as a focused desktop app first
 
-**Writer** — When I want to work wherever I am, I want Mythos as a mobile-first web app with an optional desktop app for offline or local-storage use, so I can create and read without being tied to one machine.
+**Writer** — When I am building a story, I want Mythos as a focused desktop app, so I can work in a durable, local-first creative environment without depending on a browser or mobile session.
 
-The primary surface is a mobile-first web app accessible in any browser — no install required. A local desktop app (Electron or equivalent) serves users who want offline access or local storage. Native mobile is a later target.
+The v1 surface is desktop-only. Browser, mobile, and cross-device access are later distribution surfaces for the same Writer experience, not v1 requirements.
 
 ### Use Mythos as an MCP server
 
